@@ -1,0 +1,57 @@
+# Site settings
+title: "Abdul Aziz Mandal"
+name: "Abdul Aziz Mandal"
+description: "Master’s graduate in Chemistry | Molecular Dynamics | Computational Chemistry"
+email: "abdulazizcaluniv@gmail.com"
+github_username: "AzizSimX"
+# scholar: "https://scholar.google.com/citations?user=XXXX"  # Add later if you have
+# orcid: "0000-0000-0000-0000"  # Add if you have
+
+# URL settings
+url: "https://AzizSimX.github.io"   # main url
+baseurl: ""                         # leave blank for user.github.io
+
+# Build settings
+markdown: kramdown
+theme: minimal-mistakes-jekyll
+remote_theme: "mmistakes/minimal-mistakes"   # Minimal Mistakes theme
+
+# Author profile (appears on sidebar or footer)
+author:
+  name   : "Abdul Aziz Mandal"
+  avatar : "/assets/images/profile.jpg"  # Add your photo here later
+  bio    : "Master’s in Chemistry, specializing in Physical Chemistry. Passionate about MD simulations, protein aggregation, and drug discovery."
+  location: "Kolkata, India"
+  links:
+    - label: "Email"
+      icon: "fas fa-envelope"
+      url: "mailto:abdulazizcaluniv@gmail.com"
+    - label: "GitHub"
+      icon: "fab fa-github"
+      url: "https://github.com/AzizSimX"
+    - label: "LinkedIn"
+      icon: "fab fa-linkedin"
+      url: "https://www.linkedin.com/in/"  # Add your profile link
+    - label: "Download CV"
+      icon: "fas fa-file-pdf"
+      url: "/assets/docs/CV_Abdul_Aziz_Mandal.pdf"
+
+# Navigation menu
+nav:
+  - title: "Home"
+    url: /
+  - title: "About"
+    url: /about/
+  - title: "CV"
+    url: /cv/
+  - title: "Publications"
+    url: /publications/
+  - title: "Blog"
+    url: /blog/
+
+# Plugins (useful with GitHub Pages)
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
