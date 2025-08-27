@@ -27,7 +27,7 @@ author:
       url: "https://www.linkedin.com/in/"
     - label: "Download CV"
       icon: "fas fa-file-pdf"
-      url: "/assets/docs/CV_Abdul_Aziz_Mandal.pdf"
+#      url: "/assets/docs/CV_Abdul_Aziz_Mandal.pdf"
 
 nav:
   - title: "Home"
