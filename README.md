@@ -3,8 +3,6 @@
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=azizsimx&label=Profile%20views&color=0e75b6&style=flat" alt="azizsimx" /> </p>
 
-<p align="left"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=azizsimx" alt="azizsimx" /></a> </p>
-
 - 🔭 I’m currently working on **Investigated amyloid aggregation of single amino acids and its inhibition using small molecules, with a focus on tannin compounds; also studied the eﬀect of pH on amyloid aggregation propensity. Aimed to contribute insights toward the development of therapeutic strategies for amyloid-related diseases**
 
 - 🌱 I’m currently learning **AI/ML methods to predict the aggregation of peptide molecules and their inhibition using small molecule.**
