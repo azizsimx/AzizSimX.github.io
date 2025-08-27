@@ -3,38 +3,33 @@
   <head>
     <!-- Page setup -->
     <meta charset="utf-8">
-    <title>Your title here</title>
-    <meta name="description" content="A brief description of your site for search engines">
-    <meta name="author" content="Information about the author here">
+    <title>You R. Name</title>
+    <meta name="description" content="Personal academic website of You R. Name – profile, publications, and posts.">
+    <meta name="author" content="You R. Name">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
     <link rel="icon" type="image/png" href="favicon.png">
   
     <!-- Stylesheets -->
-    <!-- Reset default styles and add support for google fonts -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" type="text/css" />
     <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
-   
-    <!-- Custom styles -->
     <link href="style.css" rel="stylesheet" type="text/css" />
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>    
-
-    <!-- Want to add Bootstrap? -->
-    <!-- Visit: https://getbootstrap.com/docs/4.3/getting-started/introduction/ -->
-    
   </head>
   
   <body>
 
     <header id="header">
-      <img src="logo.jpg">
-      <h1>Simple Website</h1>
+      <img src="prof_pic.jpg" alt="Profile Picture">
+      <h1>You R. Name</h1>
       
-      <!-- Menu link fragment #id should match a div id. Example: <a href="#home"> links to <div id="home"></div>  -->
       <ul class="main-menu">
         <li><a href="#home">home</a></li>
         <li><a href="#about">about</a></li>
+        <li><a href="#news">news</a></li>
+        <li><a href="#posts">latest posts</a></li>
+        <li><a href="#publications">publications</a></li>
         <li><a href="#contact">contact</a></li>
       </ul>                 
     </header>
@@ -46,34 +41,86 @@
           <div id="home" class="content-region hide">
             <h2>Home</h2>
             <p>
-              This is a simple website template published with Github Pages. <a href="https://github.com/cpl-makerlab/simple-website-template">Fork this repository</a> to create your own site!
+              Welcome to my academic webpage. Here you can find information about me, my research, 
+              latest posts, and selected publications.
             </p>
           </div>
           
           <div id="about" class="content-region hide">
             <h2>About</h2>
             <p>
-              Sed tempus urna et pharetra pharetra massa massa ultricies. Porttitor rhoncus dolor purus non enim praesent. Id aliquet risus feugiat in ante metus dictum. 
+              555 your office number<br>
+              123 your address street<br>
+              Your City, State 12345
+            </p>
+            <p>
+              Affiliations. Address. Contacts. Motto. Etc.
+            </p>
+            <p>
+              Write your biography here. Tell the world about yourself. Link to your favorite subreddit. 
+              You can put a picture in, too. The code is already in, just name your picture 
+              <code>prof_pic.jpg</code> and put it in the <code>img/</code> folder.
+            </p>
+            <p>
+              Put your address / P.O. box / other info right below your picture. 
+              You can also disable any of these elements by editing <code>profile</code> property of 
+              the YAML header of your <code>_pages/about.md</code>.
+            </p>
+            <p>
+              Link to your social media connections, too. This theme is set up to use 
+              <a href="https://fontawesome.com/">Font Awesome</a> and 
+              <a href="https://jpswalsh.github.io/academicons/">Academicons</a>.
             </p>
           </div>
+
+          <div id="news" class="content-region hide">
+            <h2>News</h2>
+            <ul>
+              <li>Mar 26, 2025 – a post with plotly.js</li>
+              <li>Dec 04, 2024 – a post with image galleries</li>
+              <li>May 14, 2024 – Google Gemini updates: Flash 1.5, Gemma 2 and Project Astra</li>
+              <li>Jan 15, 2016 – A simple inline announcement with Markdown emoji!</li>
+              <li>Nov 07, 2015 – A long announcement with details</li>
+              <li>Oct 22, 2015 – A simple inline announcement</li>
+            </ul>
+          </div>
+
+          <div id="posts" class="content-region hide">
+            <h2>Latest Posts</h2>
+            <p>See <a href="https://alshedivat.github.io/al-folio/blog/">my blog</a> for more.</p>
+          </div>
           
+          <div id="publications" class="content-region hide">
+            <h2>Selected Publications</h2>
+            <p>
+              <strong>Can Quantum-Mechanical Description of Physical Reality Be Considered Complete?</strong><br>
+              A. Einstein, B. Podolsky, N. Rosen. <em>Phys. Rev.</em>, 1935.<br>
+              <a href="https://doi.org/10.1103/PhysRev.47.777">DOI</a> | 
+              <a href="https://journals.aps.org/pr/abstract/10.1103/PhysRev.47.777">HTML</a> | 
+              <a href="https://alshedivat.github.io/al-folio/assets/pdf/example_pdf.pdf">PDF</a> | 
+              <a href="https://www.youtube-nocookie.com/embed/aqz-KE-bpKQ">Video</a>
+            </p>
+          </div>
+
           <div id="contact" class="content-region hide">
             <h2>Contact</h2>
+            <p>Email: <a href="mailto:you@example.com">you@example.com</a></p>
             <p>
-              Pellentesque nec nam aliquam sem et tortor consequat. Quisque sagittis purus sit amet volutpat consequat. Magna eget est lorem ipsum dolor. 
+              <a href="https://scholar.google.com/citations?user=qc6CJjYAAAAJ">Google Scholar</a> |
+              <a href="https://inspirehep.net/authors/1010907">Inspire</a> |
+              <a href="https://github.com/alshedivat/al-folio">GitHub</a> |
+              <a href="http://reddit.com/">Reddit</a>
             </p>
           </div>
-          
+
         </div>
       </div>
     </div>
 
     <footer>  
-      Footer region
+      © Copyright 2025 You R. Name. Powered by Jekyll with al-folio theme. Hosted by GitHub Pages.
     </footer>
     
-    <!-- Load additional JS scripts here -->
     <script type="text/javascript" src="script.js"></script>
-    
   </body>
 </html>
