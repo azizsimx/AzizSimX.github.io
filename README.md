@@ -1,5 +1,9 @@
 <h1 align="center">Hi 👋, I'm Abdul Aziz Mandal</h1>
-<h3 align="center">A passionate researcher from India</h3>
+<h3 align="center">A passionate researcher on computational chemistry from India</h3>
+
+<p align="left"> <img src="https://komarev.com/ghpvc/?username=azizsimx&label=Profile%20views&color=0e75b6&style=flat" alt="azizsimx" /> </p>
+
+<p align="left"> <a href="https://github.com/ryo-ma/github-profile-trophy"><img src="https://github-profile-trophy.vercel.app/?username=azizsimx" alt="azizsimx" /></a> </p>
 
 - 🔭 I’m currently working on **Investigated amyloid aggregation of single amino acids and its inhibition using small molecules, with a focus on tannin compounds; also studied the eﬀect of pH on amyloid aggregation propensity. Aimed to contribute insights toward the development of therapeutic strategies for amyloid-related diseases**
 
@@ -16,6 +20,7 @@
 <h3 align="left">Connect with me:</h3>
 <p align="left">
 <a href="https://linkedin.com/in/https://www.linkedin.com/in/abdul-aziz-mandal-804a48206" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/linked-in-alt.svg" alt="https://www.linkedin.com/in/abdul-aziz-mandal-804a48206" height="30" width="40" /></a>
+<a href="https://discord.gg/abdulaziz_63362" target="blank"><img align="center" src="https://raw.githubusercontent.com/rahuldkjain/github-profile-readme-generator/master/src/images/icons/Social/discord.svg" alt="abdulaziz_63362" height="30" width="40" /></a>
 </p>
 
 <h3 align="left">Languages and Tools:</h3>
@@ -25,3 +30,4 @@
 
 <p>&nbsp;<img align="center" src="https://github-readme-stats.vercel.app/api?username=azizsimx&show_icons=true&locale=en" alt="azizsimx" /></p>
 
+<p><img align="center" src="https://github-readme-streak-stats.herokuapp.com/?user=azizsimx&" alt="azizsimx" /></p>
