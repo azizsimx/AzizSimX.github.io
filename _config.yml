@@ -13,7 +13,7 @@ remote_theme: "mmistakes/minimal-mistakes"
 
 author:
   name   : "Abdul Aziz Mandal"
-  avatar : "/assets/images/profile.jpg"
+  avatar : "https://github.com/AzizSimX.png"
   bio    : "Master’s in Chemistry, specializing in Physical Chemistry. Passionate about MD simulations, protein aggregation, and drug discovery."
   location: "Kolkata, India"
   links:
