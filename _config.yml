@@ -8,8 +8,7 @@ url: "https://AzizSimX.github.io"
 baseurl: ""
 
 markdown: kramdown
-remote_theme: "mmistakes/minimal-mistakes@4.24.0"
-remote_theme: "mmistakes/minimal-mistakes"
+theme: jekyll-theme-minimal
 
 author:
   name   : "Abdul Aziz Mandal"
