@@ -1,123 +1,187 @@
 <!doctype html>
-<html>
-  <head>
-    <!-- Page setup -->
-    <meta charset="utf-8">
-    <title>Abdul Aziz Mandal</title>
-    <meta name="description" content="Personal academic website of Abdul Aziz Mandal – research, publications, and CV.">
-    <meta name="author" content="Abdul Aziz Mandal">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-    <link rel="icon" type="image/png" href="favicon.png">
-  
-    <!-- Stylesheets -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" type="text/css" />
-    <link href="http://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
-    <link href="style.css" rel="stylesheet" type="text/css" />
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Abdul Aziz Mandal</title>
+  <meta name="description" content="Academic website of Abdul Aziz Mandal – research, publications, projects, and CV.">
+  <meta name="author" content="Abdul Aziz Mandal">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+  <link rel="icon" type="image/png" href="favicon.png">
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>    
-  </head>
-  
-  <body>
+  <!-- Stylesheets -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
 
-    <header id="header">
-      <!-- Profile Image -->
-      <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4" 
-           alt="Profile Picture" style="border-radius:50%; width:150px; height:150px;">
-      <h1>Abdul Aziz Mandal</h1>
-      
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+
+<body>
+  <header id="header">
+    <!-- Profile Image -->
+    <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4"
+         alt="Profile Picture"
+         style="border-radius:50%; width:150px; height:150px;">
+    <h1>Abdul Aziz Mandal</h1>
+
+    <!-- Navigation Menu -->
+    <nav>
       <ul class="main-menu">
-        <li><a href="#home">home</a></li>
-        <li><a href="#about">about</a></li>
-        <li><a href="#experience">experience</a></li>
-        <li><a href="#education">education</a></li>
-        <li><a href="#skills">skills</a></li>
-        <li><a href="#awards">awards</a></li>
-        <li><a href="#contact">contact</a></li>
-      </ul>                 
-    </header>
-   
-    <div id="container">
-      <div class="inner">
-        <div id="content"> 
-          
-          <div id="home" class="content-region hide">
-            <h2>Welcome</h2>
-            <p>
-              I am a Master's graduate in Chemistry (specialization: Physical Chemistry), passionate about 
-              molecular dynamics simulations and computational chemistry. My interests include 
-              protein aggregation, protein-ligand interactions, and developing computational strategies 
-              for drug discovery.
-            </p>
-          </div>
-          
-          <div id="about" class="content-region hide">
-            <h2>About Me</h2>
-            <p>
-              I have experience in computational modeling, data analysis, and advanced use of simulation 
-              software (GROMACS, AMBER). My current research involves simulating amyloid aggregation, 
-              inhibition mechanisms, and exploring quantum computing approaches to cryptography. 
-              I aim to contribute to improving force fields using machine learning and AI, with 
-              the long-term goal of advancing computational drug discovery.
-            </p>
-          </div>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#awards">Awards</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#repositories">Repositories</a></li>
+        <li><a href="#cv">CV</a></li>
+        <li><a href="#teaching">Teaching</a></li>
+        <li><a href="#people">People</a></li>
+        <!-- Submenu -->
+        <li class="submenu">
+          <a href="#">More ▾</a>
+          <ul>
+            <li><a href="#bookshelf">Bookshelf</a></li>
+            <li><a href="#blog">Blog</a></li>
+          </ul>
+        </li>
+        <li><button id="theme-toggle">🌙 Dark/Light</button></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
 
-          <div id="experience" class="content-region hide">
-            <h2>Research Experience</h2>
-            <ul>
-              <li><strong>Project Assistant</strong>, Jadavpur University<br>
-              Investigated amyloid aggregation of single amino acids and inhibition using tannin compounds; studied pH effects on aggregation.</li>
-              
-              <li><strong>Project Student</strong>, University of Calcutta (2022)<br>
-              Quantum Cryptography project using IBM Quantum Lab & Qiskit to implement encryption methods based on quantum mechanics.</li>
-              
-              <li><strong>Project Student</strong>, University of Calcutta (2020)<br>
-              Studied effects of oral contraceptives on miRNAs and stress pathways in endometrial and ovarian cancer cells in vitro.</li>
-            </ul>
-          </div>
+  <div id="container">
+    <div class="inner">
+      <div id="content">
 
-          <div id="education" class="content-region hide">
-            <h2>Education</h2>
-            <ul>
-              <li><strong>M.S. in Chemistry</strong>, University of Calcutta (2020–2022) – 81.3% (First Class, A+)</li>
-              <li><strong>B.S. in Chemistry</strong>, Maulana Azad College, University of Calcutta (2017–2020) – 78.1% (First Class)</li>
-              <li><strong>Higher Secondary Education</strong>, Tapan High School (2015–2017) – 89.8%</li>
-              <li><strong>Secondary Education</strong>, Tapan High School (2010–2015) – 85.7%</li>
-            </ul>
-          </div>
-
-          <div id="skills" class="content-region hide">
-            <h2>Skills</h2>
-            <p>
-              GROMACS, AMBER, VMD, Chimera, GaussView, PyMol, HPC systems, Python, Julia, Fortran, AutoDock Vina, 
-              Discovery Studio, LigPlot+, IBM Qiskit, Microsoft Office.
-            </p>
-          </div>
-
-          <div id="awards" class="content-region hide">
-            <h2>Honours and Awards</h2>
-            <ul>
-              <li><strong>INSPIRE Fellowship</strong> (2023), Department of Science & Technology (DST), Govt. of India</li>
-              <li><strong>INSPIRE Scholarship for Higher Education (SHE)</strong> (2018), DST, Govt. of India</li>
-              <li><strong>IIT JAM</strong> (2020), Indian Institute of Technology Kanpur</li>
-            </ul>
-          </div>
-
-          <div id="contact" class="content-region hide">
-            <h2>Contact</h2>
-            <p>Email: <a href="mailto:abdulazizcaluniv@gmail.com">abdulazizcaluniv@gmail.com</a></p>
-            <p>GitHub: <a href="https://github.com/AzizSimX">https://github.com/AzizSimX</a></p>
-            <p>Address: Vill-Sihur, PO & PS-Tapan, Dist-Dakshin Dinajpur, Pin-733127, Balurghat, India</p>
-          </div>
-
+        <!-- Sections -->
+        <div id="home" class="content-region hide">
+          <h2>Welcome</h2>
+          <p>
+            Master's graduate in Chemistry (specialization: Physical Chemistry), passionate about molecular dynamics simulations and computational chemistry.
+          </p>
         </div>
+
+        <div id="about" class="content-region hide">
+          <h2>About Me</h2>
+          <p>
+            Experienced in computational modeling, data analysis, and advanced use of molecular dynamics software. 
+            My research interests include protein aggregation, ligand interactions, and AI-based force field development.
+          </p>
+        </div>
+
+        <div id="experience" class="content-region hide">
+          <h2>Research Experience</h2>
+          <ul>
+            <li><strong>Project Assistant</strong> – Jadavpur University: Studied amyloid aggregation and inhibition using tannin compounds.</li>
+            <li><strong>Project Student</strong> – University of Calcutta (2022): Quantum Cryptography with IBM Quantum Lab & Qiskit.</li>
+            <li><strong>Project Student</strong> – University of Calcutta (2020): Cancer biology, miRNA studies in vitro.</li>
+          </ul>
+        </div>
+
+        <div id="education" class="content-region hide">
+          <h2>Education</h2>
+          <ul>
+            <li>M.S. in Chemistry – University of Calcutta (81.3%, A+, First Class)</li>
+            <li>B.S. in Chemistry – Maulana Azad College, University of Calcutta (78.1%, First Class)</li>
+            <li>Higher Secondary – Tapan High School (89.8%)</li>
+            <li>Secondary – Tapan High School (85.7%)</li>
+          </ul>
+        </div>
+
+        <div id="skills" class="content-region hide">
+          <h2>Skills</h2>
+          <p>GROMACS, AMBER, VMD, PyMOL, HPC Systems, Python, Julia, Fortran, AutoDock Vina, IBM Qiskit.</p>
+        </div>
+
+        <div id="awards" class="content-region hide">
+          <h2>Honours and Awards</h2>
+          <ul>
+            <li>INSPIRE Fellowship – DST, Govt. of India (2023)</li>
+            <li>INSPIRE Scholarship for Higher Education – DST (2018)</li>
+            <li>IIT JAM (2020)</li>
+          </ul>
+        </div>
+
+        <div id="blog" class="content-region hide">
+          <h2>Blog</h2>
+          <p>Coming soon! 🚧</p>
+        </div>
+
+        <div id="publications" class="content-region hide">
+          <h2>Publications</h2>
+          <p>Yet to be published – check back later.</p>
+        </div>
+
+        <div id="projects" class="content-region hide">
+          <h2>Projects</h2>
+          <p>Coming soon! 🚧</p>
+        </div>
+
+        <div id="repositories" class="content-region hide">
+          <h2>Repositories</h2>
+          <p>Visit my <a href="https://github.com/AzizSimX" target="_blank">GitHub Profile</a> to explore my repositories.</p>
+        </div>
+
+        <div id="cv" class="content-region hide">
+          <h2>Curriculum Vitae</h2>
+          <p><a href="CV_Abdul_Aziz_Mandal.pdf" target="_blank">Download CV (PDF)</a></p>
+        </div>
+
+        <div id="teaching" class="content-region hide">
+          <h2>Teaching</h2>
+          <p>Coming soon – teaching experience and materials will be added here.</p>
+        </div>
+
+        <div id="people" class="content-region hide">
+          <h2>People</h2>
+          <p>Collaborators, mentors, and colleagues will be highlighted here. 🚧</p>
+        </div>
+
+        <div id="bookshelf" class="content-region hide">
+          <h2>Bookshelf</h2>
+          <p>Recommended books, papers, and resources – Coming soon!</p>
+        </div>
+
+        <div id="contact" class="content-region hide">
+          <h2>Contact</h2>
+          <p>Email: <a href="mailto:abdulazizcaluniv@gmail.com">abdulazizcaluniv@gmail.com</a></p>
+          <p>GitHub: <a href="https://github.com/AzizSimX" target="_blank">github.com/AzizSimX</a></p>
+          <p>Address: Vill-Sihur, PO & PS-Tapan, Dist-Dakshin Dinajpur, Pin-733127, Balurghat, India</p>
+        </div>
+
       </div>
     </div>
+  </div>
 
-    <footer>  
-      © 2025 Abdul Aziz Mandal. All rights reserved.
-    </footer>
-    
-    <script type="text/javascript" src="script.js"></script>
-  </body>
+  <footer>
+    © 2025 Abdul Aziz Mandal. All rights reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Show/hide sections
+    $(document).ready(function () {
+      $(".content-region").hide();
+      $("#home").show();
+
+      $(".main-menu a").click(function (e) {
+        e.preventDefault();
+        var target = $(this).attr("href");
+        $(".content-region").hide();
+        $(target).fadeIn();
+      });
+
+      // Theme toggle
+      $("#theme-toggle").click(function () {
+        $("body").toggleClass("dark-theme");
+      });
+    });
+  </script>
+</body>
 </html>
