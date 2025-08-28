@@ -1,26 +1,30 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Page setup -->
   <meta charset="utf-8">
   <title>Abdul Aziz Mandal</title>
-  <meta name="description" content="Academic website of Abdul Aziz Mandal – research, publications, projects, and CV.">
+  <meta name="description" content="Personal academic website of Abdul Aziz Mandal">
   <meta name="author" content="Abdul Aziz Mandal">
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
   <link rel="icon" type="image/png" href="favicon.png">
 
-  <!-- Google Fonts & Styles -->
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500;700&display=swap" rel="stylesheet">
-  <link href="style.css" rel="stylesheet">
+  <!-- Stylesheets -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
 
   <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
-
+  
 <body>
-  <!-- Navigation -->
+
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="nav-left"><span class="site-title">Abdul Aziz Mandal</span></div>
+    <div class="site-title">Abdul Aziz Mandal</div>
     <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
       <li><a href="#education">Education</a></li>
@@ -40,92 +44,80 @@
           <li><a href="#blog">Blog</a></li>
         </ul>
       </li>
-      <li><button id="theme-toggle">🌙</button></li>
+      <li><button id="theme-toggle">Dark/Light</button></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
 
-  <!-- Main Content -->
-  <main class="content">
+  <!-- Content -->
+  <div class="content" id="home">
+
+    <!-- About Section -->
     <section id="about" class="two-column">
       <div class="left">
-        <h1>About Me</h1>
+        <h2>About Me</h2>
         <p>
-          I am a Master's graduate in Chemistry (specialization: Physical Chemistry) with a passion for 
-          computational chemistry and molecular dynamics simulations. 
-          My research focuses on protein aggregation, protein-ligand interactions, and drug discovery 
-          through computational methods. 
+          I am a Master's graduate in Chemistry (specialization: Physical Chemistry) with a passion 
+          for computational chemistry and molecular dynamics simulations. My research focuses on 
+          protein aggregation, protein-ligand interactions, and drug discovery through computational methods.
         </p>
         <p>
-          I aim to combine machine learning, AI, and advanced simulations to improve force fields and 
-          accelerate new drug discovery.
+          I aim to combine machine learning, AI, and advanced simulations to improve force fields 
+          and accelerate new drug discovery.
         </p>
       </div>
       <div class="right">
-        <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4" 
-             alt="Profile Picture" class="profile-pic">
+        <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4" alt="Profile picture" class="profile-pic">
       </div>
     </section>
 
-    <section id="experience">
-      <h2>Research Experience</h2>
-      <ul>
-        <li><strong>Project Assistant</strong>, Jadavpur University – Studied amyloid aggregation and inhibition mechanisms using tannins.</li>
-        <li><strong>Project Student</strong>, University of Calcutta (2022) – Quantum Cryptography using IBM Quantum Lab & Qiskit.</li>
-        <li><strong>Project Student</strong>, University of Calcutta (2020) – Cancer biology research on miRNA expression.</li>
-      </ul>
-    </section>
-
-    <section id="education">
-      <h2>Education</h2>
-      <ul>
-        <li>M.S. Chemistry – University of Calcutta (2020–2022) | 81.3% First Class (A+)</li>
-        <li>B.S. Chemistry – Maulana Azad College (2017–2020) | 78.1% First Class</li>
-        <li>Higher Secondary – Tapan High School (2015–2017) | 89.8%</li>
-        <li>Secondary – Tapan High School (2010–2015) | 85.7%</li>
-      </ul>
-    </section>
-
-    <section id="skills">
-      <h2>Skills</h2>
-      <p>GROMACS, AMBER, VMD, PyMOL, Chimera, HPC Systems, Python, Julia, Fortran, AutoDock Vina, IBM Qiskit.</p>
-    </section>
-
-    <section id="awards">
-      <h2>Awards & Fellowships</h2>
-      <ul>
-        <li>INSPIRE Fellowship (DST, 2023)</li>
-        <li>INSPIRE SHE Scholarship (DST, 2018)</li>
-        <li>IIT JAM (2020)</li>
-      </ul>
-    </section>
-
-    <section id="blog"><h2>Blog</h2><p>Coming soon 🚧</p></section>
+    <!-- Placeholder Sections -->
+    <section id="experience"><h2>Experience</h2><p>Coming soon...</p></section>
+    <section id="education"><h2>Education</h2><p>Coming soon...</p></section>
+    <section id="skills"><h2>Skills</h2><p>Computational modeling, molecular dynamics, AI for force fields.</p></section>
+    <section id="awards"><h2>Awards</h2><p>Coming soon...</p></section>
+    <section id="blog"><h2>Blog</h2><p>Coming soon...</p></section>
     <section id="publications"><h2>Publications</h2><p>Yet to be published.</p></section>
-    <section id="projects"><h2>Projects</h2><p>Coming soon 🚧</p></section>
-    <section id="repositories"><h2>Repositories</h2><p>Check my <a href="https://github.com/AzizSimX" target="_blank">GitHub Profile</a>.</p></section>
-    <section id="cv"><h2>CV</h2><p><a href="CV_Abdul_Aziz_Mandal.pdf" target="_blank">Download CV (PDF)</a></p></section>
-    <section id="teaching"><h2>Teaching</h2><p>Coming soon 🚧</p></section>
-    <section id="people"><h2>People</h2><p>Collaborators and colleagues – Coming soon.</p></section>
-    <section id="bookshelf"><h2>Bookshelf</h2><p>Recommended books & resources – Coming soon.</p></section>
+    <section id="projects"><h2>Projects</h2><p>Coming soon...</p></section>
+    <section id="repositories"><h2>Repositories</h2><p><a href="https://github.com/yourusername">Visit my GitHub</a></p></section>
+    <section id="cv"><h2>CV</h2><p><a href="CV_Abdul_Aziz_Mandal.pdf" target="_blank">Download CV</a></p></section>
+    <section id="teaching"><h2>Teaching</h2><p>Coming soon...</p></section>
+    <section id="people"><h2>People</h2><p>Members of the group (coming soon).</p></section>
+    <section id="bookshelf"><h2>Bookshelf</h2><p>Coming soon...</p></section>
+    <section id="contact"><h2>Contact</h2><p>Email: yourmail@example.com</p></section>
 
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>Email: <a href="mailto:abdulazizcaluniv@gmail.com">abdulazizcaluniv@gmail.com</a></p>
-      <p>GitHub: <a href="https://github.com/AzizSimX" target="_blank">github.com/AzizSimX</a></p>
-      <p>Address: Vill-Sihur, PO & PS-Tapan, Dist-Dakshin Dinajpur, Pin-733127, Balurghat, India</p>
-    </section>
-  </main>
+  </div>
 
+  <!-- Footer -->
   <footer>
-    <p>© 2025 Abdul Aziz Mandal. All rights reserved.</p>
+    © 2025 Abdul Aziz Mandal. All rights reserved.
   </footer>
 
-  <!-- Dark/Light Mode Toggle -->
+  <!-- Back to Top Button -->
+  <button id="backToTop" title="Go to top">↑</button>
+
+  <!-- Scripts -->
   <script>
-    $("#theme-toggle").click(function () {
-      $("body").toggleClass("dark-theme");
+    // Dark/Light mode toggle
+    const toggle = document.getElementById('theme-toggle');
+    toggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
     });
+
+    // Back to Top Button
+    window.onscroll = function() {
+      let btn = document.getElementById("backToTop");
+      if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+        btn.style.display = "block";
+      } else {
+        btn.style.display = "none";
+      }
+    };
+
+    document.getElementById("backToTop").onclick = function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
   </script>
+
 </body>
 </html>
