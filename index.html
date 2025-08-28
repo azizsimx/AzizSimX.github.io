@@ -24,67 +24,73 @@
   <nav class="navbar">
     <div class="site-title">Abdul Aziz Mandal</div>
     <ul class="nav-links">
-      <li><a href="#home">Home</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#education">Education</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#awards">Awards</a></li>
-      <li><a href="#blog">Blog</a></li>
-      <li><a href="#publications">Publications</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#repositories">Repositories</a></li>
-      <li><a href="#cv">CV</a></li>
-      <li><a href="#teaching">Teaching</a></li>
-      <li><a href="#people">People</a></li>
+      <li><a href="#home" class="menu-link">Home</a></li>
+      <li><a href="#about" class="menu-link">About</a></li>
+      <li><a href="#experience" class="menu-link">Experience</a></li>
+      <li><a href="#education" class="menu-link">Education</a></li>
+      <li><a href="#skills" class="menu-link">Skills</a></li>
+      <li><a href="#awards" class="menu-link">Awards</a></li>
+      <li><a href="#blog" class="menu-link">Blog</a></li>
+      <li><a href="#publications" class="menu-link">Publications</a></li>
+      <li><a href="#projects" class="menu-link">Projects</a></li>
+      <li><a href="#repositories" class="menu-link">Repositories</a></li>
+      <li><a href="#cv" class="menu-link">CV</a></li>
+      <li><a href="#teaching" class="menu-link">Teaching</a></li>
+      <li><a href="#people" class="menu-link">People</a></li>
       <li class="submenu">
         <a href="#">More ▾</a>
         <ul>
-          <li><a href="#bookshelf">Bookshelf</a></li>
-          <li><a href="#blog">Blog</a></li>
+          <li><a href="#bookshelf" class="menu-link">Bookshelf</a></li>
+          <li><a href="#blog" class="menu-link">Blog</a></li>
         </ul>
       </li>
       <li><button id="theme-toggle">Dark/Light</button></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="#contact" class="menu-link">Contact</a></li>
     </ul>
   </nav>
 
-  <!-- Content -->
-  <div class="content" id="home">
+  <!-- Sections -->
+  <div class="content">
 
-    <!-- About Section -->
-    <section id="about" class="two-column">
-      <div class="left">
-        <h2>About Me</h2>
-        <p>
-          I am a Master's graduate in Chemistry (specialization: Physical Chemistry) with a passion 
-          for computational chemistry and molecular dynamics simulations. My research focuses on 
-          protein aggregation, protein-ligand interactions, and drug discovery through computational methods.
-        </p>
-        <p>
-          I aim to combine machine learning, AI, and advanced simulations to improve force fields 
-          and accelerate new drug discovery.
-        </p>
-      </div>
-      <div class="right">
-        <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4" alt="Profile picture" class="profile-pic">
+    <section id="home" class="content-section">
+      <h2>Welcome</h2>
+      <p>This is the personal academic website of Abdul Aziz Mandal.</p>
+    </section>
+
+    <section id="about" class="content-section hide">
+      <div class="two-column">
+        <div class="left">
+          <h2>About Me</h2>
+          <p>
+            I am a Master's graduate in Chemistry (specialization: Physical Chemistry) with a passion 
+            for computational chemistry and molecular dynamics simulations. My research focuses on 
+            protein aggregation, protein-ligand interactions, and drug discovery through computational methods.
+          </p>
+          <p>
+            I aim to combine machine learning, AI, and advanced simulations to improve force fields 
+            and accelerate new drug discovery.
+          </p>
+        </div>
+        <div class="right">
+          <img src="https://avatars.githubusercontent.com/u/142770910?s=400&u=abd30d89501fa5fb01ebb6a85882c8be7ebf3f82&v=4" 
+               alt="Profile picture" class="profile-pic">
+        </div>
       </div>
     </section>
 
-    <!-- Placeholder Sections -->
-    <section id="experience"><h2>Experience</h2><p>Coming soon...</p></section>
-    <section id="education"><h2>Education</h2><p>Coming soon...</p></section>
-    <section id="skills"><h2>Skills</h2><p>Computational modeling, molecular dynamics, AI for force fields.</p></section>
-    <section id="awards"><h2>Awards</h2><p>Coming soon...</p></section>
-    <section id="blog"><h2>Blog</h2><p>Coming soon...</p></section>
-    <section id="publications"><h2>Publications</h2><p>Yet to be published.</p></section>
-    <section id="projects"><h2>Projects</h2><p>Coming soon...</p></section>
-    <section id="repositories"><h2>Repositories</h2><p><a href="https://github.com/yourusername">Visit my GitHub</a></p></section>
-    <section id="cv"><h2>CV</h2><p><a href="CV_Abdul_Aziz_Mandal.pdf" target="_blank">Download CV</a></p></section>
-    <section id="teaching"><h2>Teaching</h2><p>Coming soon...</p></section>
-    <section id="people"><h2>People</h2><p>Members of the group (coming soon).</p></section>
-    <section id="bookshelf"><h2>Bookshelf</h2><p>Coming soon...</p></section>
-    <section id="contact"><h2>Contact</h2><p>Email: yourmail@example.com</p></section>
+    <section id="experience" class="content-section hide"><h2>Experience</h2><p>Coming soon...</p></section>
+    <section id="education" class="content-section hide"><h2>Education</h2><p>Coming soon...</p></section>
+    <section id="skills" class="content-section hide"><h2>Skills</h2><p>Computational modeling, molecular dynamics, AI for force fields.</p></section>
+    <section id="awards" class="content-section hide"><h2>Awards</h2><p>Coming soon...</p></section>
+    <section id="blog" class="content-section hide"><h2>Blog</h2><p>Coming soon...</p></section>
+    <section id="publications" class="content-section hide"><h2>Publications</h2><p>Yet to be published.</p></section>
+    <section id="projects" class="content-section hide"><h2>Projects</h2><p>Coming soon...</p></section>
+    <section id="repositories" class="content-section hide"><h2>Repositories</h2><p><a href="https://github.com/yourusername">Visit my GitHub</a></p></section>
+    <section id="cv" class="content-section hide"><h2>CV</h2><p><a href="CV_Abdul_Aziz_Mandal.pdf" target="_blank">Download CV</a></p></section>
+    <section id="teaching" class="content-section hide"><h2>Teaching</h2><p>Coming soon...</p></section>
+    <section id="people" class="content-section hide"><h2>People</h2><p>Members of the group (coming soon).</p></section>
+    <section id="bookshelf" class="content-section hide"><h2>Bookshelf</h2><p>Coming soon...</p></section>
+    <section id="contact" class="content-section hide"><h2>Contact</h2><p>Email: yourmail@example.com</p></section>
 
   </div>
 
@@ -113,11 +119,33 @@
         btn.style.display = "none";
       }
     };
-
     document.getElementById("backToTop").onclick = function() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+
+    // Show only clicked section
+    const links = document.querySelectorAll(".menu-link");
+    const sections = document.querySelectorAll(".content-section");
+
+    links.forEach(link => {
+      link.addEventListener("click", function(e) {
+        e.preventDefault();
+        const target = this.getAttribute("href").substring(1);
+
+        sections.forEach(sec => sec.classList.add("hide"));
+        document.getElementById(target).classList.remove("hide");
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
   </script>
+
+  <style>
+    /* Hide class for sections */
+    .hide {
+      display: none;
+    }
+  </style>
 
 </body>
 </html>
