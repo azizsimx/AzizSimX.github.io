@@ -177,3 +177,39 @@ footer {
     margin: 5px 0;
   }
 }
+
+
+/* ---------- Animated Gradient Background ---------- */
+body {
+  background: linear-gradient(-45deg, #e0e0f0, #d0f0e0, #f0e0d0, #e0d0f0);
+  background-size: 400% 400%;
+  animation: gradientBG 18s ease infinite;
+  transition: background 0.5s ease;
+}
+
+/* Dark mode background */
+body.dark-theme {
+  background: linear-gradient(-45deg, #0f0f1a, #1a1f2f, #222833, #141414);
+  background-size: 400% 400%;
+  animation: gradientBG 20s ease infinite;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Ensure content readability */
+.content, nav, footer {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+  border-radius: 8px;
+}
+
+body.dark-theme .content,
+body.dark-theme nav,
+body.dark-theme footer {
+  background: rgba(18, 18, 18, 0.85);
+  color: #eee;
+}
