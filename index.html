@@ -149,32 +149,14 @@
   <section id="repositories" class="content-section hide">
     <h2>Repositories</h2>
 
-    <h3 align="center">Hi 👋, I'm Abdul Aziz Mandal</h3>
-    <h4 align="center">A passionate researcher in computational chemistry from India</h4>
 
     <!-- Profile views -->
     <p align="center">
       <img src="https://komarev.com/ghpvc/?username=azizsimx&label=Profile%20views&color=0e75b6&style=flat" alt="azizsimx" />
     </p>
 
-    <!-- Research Focus -->
-    <p>
-      🔭 I’m currently working on <b>amyloid aggregation of single amino acids and its inhibition using small molecules (tannin compounds); also studied pH effects on aggregation.</b>
-    </p>
-    <p>
-      🌱 I’m currently learning <b>AI/ML methods to predict peptide aggregation and inhibition by small molecules.</b>
-    </p>
-    <p>
-      👯 Looking to collaborate on <b>AI + MD simulations for drug discovery and protein dynamics.</b>
-    </p>
-    <p>
-      🤝 I’m seeking help with <b>aggregation of small molecules and their pH-dependent behavior using AI/ML.</b>
-    </p>
     <p>
       👨‍💻 All my projects are available at: <a href="https://github.com/AzizSimX" target="_blank">GitHub Profile</a>
-    </p>
-    <p>
-      📫 Reach me at: <b>abdulazizcaluniv@gmail.com</b>
     </p>
 
     <!-- Social Links -->
@@ -214,6 +196,44 @@
       <img src="https://github-readme-stats.vercel.app/api?username=azizsimx&show_icons=true&locale=en" alt="GitHub Stats"/>
       <img src="https://github-readme-streak-stats.herokuapp.com/?user=azizsimx" alt="GitHub Streak"/>
     </div>
+    
+
+    <!-- Dynamic Repositories Grid -->
+    <h3 style="margin-top:40px;">My GitHub Projects</h3>
+    <div id="repo-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+      <!-- Repositories will be loaded here -->
+    </div>
+  </section>
+
+  <script>
+  // Fetch repos from GitHub API
+  async function loadRepos() {
+    const response = await fetch("https://api.github.com/users/AzizSimX/repos?sort=updated");
+    const repos = await response.json();
+    const repoList = document.getElementById("repo-list");
+
+    repos.forEach(repo => {
+      const card = document.createElement("div");
+      card.style.border = "1px solid #444";
+      card.style.borderRadius = "10px";
+      card.style.padding = "15px";
+      card.style.background = "rgba(0,0,0,0.6)";
+      card.style.color = "white";
+      card.style.boxShadow = "0 4px 10px rgba(0,0,0,0.5)";
+
+      card.innerHTML = `
+        <h4><a href="${repo.html_url}" target="_blank" style="color:#4da6ff; text-decoration:none;">${repo.name}</a></h4>
+        <p>${repo.description ? repo.description : "No description available."}</p>
+        <p>⭐ ${repo.stargazers_count} | 🍴 ${repo.forks_count}</p>
+        <p>Updated: ${new Date(repo.updated_at).toLocaleDateString()}</p>
+      `;
+
+      repoList.appendChild(card);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", loadRepos);
+  </script>
   </section>
 
 
