@@ -397,16 +397,35 @@
     display: inline-block;
   }
 
-  .icon {
-    width: 50px;  /* Change size as needed */
-    height: 50px; /* Change size as needed */
-    filter: grayscale(100%); /* Black and white */
-    transition: transform 0.3s; filter 0.3s;
+  /* Specific brand colors */
+  .icon[alt="LinkedIn"] {
+    background-color: #0A66C2; /* LinkedIn blue */
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .icon[alt="GitHub"] {
+    background-color: #333333; /* GitHub dark grey */
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .icon[alt="GitHub.io"] {
+    background-color: #333333; /* Same as GitHub */
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .icon[alt="Discord"] {
+    background-color: #5865F2; /* Discord violet */
+    border-radius: 8px;
+    padding: 5px;
+  }
+  .icon[alt="Gmail"] {
+    background-color: #FFFFFF; /* Gmail white background */
+    border-radius: 8px;
+    padding: 5px;
   }
 
   .icon:hover {
     transform: scale(1.2); /* Slight zoom on hover */
-    filter: grayscale(0%); /* Restore color on hover */
   }
 
     /* Global font size */
