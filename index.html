@@ -400,11 +400,13 @@
   .icon {
     width: 50px;  /* Change size as needed */
     height: 50px; /* Change size as needed */
-    transition: transform 0.3s;
+    filter: grayscale(100%); /* Black and white */
+    transition: transform 0.3s; filter 0.3s;
   }
 
   .icon:hover {
     transform: scale(1.2); /* Slight zoom on hover */
+    filter: grayscale(0%); /* Restore color on hover */
   }
 
     /* Global font size */
