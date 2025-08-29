@@ -11,7 +11,7 @@
 
 - 🤝 I’m looking for help with **aggregation of small molecules and their changes in aggregation on pH using the help of AI/ML method.**
 
-- 👨‍💻 All of my projects are available at [https://github.com/AzizSimX](https://github.com/AzizSimX)
+- 👨‍💻 All of my projects are available at [https://github.com/AzizSimX](https://github.com/AzizSimX) / https://azizsimx.github.io/
 
 - 📫 How to reach me **abdulazizcaluniv@gmail.com**
 
