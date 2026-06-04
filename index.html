@@ -1229,7 +1229,7 @@
     <li><button onclick="showPage('research')" data-page="research">Research</button></li>
     <li><button onclick="showPage('publications')" data-page="publications">Publications</button></li>
     <li><button onclick="showPage('team')"   data-page="team">Team</button></li>
-    <li><button onclick="showPage('positions')" data-page="positions">Positions</button></li>
+    <li><button onclick="showPage('positions')" data-page="positions">Software & Tutorials</button></li>
     <li><button onclick="showPage('collaborators')" data-page="collaborators">Collaborators</button></li>
     <li><button onclick="showPage('contact')" data-page="contact">Contact</button></li>
   </ul>
@@ -1245,7 +1245,7 @@
   <button onclick="showPage('research');toggleMobile()"      data-mob="research">Research</button>
   <button onclick="showPage('publications');toggleMobile()"  data-mob="publications">Publications</button>
   <button onclick="showPage('team');toggleMobile()"          data-mob="team">Team</button>
-  <button onclick="showPage('positions');toggleMobile()"     data-mob="positions">Positions</button>
+  <button onclick="showPage('positions');toggleMobile()" data-mob="positions">Software & Tutorials</button>
   <button onclick="showPage('collaborators');toggleMobile()" data-mob="collaborators">Collaborators</button>
   <button onclick="showPage('contact');toggleMobile()"       data-mob="contact">Contact</button>
 </div>
@@ -1281,7 +1281,7 @@
       <div class="home-cta">
         <button class="btn-primary" onclick="showPage('research')">Explore Research</button>
         <button class="btn-outline" onclick="showPage('about')">About Me</button>
-        <button class="btn-outline" onclick="showPage('positions')">Join Me</button>
+        <button class="btn-outline" onclick="showPage('positions')">Software & Tutorials</button>
       </div>
     </div>
 
@@ -1798,47 +1798,128 @@ encryption key easily.</div>
   </footer>
 </div>
 
-<!-- ══ POSITIONS PAGE ════════════════════════════════════════════════ -->
+<!-- ══ SOFTWARE & TUTORIALS PAGE ═══════════════════════════ -->
 <div class="page" id="page-positions">
   <div class="page-header">
-    <p class="section-label">Opportunities</p>
-    <h1 class="page-title"><em>Positions</em></h1>
+    <p class="section-label">Resources</p>
+    <h1 class="page-title">Software & <em>Tutorials</em></h1>
   </div>
 
   <div class="page-body">
-    <p class="text-muted" style="max-width:600px; margin-bottom:3rem;">
-      Positions will be listed here as they open. If you are interested in computational biophysics,
-      molecular dynamics, or ML-driven simulation methods, feel free to reach out.
-    </p>
 
-    <!--
-      ✏️ HOW TO ACTIVATE A POSITION:
-      Replace "Coming Soon" text and update the button accordingly.
-    -->
     <div class="positions-grid">
 
       <div class="position-card">
-        <span class="position-badge">Coming Soon</span>
-        <h3>Comin Soon</h3>
-        <p>Comin Soon</p>
-        <button class="btn-outline" onclick="showPage('contact')">Enquire →</button>
+        <div class="position-badge">MD Simulations</div>
+        <h3>GROMACS Tutorials</h3>
+        <p>Step-by-step molecular dynamics tutorials for beginners and advanced users.</p>
+        <a href="http://www.mdtutorials.com/gmx/" target="_blank" class="btn-outline">Open Resource</a>
       </div>
 
       <div class="position-card">
-        <span class="position-badge">Coming Soon</span>
-        <h3>Comin Soon</h3>
-        <p>Comin Soon</p>
-        <button class="btn-outline" onclick="showPage('contact')">Contact →</button>
+        <div class="position-badge">Software</div>
+        <h3>All GROMACS Versions</h3>
+        <p>Official archive containing all released versions of GROMACS.</p>
+        <a href="https://ftp.gromacs.org/pub/gromacs/" target="_blank" class="btn-outline">Download</a>
       </div>
 
       <div class="position-card">
-        <span class="position-badge">Open</span>
-        <h3>Short-term Projects</h3>
-        <p>Interested in a project collaboration, summer internship, or research visit? Write to me with your background and interests.</p>
-        <button class="btn-primary" onclick="showPage('contact')">Write to Me →</button>
+        <div class="position-badge">Visualization</div>
+        <h3>VMD / QwikMD Tutorials</h3>
+        <p>Learn molecular visualization, trajectory analysis, and simulation setup.</p>
+        <a href="https://www.ks.uiuc.edu/Training/Tutorials/" target="_blank" class="btn-outline">Open Tutorial</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Coarse-Grained MD</div>
+        <h3>MARTINI Tutorials</h3>
+        <p>Tutorials and examples for MARTINI coarse-grained simulations.</p>
+        <a href="http://cgmartini.nl/index.php/tutorials" target="_blank" class="btn-outline">Open Tutorial</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">System Builder</div>
+        <h3>CHARMM-GUI</h3>
+        <p>Web-based platform for preparing simulation-ready biomolecular systems.</p>
+        <a href="https://www.charmm-gui.org" target="_blank" class="btn-outline">Open Website</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Protein Structure</div>
+        <h3>AlphaFold Database</h3>
+        <p>Predicted protein structures generated using AlphaFold.</p>
+        <a href="https://alphafold.ebi.ac.uk" target="_blank" class="btn-outline">Browse Database</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Chemistry News</div>
+        <h3>C&EN</h3>
+        <p>Latest news and developments in chemistry and related sciences.</p>
+        <a href="https://cen.acs.org" target="_blank" class="btn-outline">Read News</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">LaTeX</div>
+        <h3>Tables Generator</h3>
+        <p>Create publication-quality LaTeX tables online.</p>
+        <a href="https://www.tablesgenerator.com" target="_blank" class="btn-outline">Open Tool</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">LaTeX</div>
+        <h3>Special Characters Guide</h3>
+        <p>Reference for LaTeX symbols and special character formatting.</p>
+        <a href="https://en.wikibooks.org/wiki/LaTeX/Special_Characters" target="_blank" class="btn-outline">View Guide</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Nucleic Acids</div>
+        <h3>Build DNA/RNA Structures</h3>
+        <p>Create custom DNA and RNA PDB structures from user-defined sequences.</p>
+        <a href="https://mmb.irbbarcelona.org/NAFlex/" target="_blank" class="btn-outline">NAFlex</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Nucleic Acids</div>
+        <h3>DNA Builder</h3>
+        <p>Generate canonical DNA structures for simulations and modeling.</p>
+        <a href="http://www.scfbio-iitd.res.in/software/drugdesign/bdna.jsp" target="_blank" class="btn-outline">Open Tool</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Protein Analysis</div>
+        <h3>MetaDisorder</h3>
+        <p>Predict intrinsically disordered regions in proteins.</p>
+        <a href="http://iimcb.genesilico.pl/metadisorder/" target="_blank" class="btn-outline">Run Prediction</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Phase Separation</div>
+        <h3>PSPredictor</h3>
+        <p>Predict liquid–liquid phase separation propensity of proteins.</p>
+        <a href="http://www.pkumdl.cn:8000/PSPredictor/" target="_blank" class="btn-outline">Run Prediction</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Force Fields</div>
+        <h3>CHARMM FF for GROMACS</h3>
+        <p>Official CHARMM force-field distributions compatible with GROMACS.</p>
+        <a href="http://mackerell.umaryland.edu/charmm_ff.shtml#gromacs" target="_blank" class="btn-outline">Download FF</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Enhanced Sampling</div>
+        <h3>PLUMED Documentation</h3>
+        <p>Comprehensive documentation for collective variables and enhanced sampling methods.</p>
+        <a href="https://www.plumed.org/doc-v2.8/user-doc/html/index.html" target="_blank" class="btn-outline">Read Docs</a>
       </div>
 
     </div>
+
+    <div class="info-callout">
+      A curated collection of molecular simulation software, databases, tutorials, force fields, and computational chemistry resources frequently used in our research workflow.
+    </div>
+
   </div>
 
   <footer>
