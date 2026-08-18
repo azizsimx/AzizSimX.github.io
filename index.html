@@ -1567,6 +1567,31 @@ encryption key easily.</div>
     <p class="section-label">Research Themes</p>
     <h1 class="page-title">Core <em>Focus Areas</em></h1>
   </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Protein Viewer</title>
+  <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+  <style>
+    #viewer { width: 500px; height: 420px; position: relative; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div id="viewer"></div>
+
+  <script>
+    let viewer = $3Dmol.createViewer("viewer", { backgroundColor: "white" });
+
+    $3Dmol.download("pdb:1MO8", viewer, {}, function () {
+      viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+      viewer.zoomTo();
+      viewer.spin("y", 1);   // gentle continuous rotation
+      viewer.render();
+    });
+  </script>
+</body>
+</html>
 
   <div class="page-body">
     <div class="research-grid">
