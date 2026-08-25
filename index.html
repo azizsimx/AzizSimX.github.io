@@ -3367,6 +3367,25 @@ nav{
     box-sizing: border-box;
   }
 }
+
+.publication-card {
+    animation: fadeIn 0.3s ease;
+}
+
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}   
    
 /* ═══════════════════════════════════════════════════════════════
    TEAM PAGE
@@ -5450,13 +5469,53 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
     <h1 class="page-title">Publications &amp; <em>Preprints</em></h1>
   </div>
 
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const filterButtons = document.querySelectorAll(".pub-filter-btn");
+  const publications = document.querySelectorAll(".publication-card");
+
+  filterButtons.forEach(button => {
+
+    button.addEventListener("click", function () {
+
+      // Remove active class from all buttons
+      filterButtons.forEach(btn => btn.classList.remove("active"));
+
+      // Add active class to clicked button
+      this.classList.add("active");
+
+      const filter = this.getAttribute("data-filter");
+
+      publications.forEach(card => {
+
+        const category = card.getAttribute("data-category");
+
+        if (filter === "all" || category === filter) {
+          card.style.display = "flex";
+        } 
+        else {
+          card.style.display = "none";
+        }
+
+      });
+
+    });
+
+  });
+
+});
+</script>
+
   <div class="page-body">
 
-    <div class="pub-filters" aria-label="Publication filters">
-      <button class="pub-filter-btn active" data-filter="all">All</button>
-      <button class="pub-filter-btn" data-filter="journal">Journal Articles</button>
-      <button class="pub-filter-btn" data-filter="upcoming">Upcoming</button>
-    </div>
+<div class="pub-filters" aria-label="Publication filters">
+  <button class="pub-filter-btn active" data-filter="all">All</button>
+  <button class="pub-filter-btn" data-filter="journal">Journal Articles</button>
+  <button class="pub-filter-btn" data-filter="upcoming">Upcoming</button>
+  <button class="pub-filter-btn" data-filter="preprints">Preprints</button>
+  <button class="pub-filter-btn" data-filter="conference">Conference</button>
+</div>
 
     <!--
       ✏️ HOW TO ADD A PUBLICATION:
@@ -5555,7 +5614,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
     </div>
 
     <h3 class="pub-title">
-      Your Second Paper Title Will Appear Here
+      Title Will Appear Here
     </h3>
 
     <div class="pub-authors">
@@ -5580,7 +5639,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
         href="https://azizsimx.github.io/#"
         class="view-paper"
       >
-        DOI Coming Soon
+        DOI
         <span>↗</span>
       </a>
 
@@ -5611,7 +5670,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
     </div>
 
     <h3 class="pub-title">
-      Your Third Paper Title Will Appear Here
+      Title Will Appear Here
     </h3>
 
     <div class="pub-authors">
@@ -5636,7 +5695,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
         href="https://azizsimx.github.io/#"
         class="view-paper"
       >
-        DOI Coming Soon
+        DOI
         <span>↗</span>
       </a>
 
