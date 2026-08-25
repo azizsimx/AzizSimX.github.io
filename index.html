@@ -996,7 +996,73 @@
   }
 
   .position-card p { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.first-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 
+  padding: 7px 14px;
+  border-radius: 999px;
+
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+
+  color: #fff3b0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.22),
+    rgba(251, 191, 36, 0.10)
+  );
+
+  border: 1px solid rgba(251, 191, 36, 0.45);
+
+  box-shadow:
+    0 0 18px rgba(245, 158, 11, 0.12);
+}
+
+
+/* Your name */
+.my-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #4ade80 !important;
+
+  font-weight: 800;
+
+  text-shadow:
+    0 0 16px rgba(74, 222, 128, 0.18);
+}
+
+
+/* Small badge beside your name */
+.author-position {
+  display: inline-block;
+
+  padding: 3px 8px;
+
+  border-radius: 6px;
+
+  font-size: 0.62rem;
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+
+  color: #0f172a;
+
+  background: linear-gradient(
+    135deg,
+    #facc15,
+    #fb923c
+  );
+
+  text-transform: uppercase;
+
+  text-shadow: none;
+}
   /* ══════════════════════════════════════
      COLLABORATORS PAGE
   ══════════════════════════════════════ */
@@ -1696,75 +1762,35 @@ encryption key easily.</div>
         pub-journal → journal name + volume/pages
         pub-link  → DOI URL
     -->
-<section class="publication-card">
+<div class="pub-tags">
+  <span class="first-author">
+    ★ 1st Author
+  </span>
 
-  <!-- Date -->
-  <div class="publication-date">
-    <span class="date-day">24</span>
-    <span class="date-month">AUG</span>
-    <span class="date-year">2026</span>
-  </div>
+  <span class="journal-tag">
+    J. Phys. Chem. B
+  </span>
+</div>
 
-  <!-- Main Content -->
-  <div class="publication-content">
+<h3 class="pub-title">
+  Mechanistic Role of Different Functional Groups in Inhibiting
+  Tryptophan Self-Assembly:
+  <span>
+    Comparison between Aromatic and Nonaromatic
+    Hydroxyl Moiety-Rich Chemical Compounds
+  </span>
+</h3>
 
-    <div class="publication-meta">
-      <span class="author-badge">
-        <span class="star">★</span>
-        First Author
-      </span>
+<div class="pub-authors">
+  <strong class="my-name">
+    Abdul Aziz Mandal
+    <span class="author-position">1st Author</span>
+  </strong>
 
-      <span class="journal-badge">
-        J. Phys. Chem. B
-      </span>
-    </div>
-
-    <h3 class="publication-title">
-      Mechanistic Role of Different Functional Groups in Inhibiting
-      Tryptophan Self-Assembly:
-      <span>
-        Comparison between Aromatic and Nonaromatic
-        Hydroxyl Moiety-Rich Chemical Compounds
-      </span>
-    </h3>
-
-    <p class="publication-authors">
-      <strong>Abdul Aziz Mandal</strong>
-      <span>·</span>
-      Sudipta Mitra
-      <span>·</span>
-      Suman Chakrabarty
-      <span>·</span>
-      Ranjit Biswas*
-    </p>
-
-    <div class="publication-bottom">
-
-      <div class="journal-info">
-        <span class="journal-name">
-          The Journal of Physical Chemistry B
-        </span>
-
-        <span class="journal-details">
-          Volume(Issue) · Pages
-        </span>
-      </div>
-
-      <a
-        href="https://doi.org/10.1021/acs.jpcb.6c03238"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="publication-button"
-      >
-        <span>View Publication</span>
-        <span class="button-arrow">↗</span>
-      </a>
-
-    </div>
-
-  </div>
-
-</section>
+  <span>· Sudipta Mitra</span>
+  <span>· Suman Chakrabarty</span>
+  <span>· Ranjit Biswas*</span>
+</div>
 
       <li class="pub-item">
         <span class="pub-year">Coming<br>Soon</span>
