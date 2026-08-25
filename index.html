@@ -1774,59 +1774,989 @@
   <button onclick="showPage('contact');toggleMobile()"       data-mob="contact">Contact</button>
 </div>
 
-<!-- ══ HOME PAGE ════════════════════════════════════════════════════ -->
-<div class="page active" id="page-home">
-  <div class="home-canvas"></div>
-  <div class="home-grid"></div>
+/* =========================================================
+   COLORFUL HOME PAGE
+   ========================================================= */
 
-  <!-- Floating particles -->
-  <div class="molecule" style="left:8%;  width:4px; height:4px; animation-duration:16s; animation-delay:0s;"></div>
-  <div class="molecule" style="left:22%; width:6px; height:6px; animation-duration:20s; animation-delay:3s;"></div>
-  <div class="molecule" style="left:40%; width:3px; height:3px; animation-duration:13s; animation-delay:7s;"></div>
-  <div class="molecule" style="left:58%; width:8px; height:8px; animation-duration:18s; animation-delay:1s; opacity:0.12;"></div>
-  <div class="molecule" style="left:74%; width:5px; height:5px; animation-duration:22s; animation-delay:5s;"></div>
-  <div class="molecule" style="left:88%; width:4px; height:4px; animation-duration:14s; animation-delay:9s;"></div>
+#page-home {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
 
-  <div class="home-content">
-    <!-- Left: text -->
-    <div>
-      <p class="home-eyebrow">Computational (Bio)physical Chemistry · SNBNCBS · Est. 2023</p>
-      <h1 class="home-title">
-       Decode Life<br>
-        at the<br>
-       Molecular Level<br>
-      </h1>
-      <p class="home-name">Abdul Aziz Mandal — Research Scholar</p>
-      <p class="home-desc">
-        Working at the intersection of computational chemistry, biophysics, and machine learning
-        to unravel molecular aggregation pathways and interactions of complex biological systems at
-        S.N. Bose National Centre for Basic Sciences, Kolkata.
-      </p>
-      <div class="home-cta">
-        <button class="btn-primary" onclick="showPage('research')">Explore Research</button>
-        <button class="btn-outline" onclick="showPage('about')">About Me</button>
-        <button class="btn-outline" onclick="showPage('positions')">Software & Tutorials</button>
-      </div>
-    </div>
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(34, 211, 238, 0.10),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(139, 92, 246, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 75% 80%,
+      rgba(236, 72, 153, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 20% 85%,
+      rgba(245, 158, 11, 0.06),
+      transparent 28%
+    ),
+    #070b14;
+}
 
-    <!-- Right: photo card -->
-    <div class="home-photo-card">
-      <div class="home-photo-frame">
-        <img src="./pic_git.jpeg" alt="Abdul Aziz Mandal">
-      </div>
-      <div class="home-info-chips">
-        <div class="chip"><div class="chip-dot"></div>PhD Scholar, S. N. Bose National Centre for Basic Sciences</div>
-        <div class="chip"><div class="chip-dot"></div>Kolkata, India</div>
-        <div class="chip"><div class="chip-dot"></div>MD Simulation · ML · Enhanced Sampling</div>
-      </div>
-    </div>
-  </div>
 
-  <div class="scroll-hint">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
-  </div>
-</div>
+/* =========================
+   COLORFUL TOP LINE
+========================= */
+
+#page-home::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f59e0b,
+    #22c55e
+  );
+
+  z-index: 20;
+}
+
+
+/* =========================
+   BACKGROUND GLOWS
+========================= */
+
+#page-home::after {
+  content: "";
+
+  position: absolute;
+
+  width: 460px;
+  height: 460px;
+
+  right: -180px;
+  top: 80px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #8b5cf6,
+    #ec4899
+  );
+
+  filter: blur(140px);
+  opacity: 0.13;
+
+  pointer-events: none;
+}
+
+
+/* second background glow */
+
+.home-canvas::before {
+  content: "";
+
+  position: absolute;
+
+  width: 380px;
+  height: 380px;
+
+  left: -150px;
+  bottom: -100px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #3b82f6
+  );
+
+  filter: blur(130px);
+  opacity: 0.12;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   GRID BACKGROUND
+========================= */
+
+.home-grid {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 55px 55px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.85),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   HOME CONTENT
+========================= */
+
+.home-content {
+  position: relative;
+  z-index: 5;
+
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+
+  align-items: center;
+
+  gap: 70px;
+
+  width: min(1200px, 90%);
+
+  min-height: 100vh;
+
+  margin: 0 auto;
+
+  padding: 110px 0 90px;
+}
+
+
+/* =========================
+   EYEBROW
+========================= */
+
+.home-eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0 0 22px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #a5f3fc;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.12),
+      rgba(59, 130, 246, 0.08)
+    );
+
+  border:
+    1px solid rgba(34, 211, 238, 0.24);
+
+  box-shadow:
+    0 0 25px rgba(34, 211, 238, 0.06);
+}
+
+
+/* small colorful dot */
+
+.home-eyebrow::before {
+  content: "";
+
+  width: 7px;
+  height: 7px;
+
+  margin-right: 9px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 12px #22d3ee;
+}
+
+
+/* =========================
+   MAIN TITLE
+========================= */
+
+.home-title {
+  margin: 0;
+
+  font-size: clamp(3.2rem, 6.5vw, 6.8rem);
+
+  line-height: 0.97;
+
+  letter-spacing: -0.055em;
+
+  font-weight: 850;
+
+  background: linear-gradient(
+    120deg,
+    #f8fafc 0%,
+    #67e8f9 24%,
+    #60a5fa 43%,
+    #a78bfa 62%,
+    #f472b6 82%,
+    #fbbf24 100%
+  );
+
+  background-size: 180% auto;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+  text-shadow:
+    0 0 45px rgba(139, 92, 246, 0.08);
+
+  animation: homeTitleGradient 8s ease infinite;
+}
+
+
+@keyframes homeTitleGradient {
+  0% {
+    background-position: 0% center;
+  }
+
+  50% {
+    background-position: 100% center;
+  }
+
+  100% {
+    background-position: 0% center;
+  }
+}
+
+
+/* =========================
+   NAME
+========================= */
+
+.home-name {
+  margin-top: 28px;
+  margin-bottom: 0;
+
+  font-size: 1.08rem;
+  font-weight: 750;
+
+  color: #f8fafc;
+}
+
+
+.home-name::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 28px;
+  height: 2px;
+
+  margin-right: 10px;
+
+  vertical-align: middle;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #a78bfa,
+    #f472b6
+  );
+}
+
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.home-desc {
+  max-width: 680px;
+
+  margin-top: 20px;
+
+  font-size: 1rem;
+  line-height: 1.85;
+
+  color: #94a3b8;
+}
+
+
+/* =========================
+   BUTTON GROUP
+========================= */
+
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+
+/* PRIMARY BUTTON */
+
+.home-cta .btn-primary {
+  position: relative;
+
+  padding: 13px 21px;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 0.88rem;
+  font-weight: 750;
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #8b5cf6,
+    #ec4899
+  );
+
+  box-shadow:
+    0 12px 30px rgba(139, 92, 246, 0.24);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+
+.home-cta .btn-primary:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 18px 40px rgba(139, 92, 246, 0.34);
+
+  filter: brightness(1.08);
+}
+
+
+/* OUTLINE BUTTONS */
+
+.home-cta .btn-outline {
+  padding: 12px 19px;
+
+  border-radius: 12px;
+
+  font-size: 0.86rem;
+  font-weight: 700;
+
+  color: #cbd5e1;
+
+  cursor: pointer;
+
+  background:
+    rgba(15, 23, 42, 0.65);
+
+  border:
+    1px solid rgba(148, 163, 184, 0.20);
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.home-cta .btn-outline:hover {
+  color: #ffffff;
+
+  border-color:
+    rgba(103, 232, 249, 0.42);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.10),
+      rgba(139, 92, 246, 0.10)
+    );
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 30px rgba(34, 211, 238, 0.08);
+}
+
+
+/* different hover color for last button */
+
+.home-cta .btn-outline:last-child:hover {
+  border-color:
+    rgba(244, 114, 182, 0.42);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.12),
+      rgba(236, 72, 153, 0.10)
+    );
+
+  box-shadow:
+    0 12px 30px rgba(236, 72, 153, 0.09);
+}
+
+
+/* =========================
+   PHOTO CARD
+========================= */
+
+.home-photo-card {
+  position: relative;
+
+  padding: 14px;
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.025)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.10);
+
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+.home-photo-card:hover {
+  transform: translateY(-7px);
+
+  border-color:
+    rgba(167, 139, 250, 0.30);
+
+  box-shadow:
+    0 35px 80px rgba(0, 0, 0, 0.42),
+    0 0 50px rgba(139, 92, 246, 0.08);
+}
+
+
+/* colorful top bar */
+
+.home-photo-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 8%;
+
+  width: 84%;
+  height: 3px;
+
+  border-radius: 100px;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f59e0b
+  );
+
+  box-shadow:
+    0 0 20px rgba(139, 92, 246, 0.28);
+}
+
+
+/* photo-card glow */
+
+.home-photo-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  top: -65px;
+  right: -55px;
+
+  border-radius: 50%;
+
+  background: #8b5cf6;
+
+  filter: blur(80px);
+
+  opacity: 0.15;
+
+  pointer-events: none;
+
+  z-index: -1;
+}
+
+
+/* =========================
+   PHOTO
+========================= */
+
+.home-photo-frame {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: #0f172a;
+}
+
+
+.home-photo-frame::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(7, 11, 20, 0.30),
+      transparent 45%
+    );
+
+  pointer-events: none;
+}
+
+
+.home-photo-frame img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.6s ease,
+    filter 0.4s ease;
+}
+
+
+.home-photo-card:hover .home-photo-frame img {
+  transform: scale(1.025);
+
+  filter:
+    saturate(1.05)
+    contrast(1.02);
+}
+
+
+/* =========================
+   INFO CHIPS
+========================= */
+
+.home-info-chips {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-top: 12px;
+}
+
+
+.chip {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 13px;
+
+  border-radius: 11px;
+
+  font-size: 0.77rem;
+  line-height: 1.45;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(15, 23, 42, 0.68);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+
+.chip:hover {
+  transform: translateX(4px);
+
+  background:
+    rgba(30, 41, 59, 0.82);
+
+  border-color:
+    rgba(148, 163, 184, 0.18);
+}
+
+
+/* chip dots */
+
+.chip-dot {
+  flex: 0 0 auto;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+
+.chip:nth-child(2) .chip-dot {
+  background: #a78bfa;
+
+  box-shadow:
+    0 0 10px rgba(167, 139, 250, 0.8);
+}
+
+
+.chip:nth-child(3) .chip-dot {
+  background: #f472b6;
+
+  box-shadow:
+    0 0 10px rgba(244, 114, 182, 0.8);
+}
+
+
+/* subtle individual chip colors */
+
+.chip:nth-child(1) {
+  border-left:
+    2px solid rgba(34, 211, 238, 0.55);
+}
+
+
+.chip:nth-child(2) {
+  border-left:
+    2px solid rgba(167, 139, 250, 0.55);
+}
+
+
+.chip:nth-child(3) {
+  border-left:
+    2px solid rgba(244, 114, 182, 0.55);
+}
+
+
+/* =========================
+   FLOATING MOLECULES
+========================= */
+
+.molecule {
+  position: absolute;
+
+  bottom: -30px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75);
+
+  animation:
+    moleculeFloat linear infinite;
+
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+
+/* give every particle a different color */
+
+.molecule:nth-of-type(4n + 1) {
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75);
+}
+
+
+.molecule:nth-of-type(4n + 2) {
+  background: #818cf8;
+
+  box-shadow:
+    0 0 15px rgba(129, 140, 248, 0.75);
+}
+
+
+.molecule:nth-of-type(4n + 3) {
+  background: #f472b6;
+
+  box-shadow:
+    0 0 15px rgba(244, 114, 182, 0.70);
+}
+
+
+.molecule:nth-of-type(4n + 4) {
+  background: #fbbf24;
+
+  box-shadow:
+    0 0 15px rgba(251, 191, 36, 0.65);
+}
+
+
+@keyframes moleculeFloat {
+  0% {
+    transform:
+      translateY(0)
+      translateX(0)
+      scale(0.7);
+
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.5;
+  }
+
+  50% {
+    transform:
+      translateY(-55vh)
+      translateX(25px)
+      scale(1);
+
+    opacity: 0.35;
+  }
+
+  90% {
+    opacity: 0.2;
+  }
+
+  100% {
+    transform:
+      translateY(-115vh)
+      translateX(-20px)
+      scale(0.8);
+
+    opacity: 0;
+  }
+}
+
+
+/* =========================
+   SCROLL INDICATOR
+========================= */
+
+.scroll-hint {
+  position: absolute;
+
+  bottom: 25px;
+  left: 50%;
+
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transform: translateX(-50%);
+
+  color: #64748b;
+
+  font-size: 0.67rem;
+
+  letter-spacing: 0.22em;
+
+  text-transform: uppercase;
+}
+
+
+.scroll-line {
+  width: 1px;
+  height: 35px;
+
+  background: linear-gradient(
+    to bottom,
+    #22d3ee,
+    #8b5cf6,
+    transparent
+  );
+
+  animation:
+    scrollPulse 2s ease-in-out infinite;
+}
+
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.75);
+    transform-origin: top;
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 950px) {
+
+  .home-content {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    padding-top: 120px;
+    padding-bottom: 120px;
+  }
+
+
+  .home-title {
+    font-size: clamp(
+      3rem,
+      12vw,
+      5.2rem
+    );
+  }
+
+
+  .home-photo-card {
+    width: min(520px, 100%);
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .home-content {
+    width: 88%;
+
+    padding-top: 105px;
+  }
+
+
+  .home-eyebrow {
+    font-size: 0.64rem;
+
+    line-height: 1.5;
+  }
+
+
+  .home-title {
+    font-size: clamp(
+      2.8rem,
+      14vw,
+      4.3rem
+    );
+  }
+
+
+  .home-desc {
+    font-size: 0.92rem;
+
+    line-height: 1.75;
+  }
+
+
+  .home-cta {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .home-cta button {
+    width: 100%;
+  }
+
+
+  .scroll-hint {
+    display: none;
+  }
+
+}
+
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .home-title,
+  .molecule,
+  .scroll-line {
+    animation: none;
+  }
+
+}
 
 <!-- ══ ABOUT PAGE ════════════════════════════════════════════════════ -->
 <div class="page" id="page-about">
