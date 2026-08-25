@@ -357,7 +357,126 @@ nav{
 .achieve-year{ font-family:var(--mono); font-size:0.64rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--amber); margin-bottom:0.5rem; }
 .achieve-title{ font-family:var(--serif); font-size:1.05rem; color:#fff; margin-bottom:0.25rem; }
 .achieve-body{ font-size:0.79rem; color:var(--text-dim); line-height:1.6; }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
 
+/* Individual conference card */
+.achieve-card {
+  padding: 26px;
+  border-radius: 22px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.achieve-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Top area */
+.achieve-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+/* Date */
+.date-badge {
+  width: 75px;
+  min-width: 75px;
+  height: 90px;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(34, 211, 238, 0.16),
+    rgba(139, 92, 246, 0.20)
+  );
+
+  border: 1px solid rgba(34, 211, 238, 0.35);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.date-day {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
+}
+
+.date-month {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #22d3ee;
+}
+
+.date-year {
+  margin-top: 3px;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Right side of date */
+.achieve-heading {
+  flex: 1;
+}
+
+.achieve-type {
+  display: inline-block;
+  padding: 5px 10px;
+  margin-bottom: 8px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+}
+
+.achieve-event {
+  font-size: 21px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Presentation title */
+.achieve-title {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #cbd5e1;
+  margin-bottom: 18px;
+}
+
+/* Location */
+.achieve-location {
+  display: inline-block;
+
+  padding: 7px 12px;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #aebbd0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
 /* ═══════════════════════════════════════════════════════════════
    RESEARCH PAGE
 ═══════════════════════════════════════════════════════════════ */
@@ -784,13 +903,63 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
               <div class="achieve-title">Inspire Scholarship</div>
               <div class="achieve-body">Awarded for ranking among the top 1% of students in the Higher Secondary Examination, West Bengal.</div>
             </div>
-            <div class="glass-card achieve-card">
-              <div class="achieve-year">24 March,2026</div>
-              <div class="achieve-title">Conference Presentation</div>
-              <div class="achieve-body">BOSE FEST 2026 
-                 
-               Molecular Dynamics Unravel Tannic Acid-Mediated Inhibition of Tryptophan Amyloid Aggregation: A Comparative Efficacy with Polyols.
-                 SNBNCBS, 2026.</div>
+<div class="achievements-grid">
+
+  <!-- Conference 1 -->
+  <div class="glass-card achieve-card">
+
+    <div class="achieve-top">
+      <div class="date-badge">
+        <span class="date-day">24</span>
+        <span class="date-month">MAR</span>
+        <span class="date-year">2026</span>
+      </div>
+
+      <div class="achieve-heading">
+        <div class="achieve-type">Conference Presentation</div>
+        <div class="achieve-event">BOSE FEST 2026</div>
+      </div>
+    </div>
+
+    <div class="achieve-title">
+      Molecular Dynamics Unravel Tannic Acid-Mediated Inhibition of
+      Tryptophan Amyloid Aggregation: A Comparative Efficacy with Polyols.
+    </div>
+
+    <div class="achieve-location">
+      📍 SNBNCBS
+    </div>
+
+  </div>
+
+
+  <!-- Conference 2 -->
+  <div class="glass-card achieve-card">
+
+    <div class="achieve-top">
+      <div class="date-badge">
+        <span class="date-day">15</span>
+        <span class="date-month">DEC</span>
+        <span class="date-year">2026</span>
+      </div>
+
+      <div class="achieve-heading">
+        <div class="achieve-type">Conference Presentation</div>
+        <div class="achieve-event">Conference Name</div>
+      </div>
+    </div>
+
+    <div class="achieve-title">
+      Your presentation title will go here.
+    </div>
+
+    <div class="achieve-location">
+      📍 Conference Location
+    </div>
+
+  </div>
+
+</div>
             </div>
             <div class="glass-card achieve-card">
               <div class="achieve-year">2025</div>
