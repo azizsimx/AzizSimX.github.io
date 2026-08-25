@@ -2828,24 +2828,21 @@ nav{
     margin-bottom: 2.5rem;
   }
 
-  .pub-filter-btn {
-    font-family: var(--mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border: 1px solid var(--border);
-    color: var(--text-muted);
-    background: none;
+.pub-filter-btn {
+    padding: 12px 32px;
+    border-radius: 50px;
+    border: 1px solid #26334d;
+    background: transparent;
+    color: #9ba9c4;
     cursor: pointer;
-    transition: border-color 0.2s, color 0.2s;
-  }
+    transition: all 0.3s ease;
+}
 
-  .pub-filter-btn.active,
-  .pub-filter-btn:hover {
-    border-color: var(--gold);
-    color: var(--gold-light);
-  }
+.pub-filter-btn.active {
+    border-color: #00d9ff;
+    color: #00d9ff;
+    background: rgba(0, 217, 255, 0.08);
+}
 
   .pub-list { list-style: none; }
 
