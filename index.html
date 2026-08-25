@@ -2864,6 +2864,21 @@ nav{
 .view-paper:hover{ transform:translateY(-3px); box-shadow:0 15px 32px rgba(139,92,246,0.3); }
 .view-paper.pending{ background:var(--surface-hi); box-shadow:none; color:var(--text-dim); border:1px solid var(--border); }
 
+/* glow : 1st addition */
+ .pub-card {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+.pub-card:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.35),
+    0 0 35px rgba(56, 189, 248, 0.10);
+}  
+
+   
 /* ═══════════════════════════════════════════════════════════════
    TEAM PAGE
 ═══════════════════════════════════════════════════════════════ */
@@ -4957,6 +4972,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
     <!-- ✏️ HOW TO ADD A PUBLICATION: copy a .pub-card block and fill in the date, tags, title, authors, journal and link. -->
 
     <div class="glass-card pub-card">
+       <div class="research-glow"></div>
       <div class="pub-date"><span class="day">24</span><span class="month">AUG</span><span class="year">2026</span></div>
       <div class="pub-content">
         <div class="pub-tags">
