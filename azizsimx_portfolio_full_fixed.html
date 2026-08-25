@@ -1,0 +1,4072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Abdul Aziz Mandal — Computational (Bio)physical Chemistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+<script src="https://3Dmol.org/build/3Dmol-min.js" defer></script>
+<style>
+  /* ── TOKENS ─────────────────────────── */
+  :root {
+    --navy:       #07111f;
+    --navy-mid:   #0d1e33;
+    --navy-light: #162a45;
+    --gold:       #c9a040;
+    --gold-light: #e8c46a;
+    --gold-pale:  #f5e8c0;
+    --cream:      #f8f4ec;
+    --text-primary: #e8e2d8;
+    --text-muted:   #8a9bb0;
+    --border:     rgba(201,160,64,0.2);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans:  'DM Sans', sans-serif;
+    --mono:  'DM Mono', monospace;
+    --nav-h: 64px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--navy);
+    color: var(--text-primary);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ── NAV ─────────────────────────────── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    height: var(--nav-h);
+    background: rgba(7,17,31,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--gold-light);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    list-style: none;
+  }
+
+  .nav-links button {
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.45rem 0.85rem;
+    border-radius: 2px;
+    transition: color 0.2s, background 0.2s;
+    position: relative;
+  }
+
+  .nav-links button::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 50%; right: 50%;
+    height: 2px;
+    background: var(--gold);
+    transition: left 0.25s, right 0.25s;
+  }
+
+  .nav-links button.active,
+  .nav-links button:hover { color: var(--gold-light); }
+
+  .nav-links button.active::after { left: 0.85rem; right: 0.85rem; }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+
+  .hamburger span { width: 24px; height: 1.5px; background: var(--text-muted); display: block; transition: all 0.3s; }
+
+  /* ── PAGE SYSTEM ─────────────────────── */
+  .page {
+    display: none;
+    min-height: 100vh;
+    padding-top: var(--nav-h);
+    animation: pageIn 0.45s ease both;
+  }
+
+  .page.active { display: block; }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SHARED LAYOUT ───────────────────── */
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 3rem; }
+
+  .page-header {
+    padding: 5rem 3rem 3rem;
+    max-width: 1080px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-body { padding: 4rem 3rem 6rem; max-width: 1080px; margin: 0 auto; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.6;
+  }
+
+  .page-title {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--cream);
+  }
+
+  .page-title em { font-style: italic; color: var(--gold-light); }
+
+  .divider {
+    width: 50px; height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin: 1.8rem 0;
+    opacity: 0.6;
+  }
+
+  /* ── BUTTONS ────────────────────────── */
+  .btn-primary {
+    display: inline-block;
+    padding: 0.65rem 1.8rem;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  .btn-outline {
+    display: inline-block;
+    padding: 0.65rem 1.8rem;
+    border: 1px solid var(--border);
+    color: var(--gold-light);
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: none;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .btn-outline:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+/* =========================================================
+   COLORFUL HOME PAGE
+   ========================================================= */
+
+#page-home {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(34, 211, 238, 0.10),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(139, 92, 246, 0.13),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 75% 80%,
+      rgba(236, 72, 153, 0.08),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 20% 85%,
+      rgba(245, 158, 11, 0.06),
+      transparent 28%
+    ),
+    #070b14;
+}
+
+
+/* =========================
+   COLORFUL TOP LINE
+========================= */
+
+#page-home::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f59e0b,
+    #22c55e
+  );
+
+  z-index: 20;
+}
+
+
+/* =========================
+   BACKGROUND GLOWS
+========================= */
+
+#page-home::after {
+  content: "";
+
+  position: absolute;
+
+  width: 460px;
+  height: 460px;
+
+  right: -180px;
+  top: 80px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #8b5cf6,
+    #ec4899
+  );
+
+  filter: blur(140px);
+  opacity: 0.13;
+
+  pointer-events: none;
+}
+
+
+/* second background glow */
+
+.home-canvas::before {
+  content: "";
+
+  position: absolute;
+
+  width: 380px;
+  height: 380px;
+
+  left: -150px;
+  bottom: -100px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #3b82f6
+  );
+
+  filter: blur(130px);
+  opacity: 0.12;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   GRID BACKGROUND
+========================= */
+
+.home-grid {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 55px 55px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.85),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   HOME CONTENT
+========================= */
+
+.home-content {
+  position: relative;
+  z-index: 5;
+
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+
+  align-items: center;
+
+  gap: 70px;
+
+  width: min(1200px, 90%);
+
+  min-height: 100vh;
+
+  margin: 0 auto;
+
+  padding: 110px 0 90px;
+}
+
+
+/* =========================
+   EYEBROW
+========================= */
+
+.home-eyebrow {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0 0 22px;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #a5f3fc;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.12),
+      rgba(59, 130, 246, 0.08)
+    );
+
+  border:
+    1px solid rgba(34, 211, 238, 0.24);
+
+  box-shadow:
+    0 0 25px rgba(34, 211, 238, 0.06);
+}
+
+
+/* small colorful dot */
+
+.home-eyebrow::before {
+  content: "";
+
+  width: 7px;
+  height: 7px;
+
+  margin-right: 9px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 12px #22d3ee;
+}
+
+
+/* =========================
+   MAIN TITLE
+========================= */
+
+.home-title {
+  margin: 0;
+  max-width: 760px;
+
+  font-size: clamp(3.2rem, 6.5vw, 6.8rem);
+  line-height: 0.97;
+  letter-spacing: -0.055em;
+  font-weight: 850;
+
+  /* IMPORTANT: visible fallback so the title can never disappear */
+  color: #f8fafc;
+  -webkit-text-fill-color: currentColor;
+
+  text-shadow:
+    0 0 45px rgba(139, 92, 246, 0.10);
+}
+
+/* Use gradient text only when the browser supports text clipping. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .home-title {
+    background: linear-gradient(
+      120deg,
+      #f8fafc 0%,
+      #67e8f9 24%,
+      #60a5fa 43%,
+      #a78bfa 62%,
+      #f472b6 82%,
+      #fbbf24 100%
+    );
+    background-size: 180% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: homeTitleGradient 8s ease infinite;
+  }
+}
+
+
+@keyframes homeTitleGradient {
+  0% {
+    background-position: 0% center;
+  }
+
+  50% {
+    background-position: 100% center;
+  }
+
+  100% {
+    background-position: 0% center;
+  }
+}
+
+
+/* =========================
+   NAME
+========================= */
+
+.home-name {
+  margin-top: 28px;
+  margin-bottom: 0;
+
+  font-size: 1.08rem;
+  font-weight: 750;
+
+  color: #f8fafc;
+}
+
+
+.home-name::before {
+  content: "";
+
+  display: inline-block;
+
+  width: 28px;
+  height: 2px;
+
+  margin-right: 10px;
+
+  vertical-align: middle;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #a78bfa,
+    #f472b6
+  );
+}
+
+
+/* =========================
+   DESCRIPTION
+========================= */
+
+.home-desc {
+  max-width: 680px;
+
+  margin-top: 20px;
+
+  font-size: 1rem;
+  line-height: 1.85;
+
+  color: #94a3b8;
+}
+
+
+/* =========================
+   BUTTON GROUP
+========================= */
+
+.home-cta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 32px;
+}
+
+
+/* PRIMARY BUTTON */
+
+.home-cta .btn-primary {
+  position: relative;
+
+  padding: 13px 21px;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 0.88rem;
+  font-weight: 750;
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #8b5cf6,
+    #ec4899
+  );
+
+  box-shadow:
+    0 12px 30px rgba(139, 92, 246, 0.24);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
+}
+
+
+.home-cta .btn-primary:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 18px 40px rgba(139, 92, 246, 0.34);
+
+  filter: brightness(1.08);
+}
+
+
+/* OUTLINE BUTTONS */
+
+.home-cta .btn-outline {
+  padding: 12px 19px;
+
+  border-radius: 12px;
+
+  font-size: 0.86rem;
+  font-weight: 700;
+
+  color: #cbd5e1;
+
+  cursor: pointer;
+
+  background:
+    rgba(15, 23, 42, 0.65);
+
+  border:
+    1px solid rgba(148, 163, 184, 0.20);
+
+  backdrop-filter: blur(10px);
+
+  transition:
+    color 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.home-cta .btn-outline:hover {
+  color: #ffffff;
+
+  border-color:
+    rgba(103, 232, 249, 0.42);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(34, 211, 238, 0.10),
+      rgba(139, 92, 246, 0.10)
+    );
+
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 12px 30px rgba(34, 211, 238, 0.08);
+}
+
+
+/* different hover color for last button */
+
+.home-cta .btn-outline:last-child:hover {
+  border-color:
+    rgba(244, 114, 182, 0.42);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(139, 92, 246, 0.12),
+      rgba(236, 72, 153, 0.10)
+    );
+
+  box-shadow:
+    0 12px 30px rgba(236, 72, 153, 0.09);
+}
+
+
+/* =========================
+   PHOTO CARD
+========================= */
+
+.home-photo-card {
+  position: relative;
+
+  padding: 14px;
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.025)
+    );
+
+  border:
+    1px solid rgba(255, 255, 255, 0.10);
+
+  backdrop-filter: blur(16px);
+
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+.home-photo-card:hover {
+  transform: translateY(-7px);
+
+  border-color:
+    rgba(167, 139, 250, 0.30);
+
+  box-shadow:
+    0 35px 80px rgba(0, 0, 0, 0.42),
+    0 0 50px rgba(139, 92, 246, 0.08);
+}
+
+
+/* colorful top bar */
+
+.home-photo-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 8%;
+
+  width: 84%;
+  height: 3px;
+
+  border-radius: 100px;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f59e0b
+  );
+
+  box-shadow:
+    0 0 20px rgba(139, 92, 246, 0.28);
+}
+
+
+/* photo-card glow */
+
+.home-photo-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  top: -65px;
+  right: -55px;
+
+  border-radius: 50%;
+
+  background: #8b5cf6;
+
+  filter: blur(80px);
+
+  opacity: 0.15;
+
+  pointer-events: none;
+
+  z-index: -1;
+}
+
+
+/* =========================
+   PHOTO
+========================= */
+
+.home-photo-frame {
+  position: relative;
+
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: #0f172a;
+}
+
+
+.home-photo-frame::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(7, 11, 20, 0.30),
+      transparent 45%
+    );
+
+  pointer-events: none;
+}
+
+
+.home-photo-frame img {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.6s ease,
+    filter 0.4s ease;
+}
+
+
+.home-photo-card:hover .home-photo-frame img {
+  transform: scale(1.025);
+
+  filter:
+    saturate(1.05)
+    contrast(1.02);
+}
+
+
+/* =========================
+   INFO CHIPS
+========================= */
+
+.home-info-chips {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+
+  margin-top: 12px;
+}
+
+
+.chip {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px 13px;
+
+  border-radius: 11px;
+
+  font-size: 0.77rem;
+  line-height: 1.45;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(15, 23, 42, 0.68);
+
+  border:
+    1px solid rgba(255, 255, 255, 0.07);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+
+.chip:hover {
+  transform: translateX(4px);
+
+  background:
+    rgba(30, 41, 59, 0.82);
+
+  border-color:
+    rgba(148, 163, 184, 0.18);
+}
+
+
+/* chip dots */
+
+.chip-dot {
+  flex: 0 0 auto;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+
+.chip:nth-child(2) .chip-dot {
+  background: #a78bfa;
+
+  box-shadow:
+    0 0 10px rgba(167, 139, 250, 0.8);
+}
+
+
+.chip:nth-child(3) .chip-dot {
+  background: #f472b6;
+
+  box-shadow:
+    0 0 10px rgba(244, 114, 182, 0.8);
+}
+
+
+/* subtle individual chip colors */
+
+.chip:nth-child(1) {
+  border-left:
+    2px solid rgba(34, 211, 238, 0.55);
+}
+
+
+.chip:nth-child(2) {
+  border-left:
+    2px solid rgba(167, 139, 250, 0.55);
+}
+
+
+.chip:nth-child(3) {
+  border-left:
+    2px solid rgba(244, 114, 182, 0.55);
+}
+
+
+/* =========================
+   FLOATING MOLECULES
+========================= */
+
+.molecule {
+  position: absolute;
+
+  bottom: -30px;
+
+  border-radius: 50%;
+
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75);
+
+  animation:
+    moleculeFloat linear infinite;
+
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+
+/* give every particle a different color */
+
+.molecule:nth-of-type(4n + 1) {
+  background: #22d3ee;
+
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.75);
+}
+
+
+.molecule:nth-of-type(4n + 2) {
+  background: #818cf8;
+
+  box-shadow:
+    0 0 15px rgba(129, 140, 248, 0.75);
+}
+
+
+.molecule:nth-of-type(4n + 3) {
+  background: #f472b6;
+
+  box-shadow:
+    0 0 15px rgba(244, 114, 182, 0.70);
+}
+
+
+.molecule:nth-of-type(4n + 4) {
+  background: #fbbf24;
+
+  box-shadow:
+    0 0 15px rgba(251, 191, 36, 0.65);
+}
+
+
+@keyframes moleculeFloat {
+  0% {
+    transform:
+      translateY(0)
+      translateX(0)
+      scale(0.7);
+
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 0.5;
+  }
+
+  50% {
+    transform:
+      translateY(-55vh)
+      translateX(25px)
+      scale(1);
+
+    opacity: 0.35;
+  }
+
+  90% {
+    opacity: 0.2;
+  }
+
+  100% {
+    transform:
+      translateY(-115vh)
+      translateX(-20px)
+      scale(0.8);
+
+    opacity: 0;
+  }
+}
+
+
+/* =========================
+   SCROLL INDICATOR
+========================= */
+
+.scroll-hint {
+  position: absolute;
+
+  bottom: 25px;
+  left: 50%;
+
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 8px;
+
+  transform: translateX(-50%);
+
+  color: #64748b;
+
+  font-size: 0.67rem;
+
+  letter-spacing: 0.22em;
+
+  text-transform: uppercase;
+}
+
+
+.scroll-line {
+  width: 1px;
+  height: 35px;
+
+  background: linear-gradient(
+    to bottom,
+    #22d3ee,
+    #8b5cf6,
+    transparent
+  );
+
+  animation:
+    scrollPulse 2s ease-in-out infinite;
+}
+
+
+@keyframes scrollPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scaleY(0.75);
+    transform-origin: top;
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 950px) {
+
+  .home-content {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    padding-top: 120px;
+    padding-bottom: 120px;
+  }
+
+
+  .home-title {
+    font-size: clamp(
+      3rem,
+      12vw,
+      5.2rem
+    );
+  }
+
+
+  .home-photo-card {
+    width: min(520px, 100%);
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .home-content {
+    width: 88%;
+
+    padding-top: 105px;
+  }
+
+
+  .home-eyebrow {
+    font-size: 0.64rem;
+
+    line-height: 1.5;
+  }
+
+
+  .home-title {
+    font-size: clamp(
+      2.8rem,
+      14vw,
+      4.3rem
+    );
+  }
+
+
+  .home-desc {
+    font-size: 0.92rem;
+
+    line-height: 1.75;
+  }
+
+
+  .home-cta {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+
+  .home-cta button {
+    width: 100%;
+  }
+
+
+  .scroll-hint {
+    display: none;
+  }
+
+}
+
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .home-title,
+  .molecule,
+  .scroll-line {
+    animation: none;
+  }
+
+}
+
+  /* ══════════════════════════════════════
+     ABOUT PAGE
+  ══════════════════════════════════════ */
+  #page-about { background: var(--navy-mid); }
+
+  .about-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  /* Profile Photo */
+  .about-photo-wrap { position: sticky; top: calc(var(--nav-h) + 2rem); }
+
+  .about-photo-frame {
+    width: 100%;
+    aspect-ratio: 3/4;
+    border: 1px solid var(--border);
+    background: var(--navy);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .about-photo-frame img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-placeholder-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--text-muted);
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .photo-placeholder-text svg { opacity: 0.25; }
+
+  .photo-placeholder-text p {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    line-height: 1.6;
+  }
+
+  .about-photo-meta {
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 1.4rem;
+    background: var(--navy);
+  }
+
+  .meta-name {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    color: var(--cream);
+    margin-bottom: 0.25rem;
+  }
+
+  .meta-role {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .meta-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .meta-link {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .meta-link:hover { color: var(--gold-light); }
+
+  .meta-link-icon { font-size: 0.9rem; }
+
+  /* About content */
+  .about-content { }
+
+  .about-bio p {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1.1rem;
+    line-height: 1.85;
+  }
+
+  .about-bio strong { color: var(--cream); font-weight: 500; }
+
+  /* Research Interests */
+  .interest-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .pill {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    padding: 5px 12px;
+    border: 1px solid rgba(201,160,64,0.3);
+    color: var(--gold-light);
+    text-transform: uppercase;
+  }
+
+  /* ── EDUCATION TIMELINE ──────────────── */
+  .edu-block { margin-top: 3rem; }
+
+  .edu-block h3 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 2rem;
+  }
+
+  .timeline { position: relative; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px; bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    opacity: 0.3;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 1.5rem;
+    padding-bottom: 2.2rem;
+    position: relative;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-year {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+    padding-top: 3px;
+    text-align: right;
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: -5.5px;
+    top: 6px;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--navy-mid);
+    border: 2px solid var(--gold);
+    opacity: 0.7;
+  }
+
+  .timeline-body { padding-left: 1rem; }
+
+  .timeline-degree {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--cream);
+    margin-bottom: 0.15rem;
+  }
+
+  .timeline-inst {
+    font-size: 0.83rem;
+    color: var(--gold-light);
+    margin-bottom: 0.3rem;
+  }
+
+  .timeline-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── ACHIEVEMENTS ──────────────────── */
+  .achieve-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .achieve-card {
+    border: 1px solid var(--border);
+    padding: 1.3rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .achieve-card:hover { border-color: rgba(201,160,64,0.5); }
+
+  .achieve-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    opacity: 0.5;
+  }
+
+  .achieve-year {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+
+  .achieve-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--cream);
+    margin-bottom: 0.2rem;
+  }
+
+  .achieve-body {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* ══════════════════════════════════════
+     RESEARCH PAGE
+  ══════════════════════════════════════ */
+  #page-research { background: var(--navy); }
+
+  .research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .research-card {
+    background: var(--navy);
+    padding: 2.2rem 2rem;
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .research-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--gold);
+    transition: width 0.35s ease;
+  }
+
+  .research-card:hover::after { width: 100%; }
+  .research-card:hover { background: var(--navy-light); }
+
+  .research-icon { font-size: 2rem; margin-bottom: 1.2rem; display: block; }
+
+  .research-card h3 {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+  }
+
+  .research-card p { font-size: 0.84rem; color: var(--text-muted); line-height: 1.7; }
+
+  .research-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border: 1px solid rgba(201,160,64,0.3);
+    color: var(--gold);
+    margin-top: 1rem;
+    text-transform: uppercase;
+  }
+
+  /* Skills / Tools */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+  }
+
+  .tool-chip {
+    border: 1px solid var(--border);
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .tool-chip:hover { border-color: rgba(201,160,64,0.4); color: var(--gold-light); }
+  .tool-chip-icon { font-size: 1.1rem; }
+
+  /* ══════════════════════════════════════
+     PUBLICATIONS PAGE
+  ══════════════════════════════════════ */
+  #page-publications { background: var(--navy-mid); }
+
+  .pub-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .pub-filter-btn {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: none;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .pub-filter-btn.active,
+  .pub-filter-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  .pub-list { list-style: none; }
+
+  .pub-item {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 1.8rem 0;
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .pub-year {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+    padding-top: 5px;
+  }
+
+  .pub-title {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    color: var(--cream);
+    margin-bottom: 0.35rem;
+    line-height: 1.4;
+  }
+
+  .pub-authors { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+
+  .pub-journal {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--gold-light);
+    opacity: 0.8;
+  }
+
+  .pub-link {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--gold);
+    text-decoration: none;
+    margin-left: 1rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .pub-link:hover { opacity: 1; }
+
+  .pub-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    margin-right: 0.4rem;
+  }
+
+  .pub-badge.first  { background: rgba(201,160,64,0.15); color: var(--gold-light); border: 1px solid rgba(201,160,64,0.3); }
+  .pub-badge.review { background: rgba(100,170,255,0.1); color: #80b4e8; border: 1px solid rgba(100,170,255,0.2); }
+ /* update font and color */
+  .publication-card {
+  position: relative;
+  overflow: hidden;
+
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 32px;
+
+  max-width: 1050px;
+  margin: 30px auto;
+  padding: 38px;
+
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(0, 255, 255, 0.11),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      rgba(168, 85, 247, 0.13),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      #07111f,
+      #0f172a 55%,
+      #111827
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.35);
+
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+
+.publication-card:hover {
+  transform: translateY(-7px);
+
+  box-shadow:
+    0 35px 90px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(34, 211, 238, 0.08);
+}
+
+
+/* colorful top line */
+
+.publication-card::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background: linear-gradient(
+    90deg,
+    #22d3ee,
+    #3b82f6,
+    #8b5cf6,
+    #ec4899,
+    #f59e0b
+  );
+}
+
+
+/* subtle glow */
+
+.research-glow {
+  position: absolute;
+
+  width: 250px;
+  height: 250px;
+
+  right: -100px;
+  top: -120px;
+
+  border-radius: 50%;
+
+  background: #8b5cf6;
+
+  filter: blur(100px);
+
+  opacity: 0.15;
+
+  pointer-events: none;
+}
+
+
+/* ==========================
+   DATE
+========================== */
+
+.pub-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-right: 28px;
+
+  border-right: 1px solid
+    rgba(255, 255, 255, 0.12);
+}
+
+
+.pub-date .day {
+  font-size: 3.3rem;
+  line-height: 1;
+
+  font-weight: 800;
+
+  background: linear-gradient(
+    135deg,
+    #22d3ee,
+    #60a5fa
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+.pub-date .month {
+  margin-top: 10px;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+
+  letter-spacing: 4px;
+
+  color: #f472b6;
+}
+
+
+.pub-date .year {
+  margin-top: 5px;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  color: #a78bfa;
+}
+
+
+/* ==========================
+   TAGS
+========================== */
+
+.pub-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+
+.first-author {
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  font-size: 0.73rem;
+  font-weight: 750;
+
+  color: #fde68a;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245, 158, 11, 0.18),
+      rgba(251, 191, 36, 0.08)
+    );
+
+  border:
+    1px solid rgba(251, 191, 36, 0.35);
+
+  box-shadow:
+    0 0 20px rgba(245, 158, 11, 0.08);
+}
+
+
+.journal-tag {
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  font-size: 0.73rem;
+  font-weight: 750;
+
+  color: #ddd6fe;
+
+  background:
+    rgba(139, 92, 246, 0.14);
+
+  border:
+    1px solid rgba(167, 139, 250, 0.28);
+}
+
+
+/* ==========================
+   TITLE
+========================== */
+
+.pub-title {
+  margin: 0;
+
+  font-size: 1.45rem;
+  line-height: 1.48;
+
+  font-weight: 750;
+
+  letter-spacing: -0.02em;
+
+  color: #f8fafc;
+}
+
+
+/* different color for second part */
+
+.pub-title span {
+  background: linear-gradient(
+    90deg,
+    #67e8f9,
+    #818cf8,
+    #c084fc
+  );
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+}
+
+
+/* ==========================
+   AUTHORS
+========================== */
+
+.pub-authors {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  margin-top: 20px;
+
+  font-size: 0.94rem;
+  line-height: 1.7;
+
+  color: #94a3b8;
+}
+
+
+/* your name */
+
+.pub-authors strong {
+  color: #4ade80;
+
+  font-weight: 750;
+
+  text-shadow:
+    0 0 15px rgba(74, 222, 128, 0.12);
+}
+
+
+.pub-authors span:nth-child(2) {
+  color: #93c5fd;
+}
+
+
+.pub-authors span:nth-child(3) {
+  color: #c4b5fd;
+}
+
+
+.pub-authors span:nth-child(4) {
+  color: #f9a8d4;
+}
+
+
+/* ==========================
+   BOTTOM
+========================== */
+
+.pub-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 25px;
+
+  margin-top: 25px;
+  padding-top: 22px;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.1);
+}
+
+
+.journal-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.journal-name {
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 0.96rem;
+
+  font-weight: 600;
+  font-style: italic;
+
+  color: #7dd3fc;
+}
+
+
+.journal-details {
+  font-size: 0.8rem;
+
+  color: #64748b;
+}
+
+
+/* ==========================
+   BUTTON
+========================== */
+
+.view-paper {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 11px 18px;
+
+  border-radius: 12px;
+
+  font-size: 0.83rem;
+  font-weight: 750;
+
+  text-decoration: none;
+
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #8b5cf6,
+    #ec4899
+  );
+
+  box-shadow:
+    0 10px 25px rgba(236, 72, 153, 0.2);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+.view-paper:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 15px 35px rgba(139, 92, 246, 0.3);
+}
+
+
+.view-paper span {
+  transition: transform 0.25s ease;
+}
+
+
+.view-paper:hover span {
+  transform: translate(3px, -3px);
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 720px) {
+
+  .publication-card {
+    grid-template-columns: 1fr;
+
+    padding: 26px;
+
+    gap: 20px;
+  }
+
+
+  .pub-date {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+
+    gap: 8px;
+
+    padding-right: 0;
+    padding-bottom: 16px;
+
+    border-right: none;
+
+    border-bottom:
+      1px solid rgba(255, 255, 255, 0.1);
+  }
+
+
+  .pub-date .day {
+    font-size: 2rem;
+  }
+
+
+  .pub-date .month,
+  .pub-date .year {
+    margin: 0;
+  }
+
+
+  .pub-title {
+    font-size: 1.15rem;
+  }
+
+
+  .pub-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+
+  .view-paper {
+    width: 100%;
+
+    justify-content: center;
+
+    box-sizing: border-box;
+  }
+}
+  /* ══════════════════════════════════════
+     TEAM PAGE
+  ══════════════════════════════════════ */
+  #page-team { background: var(--navy); }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .team-card {
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.25s;
+  }
+
+  .team-card:hover { border-color: rgba(201,160,64,0.5); }
+
+  .team-photo {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--navy-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 300;
+    color: var(--gold-light);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .team-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+  .team-info { padding: 1.2rem; }
+
+  .team-name {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--cream);
+    margin-bottom: 0.2rem;
+  }
+
+  .team-role {
+    font-family: var(--mono);
+    font-size: 0.63rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
+
+  .team-desc { font-size: 0.78rem; color: var(--text-muted); }
+
+  /* PI card special */
+  .team-card.pi-card {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+  }
+
+  .team-card.pi-card .team-photo {
+    aspect-ratio: unset;
+    min-height: 220px;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    font-size: 3rem;
+  }
+
+  .team-card.pi-card .team-info { padding: 2rem; }
+
+  /* ══════════════════════════════════════
+     POSITIONS PAGE
+  ══════════════════════════════════════ */
+  #page-positions { background: var(--navy-mid); }
+
+  .positions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .position-card {
+    border: 1px solid var(--border);
+    padding: 2rem;
+    transition: border-color 0.25s;
+    position: relative;
+  }
+
+  .position-card:hover { border-color: var(--gold); }
+
+  .position-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height 0.3s ease;
+  }
+
+  .position-card:hover::before { height: 100%; }
+
+  .position-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    padding: 4px 10px;
+    background: rgba(201,160,64,0.1);
+    color: var(--gold-light);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .position-card h3 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+  }
+
+  .position-card p { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+.first-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 7px 14px;
+  border-radius: 999px;
+
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+
+  color: #fff3b0;
+
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.22),
+    rgba(251, 191, 36, 0.10)
+  );
+
+  border: 1px solid rgba(251, 191, 36, 0.45);
+
+  box-shadow:
+    0 0 18px rgba(245, 158, 11, 0.12);
+}
+
+
+/* Your name */
+.my-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: #4ade80 !important;
+
+  font-weight: 800;
+
+  text-shadow:
+    0 0 16px rgba(74, 222, 128, 0.18);
+}
+
+
+/* Small badge beside your name */
+.author-position {
+  display: inline-block;
+
+  padding: 3px 8px;
+
+  border-radius: 6px;
+
+  font-size: 0.62rem;
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+
+  color: #0f172a;
+
+  background: linear-gradient(
+    135deg,
+    #facc15,
+    #fb923c
+  );
+
+  text-transform: uppercase;
+
+  text-shadow: none;
+}
+  /* ══════════════════════════════════════
+     COLLABORATORS PAGE
+  ══════════════════════════════════════ */
+  #page-collaborators { background: var(--navy); }
+
+  .collab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .collab-card {
+    border: 1px solid var(--border);
+    padding: 1.8rem 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .collab-card:hover { border-color: rgba(201,160,64,0.5); background: var(--navy-light); }
+
+  .collab-avatar {
+    width: 68px; height: 68px;
+    border-radius: 50%;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    color: var(--gold-light);
+  }
+
+  .collab-name { font-family: var(--serif); font-size: 1rem; color: var(--cream); margin-bottom: 0.3rem; }
+  .collab-inst { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+  /* ══════════════════════════════════════
+     CONTACT PAGE
+  ══════════════════════════════════════ */
+  #page-contact { background: var(--navy-mid); }
+
+  .contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact-item {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+  }
+
+  .contact-icon {
+    width: 40px; height: 40px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1rem;
+    color: var(--gold);
+  }
+
+  .contact-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+
+  .contact-value { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
+  .contact-value a { color: inherit; text-decoration: none; transition: color 0.2s; }
+  .contact-value a:hover { color: var(--gold-light); }
+
+  .contact-box {
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    background: rgba(201,160,64,0.02);
+  }
+
+  .contact-box h3 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+
+  .contact-box p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.8rem; }
+
+  .social-row {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .social-btn {
+    width: 38px; height: 38px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-family: var(--mono);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .social-btn:hover { border-color: var(--gold); color: var(--gold-light); }
+
+  /* ── FOOTER ────────────────────────── */
+  footer {
+    background: var(--navy);
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 3rem;
+  }
+
+  .footer-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--gold-light);
+    text-decoration: none;
+  }
+
+  .footer-copy { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ── RESPONSIVE ────────────────────── */
+  @media (max-width: 900px) {
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+
+    .home-content { grid-template-columns: 1fr; padding: 6rem 1.5rem 4rem; }
+    .home-photo-card { max-width: 260px; margin: 0 auto; }
+    .about-layout { grid-template-columns: 1fr; }
+    .about-photo-wrap { position: static; }
+    .about-photo-frame { max-width: 260px; }
+    .achieve-grid { grid-template-columns: 1fr; }
+    .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .team-card.pi-card { grid-column: span 1; grid-template-columns: 1fr; }
+    .team-card.pi-card .team-photo { min-height: 180px; border-right: none; border-bottom: 1px solid var(--border); }
+
+    .page-header { padding: 3rem 1.5rem 2rem; }
+    .page-body { padding: 2.5rem 1.5rem 4rem; }
+    footer { padding: 2rem 1.5rem; }
+  }
+
+  /* ── MOBILE MENU ───────────────────── */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0; right: 0;
+    background: rgba(7,17,31,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 1.5rem;
+    z-index: 150;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .mobile-menu.open { display: flex; }
+
+  .mobile-menu button {
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.7rem 0;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: color 0.2s;
+    width: 100%;
+  }
+
+  .mobile-menu button:hover,
+  .mobile-menu button.active { color: var(--gold-light); }
+
+  /* ── UTILITY ───────────────────────── */
+  .mt-2 { margin-top: 2rem; }
+  .mt-3 { margin-top: 3rem; }
+  .text-muted { color: var(--text-muted); font-size: 0.9rem; }
+
+  .info-callout {
+    border-left: 2px solid rgba(201,160,64,0.4);
+    padding: 1rem 1.5rem;
+    background: rgba(201,160,64,0.04);
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    margin: 2rem 0;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    line-height: 1.7;
+  }
+
+
+/* =========================================================
+   FINAL PORTFOLIO POLISH — cohesive, colorful, restrained
+   ========================================================= */
+:root {
+  --navy: #070b14;
+  --navy-mid: #0a1020;
+  --navy-light: #111a2e;
+  --gold: #67e8f9;
+  --gold-light: #a78bfa;
+  --gold-pale: #f0abfc;
+  --cream: #f8fafc;
+  --text-primary: #dbe7f5;
+  --text-muted: #94a3b8;
+  --border: rgba(148, 163, 184, 0.15);
+  --cyan: #22d3ee;
+  --blue: #3b82f6;
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --amber: #f59e0b;
+  --green: #4ade80;
+  --surface: rgba(15, 23, 42, 0.68);
+  --surface-strong: rgba(15, 23, 42, 0.88);
+  --gradient: linear-gradient(90deg, var(--cyan), var(--blue), var(--violet), var(--pink), var(--amber));
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.055), transparent 28rem),
+    radial-gradient(circle at 88% 18%, rgba(139, 92, 246, 0.06), transparent 30rem),
+    var(--navy);
+  color: var(--text-primary);
+}
+
+::selection { background: rgba(139, 92, 246, 0.45); color: #fff; }
+
+nav {
+  background: rgba(7, 11, 20, 0.82);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 10px 35px rgba(0,0,0,.18);
+}
+nav::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gradient);
+  opacity: .9;
+}
+.nav-logo {
+  font-family: var(--serif);
+  font-weight: 600;
+  border: 0;
+  padding: 0;
+  appearance: none;
+  cursor: pointer;
+  background: linear-gradient(100deg, #e6fbff, #67e8f9 40%, #c4b5fd 72%, #f9a8d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.nav-links button { border-radius: 999px; }
+.nav-links button:hover,
+.nav-links button.active { color: #fff; background: rgba(255,255,255,.045); }
+.nav-links button::after { background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink)); }
+
+.page:not(#page-home) {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(34,211,238,.055), transparent 25rem),
+    radial-gradient(circle at 92% 18%, rgba(139,92,246,.06), transparent 30rem),
+    linear-gradient(180deg, #080d18, #0a1020 55%, #070b14) !important;
+}
+.page-header {
+  position: relative;
+  overflow: hidden;
+  max-width: 1160px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+}
+.page-header::after {
+  content: '';
+  position: absolute;
+  width: 240px; height: 240px;
+  right: 4%; top: -140px;
+  border-radius: 50%;
+  background: var(--violet);
+  filter: blur(95px);
+  opacity: .09;
+  pointer-events: none;
+}
+.page-body, .container { max-width: 1160px; }
+.section-label { color: #67e8f9; font-weight: 500; }
+.section-label::before { background: linear-gradient(90deg, var(--cyan), var(--violet)); opacity: 1; }
+.page-title { color: #f8fafc; letter-spacing: -.025em; }
+.page-title em,
+.edu-block h3 em {
+  background: linear-gradient(90deg, #67e8f9, #818cf8, #c084fc, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.divider { background: linear-gradient(90deg, var(--cyan), var(--violet), transparent); opacity: .8; }
+
+.btn-primary,
+.view-paper {
+  border-radius: 11px;
+  background: linear-gradient(135deg, #2563eb, #8b5cf6 58%, #ec4899);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(139,92,246,.18);
+  transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+}
+.btn-primary:hover,
+.view-paper:hover {
+  background: linear-gradient(135deg, #2563eb, #8b5cf6 58%, #ec4899);
+  transform: translateY(-3px);
+  filter: brightness(1.06);
+  box-shadow: 0 18px 38px rgba(139,92,246,.26);
+}
+.btn-outline {
+  border-radius: 11px;
+  border-color: rgba(148,163,184,.22);
+  color: #dbeafe;
+  background: rgba(15,23,42,.5);
+  backdrop-filter: blur(10px);
+}
+.btn-outline:hover {
+  border-color: rgba(103,232,249,.4);
+  color: #fff;
+  background: linear-gradient(135deg, rgba(34,211,238,.08), rgba(139,92,246,.10));
+  box-shadow: 0 10px 28px rgba(34,211,238,.06);
+}
+
+/* Home: colorful accents, calm typography */
+#page-home { background-color: #070b14; }
+.home-content { max-width: 1220px; }
+.home-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -.045em;
+  background: linear-gradient(112deg, #f8fafc 0%, #dffbff 22%, #67e8f9 40%, #818cf8 62%, #c084fc 78%, #f9a8d4 100%);
+  background-size: 160% auto;
+}
+.home-name { color: #e2e8f0; }
+.home-desc { color: #9eacc0; max-width: 650px; }
+.home-photo-card {
+  border: 1px solid rgba(148,163,184,.16);
+  background: linear-gradient(145deg, rgba(30,41,59,.68), rgba(15,23,42,.46));
+  box-shadow: 0 32px 80px rgba(0,0,0,.34);
+}
+.home-photo-frame { border: 1px solid rgba(255,255,255,.06); }
+.chip { background: rgba(7,11,20,.56); }
+
+/* About */
+.about-photo-frame,
+.about-photo-meta,
+.team-card,
+.position-card,
+.collab-card,
+.contact-box,
+.tool-chip,
+.achieve-card {
+  border-color: rgba(148,163,184,.14);
+}
+.about-photo-frame { border-radius: 18px 18px 0 0; }
+.about-photo-meta {
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(145deg, rgba(15,23,42,.9), rgba(15,23,42,.65));
+}
+.meta-role { color: #67e8f9; }
+.meta-link:hover { color: #c4b5fd; }
+.profile-links { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .7rem; }
+.profile-link {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(255,255,255,.025);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: .75rem;
+  transition: transform .2s ease, border-color .2s ease, color .2s ease, background .2s ease;
+}
+.profile-link svg { width: 19px; height: 19px; }
+.profile-link:hover { transform: translateY(-2px); color: #fff; border-color: rgba(103,232,249,.42); background: rgba(103,232,249,.07); }
+.rg-link { color: #5eead4; }
+.orcid-link { color: #a3e635; }
+.pill {
+  border-radius: 999px;
+  border-color: rgba(129,140,248,.25);
+  color: #c4b5fd;
+  background: rgba(139,92,246,.07);
+}
+.timeline::before { background: linear-gradient(to bottom, var(--cyan), var(--violet), transparent); opacity: .42; }
+.timeline-dot { border-color: #67e8f9; background: #0a1020; box-shadow: 0 0 16px rgba(34,211,238,.2); }
+.timeline-inst { color: #93c5fd; }
+.achieve-card { border-radius: 14px; background: rgba(15,23,42,.46); }
+.achieve-card::before { background: var(--gradient); opacity: .8; }
+.achieve-year { color: #fbbf24; }
+
+/* Research */
+.protein-viewer-panel {
+  max-width: 1160px;
+  margin: 2.2rem auto 0;
+  padding: 1.2rem 3rem 0;
+  display: grid;
+  grid-template-columns: .8fr 1.2fr;
+  gap: 2rem;
+  align-items: center;
+}
+.viewer-copy {
+  padding: 1.7rem;
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(15,23,42,.66), rgba(15,23,42,.35));
+}
+.viewer-kicker {
+  display: inline-block;
+  margin-bottom: .65rem;
+  font-family: var(--mono);
+  font-size: .64rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #67e8f9;
+}
+.viewer-copy h2 { font-family: var(--serif); font-weight: 400; color: #f8fafc; font-size: 1.65rem; line-height: 1.2; margin-bottom: .65rem; }
+.viewer-copy p { font-size: .84rem; color: var(--text-muted); }
+#viewer {
+  width: 100%; height: 360px;
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(103,232,249,.16);
+  background: radial-gradient(circle at 50% 50%, rgba(30,41,59,.55), rgba(7,11,20,.9));
+  box-shadow: inset 0 0 55px rgba(34,211,238,.025), 0 24px 55px rgba(0,0,0,.22);
+}
+.research-grid { gap: 1rem; background: transparent; border: 0; }
+.research-card {
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148,163,184,.14);
+  background: linear-gradient(145deg, rgba(15,23,42,.72), rgba(15,23,42,.42));
+  box-shadow: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease, border-color .25s ease, background .25s ease, box-shadow .25s ease;
+}
+.research-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink));
+  opacity: .55;
+}
+.research-card::after { display: none; }
+.research-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(103,232,249,.23);
+  background: linear-gradient(145deg, rgba(17,26,46,.88), rgba(15,23,42,.58));
+  box-shadow: 0 18px 42px rgba(0,0,0,.2);
+}
+.research-card h3 { font-size: 1.28rem; }
+.research-card p { color: #96a5b8; }
+.research-tag {
+  border-radius: 999px;
+  border-color: rgba(129,140,248,.24);
+  color: #c4b5fd;
+  background: rgba(139,92,246,.065);
+}
+.tool-chip { border-radius: 12px; background: rgba(15,23,42,.44); }
+.tool-chip:hover { border-color: rgba(103,232,249,.30); color: #dffbff; background: rgba(34,211,238,.04); }
+
+/* Publications */
+.publication-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 105px 1fr;
+  gap: 30px;
+  max-width: 1080px;
+  margin: 1.4rem auto;
+  padding: 34px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(34,211,238,.075), transparent 28%),
+    radial-gradient(circle at 94% 90%, rgba(139,92,246,.09), transparent 30%),
+    linear-gradient(145deg, rgba(15,23,42,.94), rgba(10,16,32,.92));
+  border: 1px solid rgba(148,163,184,.14);
+  box-shadow: 0 22px 55px rgba(0,0,0,.24);
+  transition: transform .28s ease, border-color .28s ease, box-shadow .28s ease;
+}
+.publication-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient);
+  opacity: .9;
+}
+.publication-card:hover { transform: translateY(-5px); border-color: rgba(167,139,250,.25); box-shadow: 0 28px 65px rgba(0,0,0,.31); }
+.publication-card[hidden] { display: none !important; }
+.research-glow { opacity: .10; }
+.pub-date { border-right-color: rgba(148,163,184,.14); }
+.pub-date .day { font-family: var(--sans); }
+.pub-title { font-family: var(--serif); font-weight: 600; letter-spacing: -.015em; }
+.pub-authors strong { color: #4ade80; }
+.pub-bottom { border-top-color: rgba(148,163,184,.12); }
+.journal-name { color: #7dd3fc; }
+.pub-filter-btn { border-radius: 999px; border-color: rgba(148,163,184,.17); background: rgba(15,23,42,.42); }
+.pub-filter-btn.active,
+.pub-filter-btn:hover { border-color: rgba(103,232,249,.35); color: #fff; background: linear-gradient(135deg, rgba(34,211,238,.08), rgba(139,92,246,.09)); }
+
+/* Team, resources, collaborators, contact */
+.team-card,
+.position-card,
+.collab-card,
+.contact-box {
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(15,23,42,.68), rgba(15,23,42,.40));
+  overflow: hidden;
+}
+.team-card:hover,
+.position-card:hover,
+.collab-card:hover { border-color: rgba(103,232,249,.27); box-shadow: 0 16px 36px rgba(0,0,0,.18); }
+.team-photo { background: linear-gradient(145deg, #111a2e, #0b1222); }
+.team-role { color: #67e8f9; }
+.position-card::before { width: 3px; background: linear-gradient(to bottom, var(--cyan), var(--violet), var(--pink)); }
+.position-badge { border-radius: 999px; background: rgba(139,92,246,.08); color: #c4b5fd; border: 1px solid rgba(139,92,246,.17); }
+.collab-avatar { border-color: rgba(103,232,249,.18); background: linear-gradient(145deg, rgba(34,211,238,.08), rgba(139,92,246,.08)); color: #dffbff; }
+.contact-icon { border-radius: 12px; background: rgba(34,211,238,.045); border-color: rgba(103,232,249,.18); }
+.contact-label { color: #67e8f9; }
+.contact-box { background: linear-gradient(145deg, rgba(15,23,42,.78), rgba(139,92,246,.035)); }
+.social-row > a {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  transition: transform .2s ease, border-color .2s ease, color .2s ease;
+}
+.social-row > a:hover { transform: translateY(-2px); border-color: rgba(103,232,249,.35); color: #fff; }
+.social-row > a svg { width: 20px; height: 20px; }
+.info-callout { border-left-color: rgba(103,232,249,.45); background: rgba(34,211,238,.035); border-radius: 0 10px 10px 0; }
+
+footer { background: rgba(7,11,20,.92); border-top-color: rgba(148,163,184,.11); }
+.footer-logo { color: #c4b5fd; }
+.mobile-menu { background: rgba(7,11,20,.96); }
+
+@media (max-width: 900px) {
+  .protein-viewer-panel { grid-template-columns: 1fr; padding: 1.2rem 1.5rem 0; }
+  #viewer { height: 320px; }
+}
+@media (max-width: 720px) {
+  .publication-card { grid-template-columns: 1fr; padding: 24px; gap: 18px; }
+  .publication-card .pub-date {
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 8px;
+    padding-right: 0;
+    padding-bottom: 14px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(148,163,184,.12);
+  }
+  .publication-card .pub-date .day { font-size: 2rem; }
+  .publication-card .pub-date .month,
+  .publication-card .pub-date .year { margin: 0; }
+  .publication-card .pub-bottom { flex-direction: column; align-items: flex-start; }
+  .publication-card .view-paper { width: 100%; justify-content: center; }
+  .protein-viewer-panel { padding-inline: 1.1rem; }
+  .viewer-copy { padding: 1.25rem; }
+  #viewer { height: 280px; }
+}
+@media (max-width: 520px) {
+  .page-header, .page-body { padding-left: 1.1rem; padding-right: 1.1rem; }
+  .home-content { width: 90%; }
+  .profile-link { width: 36px; height: 36px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════════ -->
+<nav>
+  <button class="nav-logo" type="button" onclick="showPage('home')" aria-label="Go to home page">AzizSimX</button>
+  <ul class="nav-links" id="desktopNav">
+    <li><button onclick="showPage('home')"   data-page="home">Home</button></li>
+    <li><button onclick="showPage('about')"  data-page="about">About</button></li>
+    <li><button onclick="showPage('research')" data-page="research">Research</button></li>
+    <li><button onclick="showPage('publications')" data-page="publications">Publications</button></li>
+    <li><button onclick="showPage('team')"   data-page="team">Team</button></li>
+    <li><button onclick="showPage('positions')" data-page="positions">Software & Tutorials</button></li>
+    <li><button onclick="showPage('collaborators')" data-page="collaborators">Collaborators</button></li>
+    <li><button onclick="showPage('contact')" data-page="contact">Contact</button></li>
+  </ul>
+  <button class="hamburger" type="button" onclick="toggleMobile()" aria-label="Open navigation menu" aria-controls="mobileMenu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button onclick="showPage('home');toggleMobile()"          data-mob="home">Home</button>
+  <button onclick="showPage('about');toggleMobile()"         data-mob="about">About</button>
+  <button onclick="showPage('research');toggleMobile()"      data-mob="research">Research</button>
+  <button onclick="showPage('publications');toggleMobile()"  data-mob="publications">Publications</button>
+  <button onclick="showPage('team');toggleMobile()"          data-mob="team">Team</button>
+  <button onclick="showPage('positions');toggleMobile()" data-mob="positions">Software & Tutorials</button>
+  <button onclick="showPage('collaborators');toggleMobile()" data-mob="collaborators">Collaborators</button>
+  <button onclick="showPage('contact');toggleMobile()"       data-mob="contact">Contact</button>
+</div>
+
+<!-- ══ HOME PAGE ════════════════════════════════════════════════════ -->
+  
+<div class="page active" id="page-home">
+  <div class="home-canvas"></div>
+  <div class="home-grid"></div>
+
+  <!-- Floating particles -->
+  <div class="molecule" style="left:8%;  width:4px; height:4px; animation-duration:16s; animation-delay:0s;"></div>
+  <div class="molecule" style="left:22%; width:6px; height:6px; animation-duration:20s; animation-delay:3s;"></div>
+  <div class="molecule" style="left:40%; width:3px; height:3px; animation-duration:13s; animation-delay:7s;"></div>
+  <div class="molecule" style="left:58%; width:8px; height:8px; animation-duration:18s; animation-delay:1s; opacity:0.12;"></div>
+  <div class="molecule" style="left:74%; width:5px; height:5px; animation-duration:22s; animation-delay:5s;"></div>
+  <div class="molecule" style="left:88%; width:4px; height:4px; animation-duration:14s; animation-delay:9s;"></div>
+
+  <div class="home-content">
+    <!-- Left: text -->
+    <div>
+      <p class="home-eyebrow">Computational (Bio)physical Chemistry · SNBNCBS · Est. 2023</p>
+      <h1 class="home-title">
+        Decode Life<br>
+        at the<br>
+        Molecular Level
+      </h1>
+      <p class="home-name">Abdul Aziz Mandal — Research Scholar</p>
+      <p class="home-desc">
+        Working at the intersection of computational chemistry, biophysics, and machine learning
+        to unravel molecular aggregation pathways and interactions of complex biological systems at
+        S.N. Bose National Centre for Basic Sciences, Kolkata.
+      </p>
+      <div class="home-cta">
+        <button class="btn-primary" onclick="showPage('research')">Explore Research</button>
+        <button class="btn-outline" onclick="showPage('about')">About Me</button>
+        <button class="btn-outline" onclick="showPage('positions')">Software & Tutorials</button>
+      </div>
+    </div>
+
+    <!-- Right: photo card -->
+    <div class="home-photo-card">
+      <div class="home-photo-frame">
+        <img src="./pic_git.jpeg" alt="Abdul Aziz Mandal" loading="eager" decoding="async">
+      </div>
+      <div class="home-info-chips">
+        <div class="chip"><div class="chip-dot"></div>PhD Scholar, S. N. Bose National Centre for Basic Sciences</div>
+        <div class="chip"><div class="chip-dot"></div>Kolkata, India</div>
+        <div class="chip"><div class="chip-dot"></div>MD Simulation · ML · Enhanced Sampling</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</div>
+
+<!-- ══ ABOUT PAGE ════════════════════════════════════════════════════ -->
+<div class="page" id="page-about">
+  <div class="page-header">
+    <p class="section-label">About Me</p>
+    <h1 class="page-title">At the <em>Interface</em> of Chemistry,<br>Physics &amp; Biology</h1>
+  </div>
+
+  <div class="page-body">
+    <div class="about-layout">
+
+      <!-- Left: Photo + meta -->
+      <div class="about-photo-wrap">
+        <div class="about-photo-frame">
+          <img src="./pic_git.jpeg" alt="Abdul Aziz Mandal" loading="lazy" decoding="async">
+        </div>
+        <div class="about-photo-meta">
+          <div class="meta-name">Abdul Aziz Mandal</div>
+          <div class="meta-role">Research Scholar — PhD</div>
+          <div class="meta-links">
+            <a href="mailto:abdulazizcaluniv@gmail.com" class="meta-link">
+              <span class="meta-link-icon">✉</span> abdulazizcaluniv@gmail.com
+            </a>
+            <a href="mailto:abdulaziz.mandal@bose.res.in" class="meta-link">
+              <span class="meta-link-icon">✉</span> abdulaziz.mandal@bose.res.in
+            </a>
+
+            <div class="profile-links" aria-label="Academic and social profiles">
+              <a class="profile-link" href="https://github.com/AzizSimX" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              </a>
+              <a class="profile-link" href="https://www.linkedin.com/in/abdul-aziz-mandal-804a48206" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              </a>
+              <a class="profile-link" href="https://scholar.google.com/citations?user=kKbvQUEAAAAJ&amp;hl=en&amp;authuser=2" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar" title="Google Scholar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-16L0 9l12-9 12 9-12-1z"/></svg>
+              </a>
+              <a class="profile-link rg-link" href="https://www.researchgate.net/profile/Abdul-Mandal?ev=hdr_xprf" target="_blank" rel="noopener noreferrer" aria-label="ResearchGate" title="ResearchGate">RG</a>
+              <a class="profile-link orcid-link" href="https://orcid.org/0009-0007-1778-5261" target="_blank" rel="noopener noreferrer" aria-label="ORCID" title="ORCID">iD</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Bio + Education + Achievements -->
+      <div class="about-content">
+
+        <!-- Bio -->
+        <div class="about-bio">
+          <p>
+            I am a <strong>Research Scholar</strong> in Computational Chemistry (MD Simulation) at the
+            <strong>S. N. Bose National Centre for Basic Sciences (SNBNCBS)</strong>, Kolkata. My work sits
+            at the intersection of physical chemistry, biophysics, and computational science.
+          </p>
+          <p>
+            My research aims to unravel the <strong>molecular aggregation pathways</strong> and molecular
+            interactions of small molecules in complex biological systems — particularly disease-linked peptide
+            and protein aggregation processes and their modulation by small organic molecules and metal ions.
+          </p>
+          <p>
+            I am currently developing expertise in machine learning potentials and enhanced-sampling techniques
+            to push the boundaries of what classical MD simulations can reveal about biological systems.
+          </p>
+        </div>
+
+        <!-- Research Interests -->
+        <div style="margin-top: 2rem;">
+          <p class="section-label">Research Interests</p>
+          <div class="interest-pills">
+            <span class="pill">Amyloid Aggregation</span>
+            <span class="pill">MD Simulation</span>
+            <span class="pill">Free Energy Methods</span>
+            <span class="pill">Machine Learning Methods (AI/ML)</span>
+            <span class="pill">Enhanced Sampling</span>
+            <!--<span class="pill">Protein Folding</span>-->
+            <span class="pill">Small Molecule Inhibition</span>
+            <span class="pill">Biophysics</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ── EDUCATION ────────────────────── -->
+        <!-- ✏️ EDIT BELOW: Add/remove <li class="timeline-item"> blocks to update your degrees -->
+        <div class="edu-block">
+          <p class="section-label">Education</p>
+          <h3>Academic <em style="font-style:italic; color:var(--gold-light);">Qualifications</em></h3>
+
+          <div class="timeline" style="margin-left:1.5rem; margin-top:1.8rem;">
+
+            <!-- DEGREE 1 — EDIT THIS -->
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-year">2023–<br>Present</div>
+              <div class="timeline-body">
+                <div class="timeline-degree">Ph.D. in Computational Chemistry</div>
+                <div class="timeline-inst">S. N. Bose National Centre for Basic Sciences, Kolkata (Affiliation: Jadavpur University)</div>
+                <div class="timeline-detail">Supervisor: Prof. Ranjit Biswas<br>Focus: Molecular Thermodynamics and Kinetics of Some Disease-
+linked Peptide and Protein Aggregation Processes: Modulation by Small Organic
+Molecules and Metal Ions.</div>
+              </div>
+            </div>
+
+            <!-- DEGREE 2 — EDIT THIS -->
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-year">2020–<br>2022</div>
+              <div class="timeline-body">
+                <div class="timeline-degree">M.Sc. in Chemistry</div>
+                <div class="timeline-inst">University of Calcutta, Kolkata (Campus: Rajabazar Science College)</div>
+                <div class="timeline-detail">Specialization: Physical Chemistry<br><!-- Add your grade/GPA here --></div>
+                <div class="timeline-detail">Supervisor: Prof. Swapan Chakrabarti<br>Focus: This project is on “Quantum Cryptography: An IBMQ Experience”. This
+Quantum Cryptography is a kind of encryption method uses quantum
+mechanics properties to secure and transfer data in a way that can’t be
+hacked. In current progress quantum computers will be able to break public
+encryption key easily.</div>
+              </div>
+            </div>
+
+            <!-- DEGREE 3 — EDIT THIS -->
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-year">2017–<br>2020</div>
+              <div class="timeline-body">
+                <div class="timeline-degree">B.Sc. in Chemistry (Hons.)</div>
+                <div class="timeline-inst">Maulana Azad College, Kolkata (Affiliation: University of Calcutta)</div>
+                <!--div class="timeline-detail">University of Calcutta</div>-->
+              </div>
+            </div>
+            
+            <!-- DEGREE 4 — EDIT THIS -->
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-year">2016–<br>2017</div>
+              <div class="timeline-body">
+                <div class="timeline-degree">Higher Secondary Education</div>
+                <div class="timeline-inst">Tapan High School, Tapan (Affiliation: WBCHSE)</div>
+                <!--div class="timeline-detail">University of Calcutta</div>-->
+              </div>
+            </div>
+                        <!-- DEGREE 5 — EDIT THIS -->
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-year">2014–<br>2015</div>
+              <div class="timeline-body">
+                <div class="timeline-degree">Secondary Education</div>
+                <div class="timeline-inst">Tapan High School, Tapan (Affiliation: WBBSE)</div>
+                <!--div class="timeline-detail">University of Calcutta</div>-->
+              </div>
+            </div>
+
+            <!-- ✏️ ADD MORE DEGREES: Copy a timeline-item block above and paste here -->
+
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ── ACHIEVEMENTS ──────────────────── -->
+        <!-- ✏️ EDIT BELOW: Add your awards, fellowships, achievements -->
+        <div>
+          <p class="section-label">Achievements &amp; Awards</p>
+          <h3 style="font-family:var(--serif); font-size:1.5rem; font-weight:300; color:var(--cream); margin-bottom:1.5rem;">
+            Honours &amp; <em style="font-style:italic; color:var(--gold-light);">Recognition</em>
+          </h3>
+
+          <div class="achieve-grid">
+
+            <!-- ACHIEVEMENT 1 — EDIT THIS -->
+            <div class="achieve-card">
+              <div class="achieve-year">2023</div>
+              <div class="achieve-title">Inspire Fellowship</div>
+              <div class="achieve-body">Awarded junior research fellowship (JRF) for doctoral studies at SNBNCBS, Kolkata.</div>
+            </div>
+
+            <!-- ACHIEVEMENT 2 — EDIT THIS (or delete if not yet applicable) -->
+            <div class="achieve-card">
+              <div class="achieve-year">2017</div>
+              <div class="achieve-title">Inspire Scholarship</div>
+              <div class="achieve-body">Awarded for coming under top 1% students Higher Secondary Examination in West Bengal</div>
+            </div>
+
+            <!-- ACHIEVEMENT 3 — EDIT or DELETE -->
+            <div class="achieve-card">
+              <div class="achieve-year">Coming Soon</div>
+              <div class="achieve-title">Conference Presentation</div>
+              <div class="achieve-body">Replace with conference name, title, location, and year.</div>
+            </div>
+
+            <!-- ACHIEVEMENT 4 — EDIT or DELETE -->
+            <div class="achieve-card">
+              <div class="achieve-year">2025</div>
+              <div class="achieve-title">Certification</div>
+              <div class="achieve-body">The Complete Python Bootcamp From Zero to Hero in Python, Udemy Course</div>
+            </div>
+
+            <!-- ✏️ ADD MORE: Copy an achieve-card block and paste inside achieve-grid -->
+
+          </div>
+        </div>
+
+      </div><!-- end about-content -->
+    </div><!-- end about-layout -->
+  </div><!-- end page-body -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ RESEARCH PAGE ═════════════════════════════════════════════════ -->
+<div class="page" id="page-research">
+  <div class="page-header">
+    <p class="section-label">Research Themes</p>
+    <h1 class="page-title">Core <em>Focus Areas</em></h1>
+  </div>
+  <div class="protein-viewer-panel" aria-label="Interactive molecular structure viewer">
+    <div class="viewer-copy">
+      <span class="viewer-kicker">Interactive structure</span>
+      <h2>Molecular structure in motion</h2>
+      <p>A compact 3D molecular viewer complements the research themes below. Drag to rotate, scroll to zoom, or let the structure spin gently.</p>
+    </div>
+    <div id="viewer" role="img" aria-label="Interactive 3D protein structure"></div>
+  </div>
+  <div class="page-body">
+    <div class="research-grid">
+
+      <div class="research-card">
+        <span class="research-icon">🔬</span>
+        <h3>Amyloid Aggregation &amp; Inhibition</h3>
+        <p>Exploring the aggregation pathways of disease-linked proteins and peptides (Alzheimer's, Parkinson's) and mechanistic inhibition by small molecules and metal ions using atomistic MD simulations.</p>
+        <span class="research-tag">Computational Biology</span>
+      </div>
+
+      <div class="research-card">
+        <span class="research-icon">⚙️</span>
+        <h3>Machine Learning &amp; Enhanced Sampling</h3>
+        <p>Developing expertise in ML-based force fields and enhanced sampling methods — metadynamics, replica exchange, OPES — to access timescales beyond classical MD.</p>
+        <span class="research-tag">ML / AI</span>
+      </div>
+
+      <div class="research-card">
+        <span class="research-icon">💧</span>
+        <h3>Solvation &amp; Hydration</h3>
+        <p>Investigating the role of water structure and solvation dynamics in modulating protein stability, aggregation, and small-molecule binding thermodynamics.</p>
+        <span class="research-tag">Physical Chemistry</span>
+      </div>
+
+      <div class="research-card">
+        <span class="research-icon">📐</span>
+        <h3>Protein–Ligand Interactions</h3>
+        <p>Studying binding affinities and interaction mechanisms of small organic molecules with aggregation-prone proteins using docking and free-energy perturbation methods.</p>
+        <span class="research-tag">MD Simulations</span>
+      </div>
+
+      <div class="research-card">
+        <span class="research-icon">🌀</span>
+        <h3>Intrinsically Disordered Proteins</h3>
+        <p>Characterising the conformational ensemble and aggregation propensity of intrinsically disordered regions using all-atom simulations.</p>
+        <span class="research-tag">Biophysics</span>
+      </div>
+
+      <div class="research-card">
+        <span class="research-icon">🧮</span>
+        <h3>Free Energy Methods</h3>
+        <p>Learning and applying umbrella sampling, metadynamics, thermodynamic integration, and MBAR to compute binding free energies and conformational free energy landscapes.</p>
+        <span class="research-tag">Statistical Mechanics</span>
+      </div>
+
+    </div>
+
+    <!-- Computational Tools -->
+    <div class="mt-3">
+      <p class="section-label">Computational Tools &amp; Software</p>
+      <div class="tools-grid">
+        <div class="tool-chip"><span class="tool-chip-icon">⚡</span>GROMACS</div>
+        <div class="tool-chip"><span class="tool-chip-icon">⚡</span>AMBER</div>
+        <div class="tool-chip"><span class="tool-chip-icon">🐍</span>Python</div>
+        <div class="tool-chip"><span class="tool-chip-icon">⚡</span>Julia</div>
+        <div class="tool-chip"><span class="tool-chip-icon">📊</span>MDAnalysis</div>
+        <div class="tool-chip"><span class="tool-chip-icon">🔭</span>VMD</div>
+        <div class="tool-chip"><span class="tool-chip-icon">🧬</span>PLUMED</div>
+        <div class="tool-chip"><span class="tool-chip-icon">🤖</span>DeePMD</div>
+        <div class="tool-chip"><span class="tool-chip-icon">📐</span>AutoDock</div>
+        <div class="tool-chip"><span class="tool-chip-icon">📈</span>NumPy / SciPy</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ PUBLICATIONS PAGE ═════════════════════════════════════════════ -->
+<div class="page" id="page-publications">
+  <div class="page-header">
+    <p class="section-label">Selected Work</p>
+    <h1 class="page-title">Publications &amp; <em>Preprints</em></h1>
+  </div>
+
+  <div class="page-body">
+
+    <div class="pub-filters" aria-label="Publication filters">
+      <button class="pub-filter-btn active" data-filter="all">All</button>
+      <button class="pub-filter-btn" data-filter="journal">Journal Articles</button>
+      <button class="pub-filter-btn" data-filter="upcoming">Upcoming</button>
+    </div>
+
+    <!--
+      ✏️ HOW TO ADD A PUBLICATION:
+      Copy a <li class="pub-item"> block and fill in:
+        pub-year  → year of publication
+        pub-title → full title
+        pub-authors → authors (bold your name with <strong>)
+        pub-journal → journal name + volume/pages
+        pub-link  → DOI URL
+    -->
+<div class="publication-card" data-category="journal">
+
+  <div class="research-glow"></div>
+
+  <div class="pub-date">
+    <span class="day">24</span>
+    <span class="month">AUG</span>
+    <span class="year">2026</span>
+  </div>
+
+  <div class="pub-content">
+
+    <div class="pub-tags">
+      <span class="first-author">
+        ★ First Author
+      </span>
+
+      <span class="journal-tag">
+        J. Phys. Chem. B
+      </span>
+    </div>
+
+    <h3 class="pub-title">
+      Mechanistic Role of Different Functional Groups in Inhibiting
+      Tryptophan Self-Assembly:
+      <span>
+        Comparison between Aromatic and Nonaromatic
+        Hydroxyl Moiety-Rich Chemical Compounds
+      </span>
+    </h3>
+
+    <div class="pub-authors">
+      <strong>Abdul Aziz Mandal</strong>
+      <span>· Sudipta Mitra</span>
+      <span>· Suman Chakrabarty</span>
+      <span>· Ranjit Biswas*</span>
+    </div>
+
+    <div class="pub-bottom">
+
+      <div class="journal-info">
+        <span class="journal-name">
+          The Journal of Physical Chemistry B
+        </span>
+
+        <span class="journal-details">
+          Volume(Issue) · Pages
+        </span>
+      </div>
+
+      <a
+        href="https://doi.org/10.1021/acs.jpcb.6c03238"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="view-paper"
+      >
+        View Publication
+        <span>↗</span>
+      </a>
+
+    </div>
+
+  </div>
+</div>
+
+    <!--Upcoming 2nd Article-->
+<div class="publication-card" data-category="upcoming">
+
+  <div class="research-glow"></div>
+
+  <div class="pub-date">
+    <span class="day">Soon</span>
+    <span class="month"></span>
+  </div>
+
+  <div class="pub-content">
+
+    <div class="pub-tags">
+      <span class="first-author">
+        Upcoming Paper
+      </span>
+
+      <span class="journal-tag">
+        Journal Name
+      </span>
+    </div>
+
+    <h3 class="pub-title">
+      Your Second Paper Title Will Appear Here
+    </h3>
+
+    <div class="pub-authors">
+      <span>Author C</span>
+      <span>· <strong>Mandal, A. A.*</strong></span>
+      <span>· Author D</span>
+    </div>
+
+    <div class="pub-bottom">
+
+      <div class="journal-info">
+        <span class="journal-name">
+          Journal Name
+        </span>
+
+        <span class="journal-details">
+          Volume(Issue) · Pages
+        </span>
+      </div>
+
+      <a
+        href="https://azizsimx.github.io/#"
+        class="view-paper"
+      >
+        DOI Coming Soon
+        <span>↗</span>
+      </a>
+
+    </div>
+
+  </div>
+</div>
+        <!--Upcoming 3rd Article-->
+<div class="publication-card" data-category="upcoming">
+
+  <div class="research-glow"></div>
+
+  <div class="pub-date">
+    <span class="day">Soon</span>
+    <span class="month"></span>
+  </div>
+
+  <div class="pub-content">
+
+    <div class="pub-tags">
+      <span class="first-author">
+        Upcoming Paper
+      </span>
+
+      <span class="journal-tag">
+        Journal Name
+      </span>
+    </div>
+
+    <h3 class="pub-title">
+      Your Third Paper Title Will Appear Here
+    </h3>
+
+    <div class="pub-authors">
+      <span>Author C</span>
+      <span>· <strong>Mandal, A. A.*</strong></span>
+      <span>· Author D</span>
+    </div>
+
+    <div class="pub-bottom">
+
+      <div class="journal-info">
+        <span class="journal-name">
+          Journal Name
+        </span>
+
+        <span class="journal-details">
+          Volume(Issue) · Pages
+        </span>
+      </div>
+
+      <a
+        href="https://azizsimx.github.io/#"
+        class="view-paper"
+      >
+        DOI Coming Soon
+        <span>↗</span>
+      </a>
+
+    </div>
+
+  </div>
+</div>
+
+<div class="mt-3">
+  <a
+    href="https://scholar.google.com/citations?user=kKbvQUEAAAAJ&hl=en&authuser=2"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="view-paper"
+  >
+    View on Google Scholar
+    <span>↗</span>
+  </a>
+</div>
+
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ TEAM PAGE ═════════════════════════════════════════════════════ -->
+<div class="page" id="page-team">
+  <div class="page-header">
+    <p class="section-label">People</p>
+    <h1 class="page-title">The <em>Team</em></h1>
+  </div>
+
+  <div class="page-body">
+    <div class="team-grid">
+
+      <!-- PI Card — spans 2 cols on desktop -->
+      <div class="team-card pi-card">
+        <div class="team-photo">👤</div>
+        <div class="team-info">
+          <div class="team-role">Principal Investigator</div>
+          <div class="team-name" style="font-size:1.4rem; margin-bottom:0.5rem;">Prof. Ranjit Biswas</div>
+          <div class="team-desc" style="font-size:0.85rem; margin-bottom:1rem;">
+            Professor at S.N. Bose National Centre for Basic Sciences. Research interests span
+            ultrafast spectroscopy, ionic liquids, and biophysical chemistry of complex systems.
+          </div>
+          <a href="https://pccplab.yolasite.com" class="btn-outline" style="font-size:0.72rem; padding:0.5rem 1.2rem;">Lab Website →</a>
+        </div>
+      </div>
+
+      <!-- ✏️ TEAM MEMBERS — edit name, role, initials; add img tag inside team-photo div for photo -->
+      <div class="team-card">
+        <div class="team-photo">👤</div>
+        <div class="team-info">
+          <div class="team-role">Mentor</div>
+          <div class="team-name">Suman Chakrabarty</div>
+          <div class="team-desc">Guiding research direction and simulation methodology.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">👤</div>
+        <div class="team-info">
+          <div class="team-role">Senior (Guidance)</div>
+          <div class="team-name">Sudipta Mitra</div>
+          <div class="team-desc">Senior lab member providing methodological guidance.</div>
+        </div>
+      </div>
+
+      <div class="team-card">
+        <div class="team-photo">👤</div>
+        <div class="team-info">
+          <div class="team-role">Me</div>
+          <div class="team-name">Abdul Aziz Mandal</div>
+          <div class="team-desc">PhD student working on computational biophysical chemistry.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ SOFTWARE & TUTORIALS PAGE ═══════════════════════════ -->
+<div class="page" id="page-positions">
+  <div class="page-header">
+    <p class="section-label">Resources</p>
+    <h1 class="page-title">Software & <em>Tutorials</em></h1>
+  </div>
+
+  <div class="page-body">
+
+    <div class="positions-grid">
+
+      <div class="position-card">
+        <div class="position-badge">MD Simulations</div>
+        <h3>GROMACS Tutorials</h3>
+        <p>Step-by-step molecular dynamics tutorials for beginners and advanced users.</p>
+        <a href="http://www.mdtutorials.com/gmx/" target="_blank" class="btn-outline">Open Resource</a>
+      </div>
+      <div class="position-card">
+        <div class="position-badge">MD Simulations</div>
+        <h3>AmberTools Tutorials</h3>
+        <p>Amber is a suite of biomolecular simulation programs.</p>
+        <a href="https://ambermd.org/tutorials/" target="_blank" class="btn-outline">Open Resource</a>
+      </div>
+      <div class="position-card">
+        <div class="position-badge">MD Simulations</div>
+        <h3>LAMMPS Tutorials</h3>
+        <p>Official tutorials, examples, and user guides for molecular dynamics simulations using LAMMPS.</p>
+        <a href="https://docs.lammps.org/" target="_blank" class="btn-outline">Open Resource</a>
+      </div>
+      <div class="position-card">
+        <div class="position-badge">MD Simulations</div>
+        <h3>OpenMM Tutorials</h3>
+        <p>Step-by-step molecular dynamics tutorials and documentation for beginners and advanced OpenMM users.</p>
+        <a href="https://openmm.org/" target="_blank" class="btn-outline">Open Resource</a>
+      </div>
+      <div class="position-card">  
+        <div class="position-badge">gromacs</div>
+        <h3>All GROMACS Versions</h3>
+        <p>Official archive containing all released versions of GROMACS.</p>
+        <a href="https://ftp.gromacs.org/pub/gromacs/" target="_blank" class="btn-outline">Download</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Visualization</div>
+        <h3>VMD / QwikMD Tutorials</h3>
+        <p>Learn molecular visualization, trajectory analysis, and simulation setup.</p>
+        <a href="https://www.ks.uiuc.edu/Training/Tutorials/" target="_blank" class="btn-outline">Open Tutorial</a>
+      </div>
+     <div class="position-card">
+       <div class="position-badge">MD Analysis</div>
+       <h3>MDAnalysis Tutorials</h3>
+       <p>Python module for post-processing, analyzing, and visualizing molecular dynamics trajectories and simulation data.</p>
+       <a href="https://www.mdanalysis.org/" target="_blank" class="btn-outline">Open Resource</a>
+     </div>
+    <div class="position-card">
+      <div class="position-badge">Force Field Generation</div>
+      <h3>Force Field</h3>
+     <p>
+       Generate topology and parameter files for small molecules using
+       AMBER, OPLS-AA, CHARMM, and GROMOS force fields.
+     </p>
+
+     <a href="https://www.bio2byte.be/acpype/" target="_blank" class="btn-outline">ACPYPE (AMBER)</a>
+     <a href="https://ambermd.org/" target="_blank" class="btn-outline">AmberTools</a>
+
+     <a href="https://traken.chem.yale.edu/ligpargen/" target="_blank" class="btn-outline">LigParGen (OPLS-AA)</a>
+
+     <a href="https://academiccharmm.org/" target="_blank" class="btn-outline">CHARMM</a>
+     <a href="https://www.charmm-gui.org/?doc=input/ligandrm" target="_blank" class="btn-outline">CHARMM-GUI Ligand Reader</a>
+     <a href="https://cgenff.com/" target="_blank" class="btn-outline">CGenFF (CHARMM)</a>
+
+     <a href="https://atb.uq.edu.au/" target="_blank" class="btn-outline">ATB (GROMOS)</a>
+    </div>
+  <div class="position-card">
+    <div class="position-badge">System Preparation</div>
+    <h3>Packmol</h3>
+    <p>Generate initial configurations for molecular dynamics simulations by packing molecules into simulation boxes using geometric optimization.</p>
+    <a href="https://m3g.github.io/packmol/" target="_blank" class="btn-outline">Open Resource</a>
+  </div>
+    <div class="position-card">
+      <div class="position-badge">gmx_MMPBSA</div>
+      <h3>gmx_MMPBSA Tutorials</h3>
+      <p>gmx_MMPBSA is a new tool based on AMBER's MMPBSA.py aiming to perform end-state free energy calculations with GROMACS files.</p>
+      <a href="https://valdes-tresanco-ms.github.io/" target="_blank" class="btn-outline">Open Resource</a>
+    </div>
+    
+    <div class="position-card">
+      <div class="position-badge">Amino Acid Mutation</div>
+      <h3>PMX Tutorials</h3>
+      <p>Generate hybrid structures and topologies for amino acid mutations and perform alchemical free energy calculations using PMX.</p>
+      <a href="https://github.com/deGrootLab/pmx" target="_blank" class="btn-outline">Open Resource</a>
+    </div>
+
+      <div class="position-card">
+        <div class="position-badge">Coarse-Grained MD</div>
+        <h3>MARTINI Tutorials</h3>
+        <p>Tutorials and examples for MARTINI coarse-grained simulations.</p>
+        <a href="http://cgmartini.nl/index.php/tutorials" target="_blank" class="btn-outline">Open Tutorial</a>
+      </div>
+      <div class="position-card">
+        <div class="position-badge">RCSB Protein Data Bank</div>
+        <h3>RCSB PDB</h3>
+        <p>Single worldwide archive of structural data of biological macromolecules.</p>
+        <a href="https://www.rcsb.org/" target="_blank" class="btn-outline">Open Tutorial</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">System Builder</div>
+        <h3>CHARMM-GUI</h3>
+        <p>Web-based platform for preparing simulation-ready biomolecular systems.</p>
+        <a href="https://www.charmm-gui.org" target="_blank" class="btn-outline">Open Website</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Protein Structure</div>
+        <h3>AlphaFold Database</h3>
+        <p>Predicted protein structures generated using AlphaFold.</p>
+        <a href="https://alphafold.ebi.ac.uk" target="_blank" class="btn-outline">Browse Database</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Chemistry News</div>
+        <h3>C&EN</h3>
+        <p>Latest news and developments in chemistry and related sciences.</p>
+        <a href="https://cen.acs.org" target="_blank" class="btn-outline">Read News</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">LaTeX</div>
+        <h3>Tables Generator</h3>
+        <p>Create publication-quality LaTeX tables online.</p>
+        <a href="https://www.tablesgenerator.com" target="_blank" class="btn-outline">Open Tool</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">LaTeX</div>
+        <h3>Special Characters Guide</h3>
+        <p>Reference for LaTeX symbols and special character formatting.</p>
+        <a href="https://en.wikibooks.org/wiki/LaTeX/Special_Characters" target="_blank" class="btn-outline">View Guide</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Nucleic Acids</div>
+        <h3>Build DNA/RNA Structures</h3>
+        <p>Create custom DNA and RNA PDB structures from user-defined sequences.</p>
+        <a href="https://mmb.irbbarcelona.org/NAFlex/" target="_blank" class="btn-outline">NAFlex</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Nucleic Acids</div>
+        <h3>DNA Builder</h3>
+        <p>Generate canonical DNA structures for simulations and modeling.</p>
+        <a href="http://www.scfbio-iitd.res.in/software/drugdesign/bdna.jsp" target="_blank" class="btn-outline">Open Tool</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Protein Analysis</div>
+        <h3>MetaDisorder</h3>
+        <p>Predict intrinsically disordered regions in proteins.</p>
+        <a href="http://iimcb.genesilico.pl/metadisorder/" target="_blank" class="btn-outline">Run Prediction</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Phase Separation</div>
+        <h3>PSPredictor</h3>
+        <p>Predict liquid–liquid phase separation propensity of proteins.</p>
+        <a href="http://www.pkumdl.cn:8000/PSPredictor/" target="_blank" class="btn-outline">Run Prediction</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Force Fields</div>
+        <h3>CHARMM FF for GROMACS</h3>
+        <p>Official CHARMM force-field distributions compatible with GROMACS.</p>
+        <a href="http://mackerell.umaryland.edu/charmm_ff.shtml#gromacs" target="_blank" class="btn-outline">Download FF</a>
+      </div>
+
+      <div class="position-card">
+        <div class="position-badge">Enhanced Sampling</div>
+        <h3>PLUMED Documentation</h3>
+        <p>Comprehensive documentation for collective variables and enhanced sampling methods.</p>
+        <a href="https://www.plumed.org/doc-v2.8/user-doc/html/index.html" target="_blank" class="btn-outline">Read Docs</a>
+      </div>
+
+    </div>
+
+    <div class="info-callout">
+      A curated collection of molecular simulation software, databases, tutorials, force fields, and computational chemistry resources frequently used in our research workflow.
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ COLLABORATORS PAGE ════════════════════════════════════════════ -->
+<div class="page" id="page-collaborators">
+  <div class="page-header">
+    <p class="section-label">Network</p>
+    <h1 class="page-title">Collaborators &amp; <em>Partners</em></h1>
+  </div>
+
+  <div class="page-body">
+    <!--
+      ✏️ HOW TO ADD A COLLABORATOR:
+      Copy a collab-card block, paste inside collab-grid, and fill in:
+        collab-avatar → initials or <img> tag
+        collab-name   → full name
+        collab-inst   → institution / university
+        href          → link to their profile/webpage
+    -->
+    <div class="collab-grid">
+      <a href="#" class="collab-card">
+        <div class="collab-avatar">——</div>
+        <div class="collab-name">Coming Soon</div>
+        <div class="collab-inst">Institution · Country</div>
+      </a>
+      <a href="#" class="collab-card">
+        <div class="collab-avatar">——</div>
+        <div class="collab-name">Coming Soon</div>
+        <div class="collab-inst">Institution · Country</div>
+      </a>
+      <a href="#" class="collab-card">
+        <div class="collab-avatar">——</div>
+        <div class="collab-name">Coming Soon</div>
+        <div class="collab-inst">Institution · Country</div>
+      </a>
+      <a href="#" class="collab-card">
+        <div class="collab-avatar">——</div>
+        <div class="collab-name">Coming Soon</div>
+        <div class="collab-inst">Institution · Country</div>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ CONTACT PAGE ══════════════════════════════════════════════════ -->
+<div class="page" id="page-contact">
+  <div class="page-header">
+    <p class="section-label">Find Me</p>
+    <h1 class="page-title">Get in <em>Touch</em></h1>
+  </div>
+
+  <div class="page-body">
+    <div class="contact-layout">
+
+      <div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">Address</div>
+            <div class="contact-value">
+              Department of Chemical &amp; Biological Sciences<br>
+              S. N. Bose National Centre for Basic Sciences<br>
+              JD Block, Sector III, Salt Lake<br>
+              Kolkata — 700 106, West Bengal, India
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="contact-label">Email (Personal)</div>
+            <div class="contact-value">
+              <a href="mailto:abdulazizcaluniv@gmail.com">abdulazizcaluniv@gmail.com</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="contact-label">Email (Institute)</div>
+            <div class="contact-value">
+              <a href="mailto:abdulaziz.mandal@bose.res.in">abdulaziz.mandal@bose.res.in</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">Phone</div>
+            <div class="contact-value">+91-XX-XXXX-XXXX</div>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="contact-icon">🔬</div>
+          <div>
+            <div class="contact-label">Institution</div>
+            <div class="contact-value">
+              <a href="https://www.bose.res.in" target="_blank">www.bose.res.in</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-row">
+          <!--a href="https://github.com/AzizSimX" target="_blank" class="social-btn" title="GitHub">GH</a>-->
+          <a href="https://github.com/AzizSimX" target="_blank">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 
+    0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695
+    -.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99
+    .105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225
+    -.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405
+    c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 
+    0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 
+    0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+  </svg>
+</a>
+          <!--a href="https://www.linkedin.com/in/abdul-aziz-mandal-804a48206" target="_blank" class="social-btn" title="LinkedIn">in</a>-->
+          <a href="https://www.linkedin.com/in/abdul-aziz-mandal-804a48206" target="_blank">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 
+    0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 
+    3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 
+    1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452z
+    M22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451
+    C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+</a>
+          <!-- X (Twitter) -->
+<a href="https://x.com/abdulazizmandal/" target="_blank">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.847h-7.406l-5.8-7.584-6.64 7.584H.474l8.6-9.83L0 1.153h7.594l5.243 6.932L18.901 1.153zm-1.292 19.49h2.04L6.486 3.24H4.298l13.311 17.403z"/>
+  </svg>
+</a>
+
+<!-- Google Scholar -->
+<a href="https://scholar.google.com/citations?user=kKbvQUEAAAAJ&hl=en&authuser=2" target="_blank">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-16L0 9l12-9 12 9-12-1z"/>
+  </svg>
+</a>
+
+<!-- ResearchGate exact-style RG logo -->
+<a href="https://www.researchgate.net/profile/Abdul-Mandal?ev=hdr_xprf" target="_blank" rel="noopener noreferrer" aria-label="ResearchGate">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="24"
+       height="24"
+       viewBox="0 0 256 256">
+    <circle cx="128" cy="128" r="128" fill="#00ccbb"/>
+    
+    <text x="134" y="182" font-family="Georgia, 'Times New Roman', serif" font-size="145" fill="#fff" text-anchor="end">R</text>
+    
+    <text x="138" y="112" font-family="Arial, Helvetica, sans-serif" font-size="75" fill="#fff" font-weight="bold" text-anchor="start">G</text>
+  </svg>
+</a>
+
+<!-- Official-style ORCID icon -->
+<a href="https://orcid.org/0009-0007-1778-5261" target="_blank" rel="noopener noreferrer" aria-label="ORCID">
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="24"
+       height="24"
+       viewBox="0 0 256 256"
+       fill="currentColor">
+    <path d="M128 0C57.3 0 0 57.3 0 128s57.3 128 128 128 128-57.3 128-128S198.7 0 128 0z"/>
+    <path fill="#fff" d="M86.8 74.3h18.5v107.4H86.8z"/>
+    <circle fill="#fff" cx="96.1" cy="53.2" r="10.7"/>
+    <path fill="#fff" d="M129.6 74.3h49.8c47.4 0 54.8 35.8 54.8 53.7 0 29.2-15 53.7-54.2 53.7h-50.4V74.3zm18.5 90.8h28.5c24.1 0 38.1-12.1 38.1-37.1 0-20.2-10.8-37.1-38.7-37.1h-27.9v74.2z"/>
+  </svg>
+</a>
+          <!--a href="#" class="social-btn" title="Twitter/X">𝕏</a>-->
+          <!--a href="#" class="social-btn" title="Google Scholar">GS</a>-->
+          <!--a href="#" class="social-btn" title="ResearchGate">R</a>-->
+          <!--a href="#" class="social-btn" title="ORCID">iD</a>-->
+        </div>
+      </div>
+
+      <div class="contact-box">
+        <h3>Interested in Collaborating?</h3>
+        <p>
+          I am open to research collaborations, seminar invitations, and discussions on
+          computational biophysical chemistry. Graduate students and postdocs interested in
+          joining are also welcome to write.
+        </p>
+        <p>
+          Please include a brief description of your background and what you'd like to work on.
+          I typically respond within 3–5 working days.
+        </p>
+        <a href="mailto:abdulazizcaluniv@gmail.com" class="btn-primary">Send an Email</a>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">AzizSimX</span>
+      <span class="footer-copy">© 2026 Abdul Aziz Mandal. SNBNCBS, Kolkata.</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ SCRIPT ════════════════════════════════════════════════════════ -->
+<script>
+  const PAGES = ['home', 'about', 'research', 'publications', 'team', 'positions', 'collaborators', 'contact'];
+  let mobileOpen = false;
+  let molecularViewer = null;
+
+  function showPage(id) {
+    if (!PAGES.includes(id)) id = 'home';
+
+    PAGES.forEach(page => {
+      const el = document.getElementById('page-' + page);
+      if (el) el.classList.toggle('active', page === id);
+    });
+
+    document.querySelectorAll('[data-page]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.page === id);
+    });
+
+    document.querySelectorAll('[data-mob]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mob === id);
+    });
+
+    closeMobileMenu();
+    history.replaceState(null, '', '#' + id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (id === 'research') {
+      setTimeout(() => {
+        if (!molecularViewer) initMolecularViewer();
+        else molecularViewer.resize();
+      }, 80);
+    }
+  }
+
+  function toggleMobile() {
+    mobileOpen = !mobileOpen;
+    const menu = document.getElementById('mobileMenu');
+    const hamburger = document.querySelector('.hamburger');
+    if (menu) menu.classList.toggle('open', mobileOpen);
+    if (hamburger) {
+      hamburger.setAttribute('aria-expanded', String(mobileOpen));
+      hamburger.setAttribute('aria-label', mobileOpen ? 'Close navigation menu' : 'Open navigation menu');
+    }
+  }
+
+  function closeMobileMenu() {
+    mobileOpen = false;
+    const menu = document.getElementById('mobileMenu');
+    const hamburger = document.querySelector('.hamburger');
+    if (menu) menu.classList.remove('open');
+    if (hamburger) {
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('aria-label', 'Open navigation menu');
+    }
+  }
+
+  function initPublicationFilters() {
+    const buttons = document.querySelectorAll('.pub-filter-btn[data-filter]');
+    const cards = document.querySelectorAll('.publication-card[data-category]');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter;
+        buttons.forEach(b => b.classList.toggle('active', b === btn));
+        cards.forEach(card => {
+          card.hidden = filter !== 'all' && card.dataset.category !== filter;
+        });
+      });
+    });
+  }
+
+  function initMolecularViewer() {
+    const viewerElement = document.getElementById('viewer');
+    if (!viewerElement || !window.$3Dmol) return;
+
+    molecularViewer = $3Dmol.createViewer(viewerElement, { backgroundColor: '#0b1222' });
+    $3Dmol.download('pdb:1MO8', molecularViewer, {}, function () {
+      molecularViewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+      molecularViewer.zoomTo();
+      molecularViewer.spin('y', 0.7);
+      molecularViewer.render();
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initPublicationFilters();
+
+    const hash = window.location.hash.replace('#', '');
+    showPage(PAGES.includes(hash) ? hash : 'home');
+  });
+
+  window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    if (PAGES.includes(hash)) showPage(hash);
+  });
+
+  document.addEventListener('click', event => {
+    const menu = document.getElementById('mobileMenu');
+    const hamburger = document.querySelector('.hamburger');
+    if (mobileOpen && menu && hamburger && !menu.contains(event.target) && !hamburger.contains(event.target)) {
+      closeMobileMenu();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900) closeMobileMenu();
+    if (molecularViewer) molecularViewer.resize();
+  });
+</script>
+</body>
+</html>
