@@ -1179,14 +1179,21 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
   </div>
   <div class="page-body">
     <div class="contact-layout">
-      <div>
+      <!-- Left Column: Boxed Contact Information -->
+      <div class="glass-card contact-box">
         <div class="contact-item">
-          <div class="contact-icon">📍</div>
+          <div class="contact-icon">
+            <!-- Google Maps style Location Pin SVG -->
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
           <div>
             <div class="contact-label">Address</div>
             <div class="contact-value">Department of Chemical &amp; Biological Sciences<br>S. N. Bose National Centre for Basic Sciences<br>JD Block, Sector III, Salt Lake<br>Kolkata — 700 106, West Bengal, India</div>
           </div>
         </div>
+        
         <div class="contact-item">
           <div class="contact-icon">✉️</div>
           <div>
@@ -1194,6 +1201,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
             <div class="contact-value"><a href="mailto:abdulazizcaluniv@gmail.com">abdulazizcaluniv@gmail.com</a></div>
           </div>
         </div>
+        
         <div class="contact-item">
           <div class="contact-icon">✉️</div>
           <div>
@@ -1201,6 +1209,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
             <div class="contact-value"><a href="mailto:abdulaziz.mandal@bose.res.in">abdulaziz.mandal@bose.res.in</a></div>
           </div>
         </div>
+        
         <div class="contact-item">
           <div class="contact-icon">📞</div>
           <div>
@@ -1208,6 +1217,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
             <div class="contact-value">+91-XX-XXXX-XXXX</div>
           </div>
         </div>
+        
         <div class="contact-item">
           <div class="contact-icon">🔬</div>
           <div>
@@ -1216,7 +1226,7 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
           </div>
         </div>
 
-        <!-- NEW VISITOR COUNTER ITEM -->
+        <!-- VISITOR COUNTER ITEM -->
         <div class="contact-item">
           <div class="contact-icon">👁️</div>
           <div>
@@ -1236,6 +1246,8 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
           <a href="https://orcid.org/0009-0007-1778-5261" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="ORCID"><svg width="19" height="19" viewBox="0 0 256 256" fill="currentColor"><path d="M128 0C57.3 0 0 57.3 0 128s57.3 128 128 128 128-57.3 128-128S198.7 0 128 0z"/><path fill="#fff" d="M86.8 74.3h18.5v107.4H86.8z"/><circle fill="#fff" cx="96.1" cy="53.2" r="10.7"/><path fill="#fff" d="M129.6 74.3h49.8c47.4 0 54.8 35.8 54.8 53.7 0 29.2-15 53.7-54.2 53.7h-50.4V74.3zm18.5 90.8h28.5c24.1 0 38.1-12.1 38.1-37.1 0-20.2-10.8-37.1-38.7-37.1h-27.9v74.2z"/></svg></a>
         </div>
       </div>
+
+      <!-- Right Column: Collaboration Box -->
       <div class="glass-card contact-box">
         <h3>Interested in Collaborating?</h3>
         <p>I am open to research collaborations, and discussions on computational biophysical chemistry.</p>
