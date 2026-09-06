@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAMD — molecular viewer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.3/3Dmol-min.js"></script>
+<style>
+  :root{
+    --bg-canvas:#10141a;
+    --bg-panel:#161c24;
+    --bg-panel-2:#1c232d;
+    --bg-well:#0d1116;
+    --border:#2a323c;
+    --border-strong:#3b4553;
+    --text-primary:#e7edf3;
+    --text-secondary:#93a2b3;
+    --text-muted:#5a6572;
+    --accent:#e8a33d;
+    --accent-dim:#a97a34;
+    --accent-bg:rgba(232,163,61,0.14);
+    --danger:#e2665f;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    background:var(--bg-canvas);
+    color:var(--text-primary);
+    font-family:var(--sans);
+    font-size:14px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    padding:14px 20px;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    background:var(--bg-panel);
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;}
+  .brand h1{font-size:19px;font-weight:500;margin:0;letter-spacing:0.2px;}
+  .brand h1 span{color:var(--accent);}
+  .brand p{font-size:12.5px;color:var(--text-secondary);margin:0;}
+  #statline{font-family:var(--mono);font-size:12px;color:var(--text-secondary);text-align:right;line-height:1.5;}
+  #statline b{color:var(--text-primary);font-weight:500;}
+  #main{flex:1;display:flex;min-height:0;}
+  #sidebar{
+    width:300px;
+    flex-shrink:0;
+    background:var(--bg-panel);
+    border-right:1px solid var(--border);
+    overflow-y:auto;
+    padding:6px 0 40px;
+  }
+  #sidebar::-webkit-scrollbar{width:8px;}
+  #sidebar::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
+  section.panel{
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  section.panel h2{
+    font-size:12.5px;
+    font-weight:500;
+    color:var(--text-secondary);
+    margin:0 0 10px;
+  }
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+  .row:last-child{margin-bottom:0;}
+  label.field-label{font-size:13px;color:var(--text-primary);}
+  select, input[type=text], input[type=number], textarea{
+    background:var(--bg-well);
+    color:var(--text-primary);
+    border:1px solid var(--border);
+    border-radius:5px;
+    padding:6px 8px;
+    font-size:13px;
+    font-family:var(--sans);
+    width:100%;
+  }
+  select:focus, input:focus, textarea:focus, button:focus-visible{
+    outline:none;
+    border-color:var(--accent-dim);
+    box-shadow:0 0 0 2px var(--accent-bg);
+  }
+  textarea{font-family:var(--mono);font-size:11.5px;resize:vertical;min-height:70px;}
+  button{
+    background:var(--bg-panel-2);
+    color:var(--text-primary);
+    border:1px solid var(--border-strong);
+    border-radius:5px;
+    padding:7px 10px;
+    font-size:13px;
+    font-family:var(--sans);
+    cursor:pointer;
+  }
+  button:hover{background:#232b36;}
+  button:active{transform:scale(0.98);}
+  button.primary{border-color:var(--accent-dim);color:var(--accent);}
+  button.primary:hover{background:var(--accent-bg);}
+  button.wide{width:100%;}
+  button.small{padding:5px 8px;font-size:12px;}
+  .btn-row{display:flex;gap:6px;}
+  .btn-row button{flex:1;}
+
+  .seg{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .seg button{
+    flex:1;border:none;border-radius:0;background:transparent;
+    padding:7px 4px;font-size:12px;color:var(--text-secondary);
+    border-right:1px solid var(--border);
+  }
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:var(--accent-bg);color:var(--accent);font-weight:500;}
+  .seg2{display:grid;grid-template-columns:1fr 1fr 1fr;}
+
+  .switch-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;}
+  .switch-row span{font-size:13px;}
+  .switch{position:relative;width:36px;height:20px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .slider-toggle{
+    position:absolute;inset:0;background:var(--bg-well);border:1px solid var(--border-strong);
+    border-radius:10px;cursor:pointer;transition:0.15s;
+  }
+  .slider-toggle::before{
+    content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;
+    background:var(--text-muted);border-radius:50%;transition:0.15s;
+  }
+  .switch input:checked + .slider-toggle{border-color:var(--accent-dim);background:var(--accent-bg);}
+  .switch input:checked + .slider-toggle::before{transform:translateX(16px);background:var(--accent);}
+
+  #viewport{flex:1;position:relative;background:var(--bg-well);}
+  #viewer{position:absolute;inset:0;}
+  #hud{
+    position:absolute;left:14px;bottom:14px;
+    background:rgba(13,17,22,0.88);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 12px;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--text-secondary);
+    max-width:340px;
+    pointer-events:none;
+  }
+  #hud b{color:var(--text-primary);}
+  #msg{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    background:rgba(13,17,22,0.92);border:1px solid var(--border-strong);
+    padding:8px 14px;border-radius:6px;font-size:12.5px;color:var(--text-primary);
+    display:none;max-width:70%;text-align:center;
+  }
+  #msg.err{border-color:var(--danger);color:#ffb3ae;}
+  #trajbar{
+    position:absolute;left:14px;right:14px;bottom:14px;
+    background:rgba(13,17,22,0.92);border:1px solid var(--border);
+    border-radius:8px;padding:10px 14px;display:none;align-items:center;gap:10px;
+  }
+  #trajbar input[type=range]{flex:1;}
+  #trajbar span{font-family:var(--mono);font-size:12px;color:var(--text-secondary);min-width:56px;text-align:right;}
+  .hint{font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5;}
+  footer{
+    padding:8px 16px;border-top:1px solid var(--border);background:var(--bg-panel);
+    font-size:11.5px;color:var(--text-muted);flex-shrink:0;
+  }
+  a.link{color:var(--accent);text-decoration:none;}
+  a.link:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>VA<span>MD</span></h1>
+    <p>structure &amp; trajectory viewer</p>
+  </div>
+  <div id="statline"><span id="statSource">no structure loaded</span><br><b id="statAtoms">0</b> atoms</div>
+</header>
+
+<div id="main">
+  <aside id="sidebar">
+
+    <section class="panel">
+      <h2>Structure</h2>
+      <div class="row"><label class="field-label" for="sampleSelect">Sample</label></div>
+      <select id="sampleSelect">
+        <option value="helix">Alpha helix (24 res, Cα trace)</option>
+        <option value="dna">B-DNA duplex (12 bp, backbone)</option>
+        <option value="benzene">Benzene ring</option>
+        <option value="traj">Breathing helix (trajectory demo)</option>
+      </select>
+      <div class="hint">Idealised / schematic geometry for demonstration — not experimental data.</div>
+
+      <div style="margin-top:12px;">
+        <label class="field-label">Fetch by PDB ID</label>
+        <div class="btn-row" style="margin-top:6px;">
+          <input type="text" id="pdbIdInput" placeholder="e.g. 1CRN" maxlength="4">
+          <button id="fetchBtn" style="flex:0 0 auto;">Fetch</button>
+        </div>
+        <div class="hint">Pulls straight from RCSB. If this preview blocks outside network calls, download the file below and open it directly in your browser instead.</div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label class="field-label">Upload file</label>
+        <input type="file" id="fileInput" accept=".pdb,.ent,.sdf,.mol2,.xyz,.txt" style="margin-top:6px;">
+        <div class="hint">A multi-MODEL PDB (an MD trajectory or NMR ensemble exported from VMD, MDAnalysis, mdtraj, etc.) is detected automatically and loads as a playable trajectory.</div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <label class="field-label">Paste structure data</label>
+        <textarea id="pasteArea" placeholder="Paste PDB, SDF, MOL2 or XYZ text here"></textarea>
+        <div class="row" style="margin-top:6px;">
+          <select id="pasteFormat" style="flex:1;">
+            <option value="pdb">PDB</option>
+            <option value="sdf">SDF</option>
+            <option value="mol2">MOL2</option>
+            <option value="xyz">XYZ</option>
+          </select>
+          <button id="pasteBtn" style="flex:0 0 auto;">Load</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Representation</h2>
+      <div class="seg" id="reprSeg" style="flex-wrap:wrap;">
+        <button data-val="line">Line</button>
+        <button data-val="stick" class="active">Stick</button>
+        <button data-val="ballstick">Ball+stick</button>
+        <button data-val="sphere">VDW</button>
+        <button data-val="cartoon">Trace</button>
+        <button data-val="cartoon3d">New 3D Cartoon</button>
+        <button data-val="ribbon">Ribbon</button>
+        <button data-val="surface">Surface</button>
+      </div>
+      <div class="hint">"Trace" is a thin Cα tube. "New 3D Cartoon" renders real secondary structure — coiled ribbon through alpha helices, flat arrows through beta sheets, thin tube through loops — the classic PyMOL/VMD look. "Ribbon" is a flat, constant-width strand that ignores secondary structure. Fetching or loading a real protein (e.g. PDB ID 1AKI) automatically switches to New 3D Cartoon with secondary-structure coloring.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Coloring</h2>
+      <div class="seg" id="colorSeg" style="flex-wrap:wrap;">
+        <button data-val="element" class="active">Element</button>
+        <button data-val="chain">Chain</button>
+        <button data-val="residue">Residue</button>
+        <button data-val="ss">Secondary str.</button>
+        <button data-val="spectrum">Spectrum</button>
+        <button data-val="uniform">Uniform</button>
+      </div>
+      <div class="row" id="uniformRow" style="display:none;margin-top:8px;">
+        <label class="field-label">Color</label>
+        <input type="color" id="uniformColor" value="#e8a33d" style="width:60px;padding:2px;height:30px;">
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Display</h2>
+      <div class="switch-row">
+        <span>Spin</span>
+        <label class="switch"><input type="checkbox" id="toggleSpin"><span class="slider-toggle"></span></label>
+      </div>
+      <div class="switch-row">
+        <span>Show hydrogens</span>
+        <label class="switch"><input type="checkbox" id="toggleH" checked><span class="slider-toggle"></span></label>
+      </div>
+      <div class="switch-row">
+        <span>Show waters</span>
+        <label class="switch"><input type="checkbox" id="toggleWater" checked><span class="slider-toggle"></span></label>
+      </div>
+      <div class="switch-row">
+        <span>Light background</span>
+        <label class="switch"><input type="checkbox" id="toggleBg"><span class="slider-toggle"></span></label>
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button id="resetViewBtn">Reset view</button>
+        <button id="exportBtn">Export PNG</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Measure distance</h2>
+      <div class="row">
+        <span class="field-label">Click two atoms</span>
+        <label class="switch"><input type="checkbox" id="toggleMeasure"><span class="slider-toggle"></span></label>
+      </div>
+      <div class="hint" id="distanceReadout">No measurement yet.</div>
+      <button class="wide small" id="clearMeasureBtn" style="margin-top:8px;">Clear measurements</button>
+    </section>
+
+    <section class="panel" id="trajPanel" style="display:none;">
+      <h2>Trajectory</h2>
+      <div class="btn-row">
+        <button id="playBtn" class="primary">▶ Play</button>
+        <button id="stepBtn">Step</button>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <span class="field-label">Speed</span>
+        <input type="range" id="speedSlider" min="1" max="30" value="10" style="width:60%;">
+      </div>
+      <div class="switch-row" style="margin-top:6px;">
+        <span>Align frames (remove drift)</span>
+        <label class="switch"><input type="checkbox" id="toggleAlign"><span class="slider-toggle"></span></label>
+      </div>
+      <div class="hint">Superposes every frame onto frame 1 (least-squares fit on Cα / backbone atoms) so overall translation and tumbling don't hide the internal motion — like VMD's RMSD/Align tool.</div>
+      <div class="hint" id="trajMetrics" style="margin-top:8px;">—</div>
+      <button class="wide small" id="downloadFrameBtn" style="margin-top:8px;">Download current frame (.pdb)</button>
+    </section>
+
+  </aside>
+
+  <div id="viewport">
+    <div id="viewer"></div>
+    <div id="hud">Click an atom to inspect it.</div>
+    <div id="msg"></div>
+    <div id="trajbar">
+      <button id="trajPlayInline" class="small">▶</button>
+      <input type="range" id="frameSlider" min="0" max="0" value="0">
+      <span id="frameLabel">0 / 0</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  VAMD — a lightweight, independent browser-based molecular structure &amp; trajectory viewer.
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- PDB line formatting helpers ----------
+  function rjust(s,n){ s=String(s); return s.length>=n ? s.slice(s.length-n) : ' '.repeat(n-s.length)+s; }
+  function ljust(s,n){ s=String(s); return s.length>=n ? s.slice(0,n) : s+' '.repeat(n-s.length); }
+
+  function pdbAtomLine(serial,name,resName,chain,resSeq,x,y,z,elem){
+    const nameField = ljust((' '+name),4).slice(0,4);
+    const resField = rjust(resName,3);
+    let line = 'ATOM  ';
+    line += rjust(serial,5);
+    line += ' ';
+    line += nameField;
+    line += ' ';
+    line += resField;
+    line += ' ';
+    line += chain;
+    line += rjust(resSeq,4);
+    line += '    ';
+    line += rjust(x.toFixed(3),8);
+    line += rjust(y.toFixed(3),8);
+    line += rjust(z.toFixed(3),8);
+    line += rjust('1.00',6);
+    line += rjust('0.00',6);
+    line += '          ';
+    line += rjust(elem,2);
+    return line;
+  }
+
+  const RESN_CYCLE = ['ALA','GLY','LEU','VAL','SER','THR','LYS','GLU','ASP','PHE','ASN','GLN','ARG','TYR','HIS','PRO','MET','TRP','CYS','ILE'];
+
+  function buildAlphaHelix(nres, chain, radius){
+    const R = radius || 2.3, rise = 1.5, twist = 100 * Math.PI/180;
+    let lines = [], serial = 1;
+    for(let i=0;i<nres;i++){
+      const ang = i*twist;
+      const x = R*Math.cos(ang), y = R*Math.sin(ang), z = i*rise;
+      lines.push(pdbAtomLine(serial++, 'CA', RESN_CYCLE[i%RESN_CYCLE.length], chain, i+1, x, y, z, 'C'));
+    }
+    lines.push('TER'); lines.push('END');
+    return lines.join('\n');
+  }
+
+  function buildBreathingHelixTrajectory(nres, nframes, chain){
+    const rise = 1.5, twist = 100*Math.PI/180, R0 = 2.3;
+    let out = [];
+    for(let f=0; f<nframes; f++){
+      const R = R0 * (1 + 0.18*Math.sin(2*Math.PI*f/nframes));
+      out.push('MODEL     ' + rjust(f+1,4));
+      let serial = 1;
+      for(let i=0;i<nres;i++){
+        const ang = i*twist;
+        const x = R*Math.cos(ang), y = R*Math.sin(ang), z = i*rise;
+        out.push(pdbAtomLine(serial++, 'CA', RESN_CYCLE[i%RESN_CYCLE.length], chain, i+1, x, y, z, 'C'));
+      }
+      out.push('ENDMDL');
+    }
+    out.push('END');
+    return out.join('\n');
+  }
+
+  function buildDNADuplex(bp){
+    const rise = 3.4, twist = 36*Math.PI/180, R = 9.4, grooveOffset = 145*Math.PI/180;
+    let lines = [], serial = 1;
+    for(let i=0;i<bp;i++){
+      const ang = i*twist;
+      const x = R*Math.cos(ang), y = R*Math.sin(ang), z = i*rise;
+      lines.push(pdbAtomLine(serial++, 'P', 'DA', 'A', i+1, x, y, z, 'P'));
+    }
+    for(let i=0;i<bp;i++){
+      const ang = i*twist + grooveOffset;
+      const x = R*Math.cos(ang), y = R*Math.sin(ang), z = (bp-1-i)*rise;
+      lines.push(pdbAtomLine(serial++, 'P', 'DT', 'B', i+1, x, y, z, 'P'));
+    }
+    lines.push('TER'); lines.push('END');
+    return lines.join('\n');
+  }
+
+  function buildBenzene(){
+    const rC = 1.39, rH = 1.39+1.09;
+    let lines = [], serial = 1;
+    for(let i=0;i<6;i++){
+      const ang = i*60*Math.PI/180;
+      lines.push(pdbAtomLine(serial++, 'C'+(i+1), 'BNZ', 'A', 1, rC*Math.cos(ang), rC*Math.sin(ang), 0, 'C'));
+    }
+    for(let i=0;i<6;i++){
+      const ang = i*60*Math.PI/180;
+      lines.push(pdbAtomLine(serial++, 'H'+(i+1), 'BNZ', 'A', 1, rH*Math.cos(ang), rH*Math.sin(ang), 0, 'H'));
+    }
+    lines.push('TER'); lines.push('END');
+    return lines.join('\n');
+  }
+
+  // ---------- viewer setup ----------
+  const viewerEl = document.getElementById('viewer');
+  const viewer = $3Dmol.createViewer(viewerEl, {backgroundColor:'#0d1116'});
+  let darkBg = true;
+
+  // ---------- trajectory analysis: superposition, RMSD, radius of gyration ----------
+  // Pick the atom indices used both as the least-squares fitting set and as
+  // the RMSD reference: Cα for protein, P for nucleic acid, otherwise every
+  // atom (small-molecule trajectories don't have a "backbone").
+  function pickReferenceIndices(atoms){
+    let idx = [];
+    for(let i=0;i<atoms.length;i++){ if(atoms[i].atom === 'CA') idx.push(i); }
+    if(idx.length >= 3) return idx;
+    idx = [];
+    for(let i=0;i<atoms.length;i++){ if(atoms[i].atom === 'P') idx.push(i); }
+    if(idx.length >= 3) return idx;
+    idx = [];
+    for(let i=0;i<atoms.length;i++) idx.push(i);
+    return idx;
+  }
+
+  function centroidOf(points){
+    const c = [0,0,0];
+    for(const p of points){ c[0]+=p[0]; c[1]+=p[1]; c[2]+=p[2]; }
+    const n = points.length || 1;
+    return [c[0]/n, c[1]/n, c[2]/n];
+  }
+
+  // Horn's closed-form quaternion method for the optimal rotation that maps
+  // point set `mobile` onto `ref` (both already centered on their own
+  // centroid). Returns a 3x3 rotation matrix as a flat 9-element array.
+  function optimalRotation(mobileC, refC){
+    // cross-covariance matrix M = sum( mobile_i (outer) ref_i )
+    let M = [[0,0,0],[0,0,0],[0,0,0]];
+    for(let i=0;i<mobileC.length;i++){
+      const a = mobileC[i], b = refC[i];
+      for(let r=0;r<3;r++) for(let c=0;c<3;c++) M[r][c] += a[r]*b[c];
+    }
+    const Sxx=M[0][0],Sxy=M[0][1],Sxz=M[0][2];
+    const Syx=M[1][0],Syy=M[1][1],Syz=M[1][2];
+    const Szx=M[2][0],Szy=M[2][1],Szz=M[2][2];
+    // Horn's 4x4 symmetric "key matrix" N built from M
+    const N = [
+      [ Sxx+Syy+Szz, Syz-Szy,      Szx-Sxz,      Sxy-Syx      ],
+      [ Syz-Szy,     Sxx-Syy-Szz,  Sxy+Syx,      Szx+Sxz      ],
+      [ Szx-Sxz,     Sxy+Syx,     -Sxx+Syy-Szz,  Syz+Szy      ],
+      [ Sxy-Syx,     Szx+Sxz,      Syz+Szy,     -Sxx-Syy+Szz  ]
+    ];
+    // Shift so the eigenvalue we want (the largest) is also the largest in
+    // magnitude, then find its eigenvector by power iteration. This avoids
+    // needing a general eigensolver for what's normally a tiny 4x4 problem.
+    let shift = 0;
+    for(let r=0;r<4;r++){ let rowSum=0; for(let c=0;c<4;c++) rowSum += Math.abs(N[r][c]); shift = Math.max(shift, rowSum); }
+    const Ns = N.map((row,r)=>row.map((v,c)=> v + (r===c ? shift : 0)));
+    let q = [1,0,0,1].map(()=>Math.random()*0.1); q[0]=1; // arbitrary non-degenerate start
+    for(let iter=0; iter<200; iter++){
+      const nq = [0,0,0,0];
+      for(let r=0;r<4;r++) for(let c=0;c<4;c++) nq[r] += Ns[r][c]*q[c];
+      const norm = Math.sqrt(nq.reduce((s,v)=>s+v*v,0)) || 1;
+      for(let r=0;r<4;r++) q[r] = nq[r]/norm;
+    }
+    const [qw,qx,qy,qz] = q;
+    // quaternion -> rotation matrix
+    return [
+      1-2*(qy*qy+qz*qz),   2*(qx*qy-qz*qw),     2*(qx*qz+qy*qw),
+      2*(qx*qy+qz*qw),     1-2*(qx*qx+qz*qz),   2*(qy*qz-qx*qw),
+      2*(qx*qz-qy*qw),     2*(qy*qz+qx*qw),     1-2*(qx*qx+qy*qy)
+    ];
+  }
+
+  function applyRT(p, R, tCentroidMobile, tCentroidRef){
+    const x = p[0]-tCentroidMobile[0], y = p[1]-tCentroidMobile[1], z = p[2]-tCentroidMobile[2];
+    return [
+      R[0]*x + R[1]*y + R[2]*z + tCentroidRef[0],
+      R[3]*x + R[4]*y + R[5]*z + tCentroidRef[1],
+      R[6]*x + R[7]*y + R[8]*z + tCentroidRef[2]
+    ];
+  }
+
+  // Given raw per-frame coordinate arrays (frame -> atom -> [x,y,z]), returns
+  // a new set of frames all least-squares superposed onto frame 0 using the
+  // atoms at refIdx, with the same rotation+translation applied to every
+  // atom in the frame (not just the reference subset).
+  function computeAlignedFrames(rawFrames, refIdx){
+    const ref = refIdx.map(i => rawFrames[0][i]);
+    const refCentroid = centroidOf(ref);
+    const refCentered = ref.map(p => [p[0]-refCentroid[0], p[1]-refCentroid[1], p[2]-refCentroid[2]]);
+    return rawFrames.map(frame=>{
+      const mobile = refIdx.map(i => frame[i]);
+      const mobileCentroid = centroidOf(mobile);
+      const mobileCentered = mobile.map(p => [p[0]-mobileCentroid[0], p[1]-mobileCentroid[1], p[2]-mobileCentroid[2]]);
+      const R = optimalRotation(mobileCentered, refCentered);
+      return frame.map(p => applyRT(p, R, mobileCentroid, refCentroid));
+    });
+  }
+
+  function rmsdBetween(ptsA, ptsB){
+    let sum = 0;
+    for(let i=0;i<ptsA.length;i++){
+      const dx=ptsA[i][0]-ptsB[i][0], dy=ptsA[i][1]-ptsB[i][1], dz=ptsA[i][2]-ptsB[i][2];
+      sum += dx*dx+dy*dy+dz*dz;
+    }
+    return Math.sqrt(sum / (ptsA.length || 1));
+  }
+
+  function radiusOfGyration(points){
+    const c = centroidOf(points);
+    let sum = 0;
+    for(const p of points){ const dx=p[0]-c[0], dy=p[1]-c[1], dz=p[2]-c[2]; sum += dx*dx+dy*dy+dz*dz; }
+    return Math.sqrt(sum / (points.length || 1));
+  }
+
+  let state = {
+    repr: 'stick',
+    color: 'element',
+    uniformColor: '#e8a33d',
+    showH: true,
+    showWater: true,
+    measureMode: false,
+    measurePoints: [],
+    surfaceId: null,
+    numFrames: 1,
+    frame: 0,
+    playing: false,
+    playTimer: null,
+    trajRawFrames: null,      // atom coordinates as originally loaded, per frame
+    trajAlignedFrames: null,  // same, but least-squares superposed onto frame 0
+    trajAligned: false,       // which of the two is currently applied to the model
+    trajRefIdx: null          // atom indices used as the alignment/RMSD reference set (Cα or backbone)
+  };
+
+  function showMsg(text, isErr){
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = isErr ? 'err' : '';
+    el.style.display = 'block';
+    clearTimeout(showMsg._t);
+    showMsg._t = setTimeout(()=>{ el.style.display = 'none'; }, 5000);
+  }
+
+  function setRepr(val){
+    state.repr = val;
+    document.querySelectorAll('#reprSeg button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+  }
+
+  function setColor(val){
+    state.color = val;
+    document.querySelectorAll('#colorSeg button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+    document.getElementById('uniformRow').style.display = (val === 'uniform') ? 'flex' : 'none';
+  }
+
+  function colorProps(){
+    switch(state.color){
+      case 'element': return {colorscheme:'default'};
+      case 'chain': return {colorscheme:'chain'};
+      case 'residue': return {colorscheme:'amino'};
+      case 'ss': return {colorscheme:'ssPyMOL'};
+      case 'spectrum': return {color:'spectrum'};
+      case 'uniform': return {color: state.uniformColor};
+      default: return {};
+    }
+  }
+
+  function clearSurface(){
+    if(state.surfaceId !== null){
+      try{ viewer.removeSurface(state.surfaceId); }catch(e){}
+      state.surfaceId = null;
+    }
+  }
+
+  function applyStyle(){
+    const cp = colorProps();
+    clearSurface();
+    let spec = {};
+    switch(state.repr){
+      case 'line': spec = { line: Object.assign({}, cp) }; break;
+      case 'stick': spec = { stick: Object.assign({radius:0.16}, cp) }; break;
+      case 'ballstick': spec = { stick: Object.assign({radius:0.12}, cp), sphere: Object.assign({scale:0.28}, cp) }; break;
+      case 'sphere': spec = { sphere: Object.assign({scale:1.0}, cp) }; break;
+      case 'cartoon': spec = { cartoon: Object.assign({style:'trace', thickness:0.5}, cp) }; break;
+      // Classic PyMOL/VMD "cartoon": coiled ribbon through alpha helices, flat
+      // arrows through beta sheets, thin tube through loops — driven by each
+      // residue's secondary structure (from the file's HELIX/SHEET records,
+      // or computed automatically from the backbone when those are absent).
+      case 'cartoon3d': spec = { cartoon: Object.assign({style:'rectangle', thickness:0.4, arrows:true}, cp) }; break;
+      case 'ribbon': spec = { cartoon: Object.assign({style:'rectangle', ribbon:true, thickness:0.32}, cp) }; break;
+      case 'surface': spec = { line: Object.assign({}, cp) }; break;
+    }
+    viewer.setStyle({}, spec);
+
+    if(state.repr === 'surface'){
+      const surfCp = colorProps();
+      state.surfaceId = viewer.addSurface($3Dmol.SurfaceType.VDW, Object.assign({opacity:0.9}, surfCp));
+    }
+
+    // Cartoon styles only draw the polymer backbone, so bound ligands,
+    // cofactors, and ions would otherwise vanish. Draw those as sticks on
+    // top, the way PyMOL/VMD show a ligand sitting in a cartoon backbone.
+    if(state.repr === 'cartoon' || state.repr === 'cartoon3d' || state.repr === 'ribbon'){
+      viewer.addStyle({hetflag:true}, {stick:{radius:0.16, colorscheme:'default'}});
+      viewer.setStyle({resn:'HOH'}, {});
+    }
+
+    if(!state.showH){ viewer.setStyle({elem:'H'}, {}); }
+    if(!state.showWater){ viewer.setStyle({resn:'HOH'}, {}); }
+
+    viewer.render();
+  }
+
+  function refreshStats(sourceLabel){
+    const model = viewer.getModel();
+    let n = 0;
+    if(model){ n = model.selectedAtoms({}).length; }
+    document.getElementById('statSource').textContent = sourceLabel || 'structure loaded';
+    document.getElementById('statAtoms').textContent = n;
+  }
+
+  function onAtomClick(atom){
+    if(state.measureMode){
+      state.measurePoints.push(atom);
+      viewer.addSphere({center:{x:atom.x,y:atom.y,z:atom.z}, radius:0.28, color:'yellow'});
+      if(state.measurePoints.length === 2){
+        const a = state.measurePoints[0], b = state.measurePoints[1];
+        const dx=a.x-b.x, dy=a.y-b.y, dz=a.z-b.z;
+        const dist = Math.sqrt(dx*dx+dy*dy+dz*dz);
+        viewer.addCylinder({start:{x:a.x,y:a.y,z:a.z}, end:{x:b.x,y:b.y,z:b.z}, radius:0.05, color:'yellow', dashed:true});
+        viewer.addLabel(dist.toFixed(2)+' \u00c5', {
+          position:{x:(a.x+b.x)/2, y:(a.y+b.y)/2, z:(a.z+b.z)/2},
+          backgroundColor:'black', backgroundOpacity:0.7, fontColor:'white', fontSize:13
+        });
+        document.getElementById('distanceReadout').innerHTML =
+          '<b style="color:var(--text-primary)">'+dist.toFixed(2)+' \u00c5</b> between '+
+          (a.resn||'')+(a.resi||'')+':'+(a.atom||a.elem)+' and '+(b.resn||'')+(b.resi||'')+':'+(b.atom||b.elem);
+        state.measurePoints = [];
+      }
+      viewer.render();
+    } else {
+      document.getElementById('hud').innerHTML =
+        '<b>'+(atom.resn||'—')+' '+(atom.resi||'')+'</b> · atom '+(atom.atom||atom.elem)+
+        ' · chain '+(atom.chain||'-')+
+        '<br>x '+atom.x.toFixed(2)+'  y '+atom.y.toFixed(2)+'  z '+atom.z.toFixed(2);
+    }
+  }
+
+  function bindClickable(){
+    viewer.setClickable({}, true, onAtomClick);
+  }
+
+  function stopTrajectory(){
+    if(state.playTimer){ clearInterval(state.playTimer); state.playTimer = null; }
+    state.playing = false;
+    document.getElementById('playBtn').textContent = '▶ Play';
+    document.getElementById('trajPlayInline').textContent = '▶';
+  }
+
+  function resetSceneState(){
+    stopTrajectory();
+    viewer.removeAllModels();
+    viewer.removeAllShapes();
+    viewer.removeAllLabels();
+    clearSurface();
+    state.measurePoints = [];
+    state.numFrames = 1;
+    state.frame = 0;
+    state.trajRawFrames = null;
+    state.trajAlignedFrames = null;
+    state.trajAligned = false;
+    state.trajRefIdx = null;
+    document.getElementById('trajPanel').style.display = 'none';
+    document.getElementById('trajbar').style.display = 'none';
+    document.getElementById('toggleAlign').checked = false;
+    document.getElementById('trajMetrics').textContent = '—';
+    document.getElementById('distanceReadout').textContent = 'No measurement yet.';
+    document.getElementById('hud').textContent = 'Click an atom to inspect it.';
+  }
+
+  // Real structures fetched/uploaded/pasted as PDB (hundreds to thousands of
+  // atoms, usually carrying HELIX/SHEET records or enough backbone atoms to
+  // compute secondary structure) get switched straight into the classic
+  // cartoon + secondary-structure view, the way PyMOL/VMD open a protein by
+  // default. The small schematic samples (Cα-only, a few dozen atoms) are
+  // left as-is since they don't carry real secondary-structure information.
+  function maybeAutoPresetCartoon(format){
+    if(format !== 'pdb') return;
+    const model = viewer.getModel();
+    if(!model) return;
+    const n = model.selectedAtoms({}).length;
+    if(n >= 150){
+      setRepr('cartoon3d');
+      setColor('ss');
+    }
+  }
+
+  function loadStructure(data, format, label){
+    resetSceneState();
+    try{
+      viewer.addModel(data, format);
+    }catch(e){
+      showMsg('Could not parse this structure: ' + e.message, true);
+      return;
+    }
+    maybeAutoPresetCartoon(format);
+    applyStyle();
+    viewer.zoomTo();
+    viewer.render();
+    bindClickable();
+    refreshStats(label);
+  }
+
+  function captureRawFrames(){
+    const model = viewer.getModel();
+    if(!model) return null;
+    const frames = [];
+    for(let i=0;i<state.numFrames;i++){
+      viewer.setFrame(i);
+      frames.push(model.selectedAtoms({}).map(a => [a.x, a.y, a.z]));
+    }
+    viewer.setFrame(0);
+    return frames;
+  }
+
+  function updateTrajMetrics(){
+    const el = document.getElementById('trajMetrics');
+    if(!el) return;
+    if(!state.trajRawFrames || !state.trajRefIdx || state.trajRefIdx.length < 1){
+      el.textContent = 'Not enough atoms to compute trajectory metrics.';
+      return;
+    }
+    const frames = state.trajAligned ? state.trajAlignedFrames : state.trajRawFrames;
+    const current = frames[state.frame];
+    const ref = frames[0];
+    const currentRefPts = state.trajRefIdx.map(i => current[i]);
+    const refPts = state.trajRefIdx.map(i => ref[i]);
+    const rmsd = rmsdBetween(currentRefPts, refPts);
+    const rg = radiusOfGyration(current);
+    const basis = state.trajAligned ? 'aligned' : 'raw, unaligned';
+    el.innerHTML = 'Radius of gyration: <b style="color:var(--text-primary)">' + rg.toFixed(2) + ' Å</b>' +
+      ' · Backbone RMSD to frame 1 (' + basis + '): <b style="color:var(--text-primary)">' + rmsd.toFixed(2) + ' Å</b>';
+  }
+
+  function loadTrajectory(data, nframes, label){
+    resetSceneState();
+    try{
+      viewer.addModelsAsFrames(data, 'pdb');
+    }catch(e){
+      showMsg('Could not parse trajectory: ' + e.message, true);
+      return;
+    }
+    state.numFrames = viewer.getNumFrames ? viewer.getNumFrames() : nframes;
+    state.trajRawFrames = captureRawFrames();
+    if(state.trajRawFrames && state.trajRawFrames.length){
+      state.trajRefIdx = pickReferenceIndices(viewer.getModel().selectedAtoms({}));
+      state.trajAlignedFrames = computeAlignedFrames(state.trajRawFrames, state.trajRefIdx);
+    } else {
+      state.trajRefIdx = null;
+      state.trajAlignedFrames = null;
+    }
+    state.trajAligned = false;
+    document.getElementById('toggleAlign').checked = false;
+    maybeAutoPresetCartoon('pdb');
+    applyStyle();
+    viewer.zoomTo();
+    viewer.render();
+    bindClickable();
+    refreshStats(label);
+    document.getElementById('trajPanel').style.display = 'block';
+    document.getElementById('trajbar').style.display = 'flex';
+    const slider = document.getElementById('frameSlider');
+    slider.max = state.numFrames - 1;
+    slider.value = 0;
+    document.getElementById('frameLabel').textContent = '1 / ' + state.numFrames;
+    updateTrajMetrics();
+  }
+
+  function setFrame(n){
+    state.frame = ((n % state.numFrames) + state.numFrames) % state.numFrames;
+    viewer.setFrame(state.frame);
+    viewer.render();
+    document.getElementById('frameSlider').value = state.frame;
+    document.getElementById('frameLabel').textContent = (state.frame+1) + ' / ' + state.numFrames;
+    updateTrajMetrics();
+  }
+
+  function currentFrameToPDB(){
+    const model = viewer.getModel();
+    if(!model) return null;
+    const atoms = model.selectedAtoms({});
+    if(!atoms.length) return null;
+    let lines = [], serial = 1;
+    for(const a of atoms){
+      lines.push(pdbAtomLine(serial++, a.atom || a.elem || 'X', a.resn || 'UNK', a.chain || 'A', a.resi || 1, a.x, a.y, a.z, a.elem || 'C'));
+    }
+    lines.push('TER'); lines.push('END');
+    return lines.join('\n');
+  }
+
+  // ---------- sample loaders ----------
+  function loadSample(key){
+    if(key === 'helix'){
+      loadStructure(buildAlphaHelix(24, 'A'), 'pdb', 'sample: alpha helix');
+    } else if(key === 'dna'){
+      loadStructure(buildDNADuplex(12), 'pdb', 'sample: B-DNA duplex');
+    } else if(key === 'benzene'){
+      loadStructure(buildBenzene(), 'pdb', 'sample: benzene');
+    } else if(key === 'traj'){
+      loadTrajectory(buildBreathingHelixTrajectory(24, 24, 'A'), 24, 'sample: breathing helix (trajectory)');
+    }
+  }
+
+  // A multi-MODEL PDB (an MD trajectory saved as PDB, or an NMR ensemble)
+  // loads as a playable trajectory; anything else loads as a static structure.
+  function countPDBModels(text){
+    const matches = text.match(/^\s*MODEL\s+\d+/gm);
+    return matches ? matches.length : 1;
+  }
+  function loadPDBText(text, label){
+    const n = countPDBModels(text);
+    if(n > 1){ loadTrajectory(text, n, label); }
+    else { loadStructure(text, 'pdb', label); }
+  }
+
+  // ---------- wiring ----------
+  document.getElementById('sampleSelect').addEventListener('change', e=>{
+    loadSample(e.target.value);
+  });
+
+  document.querySelectorAll('#reprSeg button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      setRepr(btn.dataset.val);
+      applyStyle();
+    });
+  });
+
+  document.querySelectorAll('#colorSeg button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      setColor(btn.dataset.val);
+      applyStyle();
+    });
+  });
+
+  document.getElementById('uniformColor').addEventListener('input', e=>{
+    state.uniformColor = e.target.value;
+    if(state.color === 'uniform') applyStyle();
+  });
+
+  document.getElementById('toggleSpin').addEventListener('change', e=>{
+    viewer.spin(e.target.checked ? 'y' : false);
+  });
+  document.getElementById('toggleH').addEventListener('change', e=>{
+    state.showH = e.target.checked; applyStyle();
+  });
+  document.getElementById('toggleWater').addEventListener('change', e=>{
+    state.showWater = e.target.checked; applyStyle();
+  });
+  document.getElementById('toggleBg').addEventListener('change', e=>{
+    darkBg = !e.target.checked;
+    viewer.setBackgroundColor(darkBg ? '#0d1116' : '#f4f6f8');
+    viewer.render();
+  });
+
+  document.getElementById('resetViewBtn').addEventListener('click', ()=>{
+    viewer.zoomTo(); viewer.render();
+  });
+  document.getElementById('exportBtn').addEventListener('click', ()=>{
+    const uri = viewer.pngURI();
+    const a = document.createElement('a');
+    a.href = uri; a.download = 'vamd-view.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+
+  document.getElementById('toggleMeasure').addEventListener('change', e=>{
+    state.measureMode = e.target.checked;
+    state.measurePoints = [];
+  });
+  document.getElementById('clearMeasureBtn').addEventListener('click', ()=>{
+    viewer.removeAllShapes();
+    viewer.removeAllLabels();
+    state.measurePoints = [];
+    document.getElementById('distanceReadout').textContent = 'No measurement yet.';
+    viewer.render();
+  });
+
+  document.getElementById('fileInput').addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const ext = file.name.split('.').pop().toLowerCase();
+    const fmt = (ext==='sdf') ? 'sdf' : (ext==='mol2') ? 'mol2' : (ext==='xyz') ? 'xyz' : 'pdb';
+    const reader = new FileReader();
+    reader.onload = ()=> {
+      if(fmt === 'pdb'){ loadPDBText(reader.result, 'file: ' + file.name); }
+      else { loadStructure(reader.result, fmt, 'file: ' + file.name); }
+    };
+    reader.onerror = ()=> showMsg('Could not read that file.', true);
+    reader.readAsText(file);
+  });
+
+  document.getElementById('pasteBtn').addEventListener('click', ()=>{
+    const data = document.getElementById('pasteArea').value.trim();
+    if(!data){ showMsg('Paste some structure data first.', true); return; }
+    const fmt = document.getElementById('pasteFormat').value;
+    if(fmt === 'pdb'){ loadPDBText(data, 'pasted PDB data'); }
+    else { loadStructure(data, fmt, 'pasted ' + fmt.toUpperCase() + ' data'); }
+  });
+
+  document.getElementById('fetchBtn').addEventListener('click', ()=>{
+    const id = document.getElementById('pdbIdInput').value.trim().toUpperCase();
+    if(!/^[A-Z0-9]{4}$/.test(id)){ showMsg('Enter a 4-character PDB ID, e.g. 1CRN.', true); return; }
+    showMsg('Fetching ' + id + ' from RCSB…');
+    fetch('https://files.rcsb.org/download/' + id + '.pdb')
+      .then(r=>{ if(!r.ok) throw new Error('not found (' + r.status + ')'); return r.text(); })
+      .then(data=> loadPDBText(data, 'RCSB: ' + id))
+      .catch(err=>{
+        showMsg('Could not fetch ' + id + ' (' + err.message + '). If this preview blocks outside network calls, download this file and open it directly in your own browser, or upload/paste the structure instead.', true);
+      });
+  });
+
+  document.getElementById('playBtn').addEventListener('click', ()=>{
+    if(state.playing){ stopTrajectory(); return; }
+    state.playing = true;
+    document.getElementById('playBtn').textContent = '⏸ Pause';
+    document.getElementById('trajPlayInline').textContent = '⏸';
+    const fps = parseInt(document.getElementById('speedSlider').value, 10);
+    state.playTimer = setInterval(()=> setFrame(state.frame+1), Math.max(30, 1000/fps));
+  });
+  document.getElementById('trajPlayInline').addEventListener('click', ()=>{
+    document.getElementById('playBtn').click();
+  });
+  document.getElementById('stepBtn').addEventListener('click', ()=>{
+    stopTrajectory();
+    setFrame(state.frame+1);
+  });
+  document.getElementById('frameSlider').addEventListener('input', e=>{
+    stopTrajectory();
+    setFrame(parseInt(e.target.value,10));
+  });
+  document.getElementById('speedSlider').addEventListener('input', ()=>{
+    if(state.playing){ stopTrajectory(); document.getElementById('playBtn').click(); }
+  });
+
+  document.getElementById('toggleAlign').addEventListener('change', e=>{
+    const model = viewer.getModel();
+    if(!model || !state.trajRawFrames){ e.target.checked = false; showMsg('No trajectory loaded to align.', true); return; }
+    state.trajAligned = e.target.checked;
+    model.setCoordinates(state.trajAligned ? state.trajAlignedFrames : state.trajRawFrames);
+    viewer.setFrame(state.frame);
+    viewer.render();
+    updateTrajMetrics();
+  });
+
+  document.getElementById('downloadFrameBtn').addEventListener('click', ()=>{
+    const text = currentFrameToPDB();
+    if(!text){ showMsg('Nothing loaded to export yet.', true); return; }
+    const blob = new Blob([text], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'vamd-frame-' + (state.frame+1) + '.pdb';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  window.addEventListener('resize', ()=>{ viewer.resize(); viewer.render(); });
+
+  // initial load
+  loadSample('helix');
+})();
+</script>
+</body>
+</html>
