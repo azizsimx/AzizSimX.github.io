@@ -341,7 +341,12 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
 .view-paper:hover span{ transform:translate(3px, -3px); }
 
 @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
+ /* Gives the entire card a subtle golden glow to indicate an achievement */
+.glass-card.award-winning {border: 1px solid rgba(255, 215, 0, 0.4);box-shadow: 0 8px 32px 0 rgba(255, 215, 0, 0.15);}
+/* Styles the new award badge to pop visually */
+.award-badge {display: inline-flex;align-items: center;gap: 6px;background: linear-gradient(135deg, #FFD700, #FDB931);color: #1A1A1A; /* Dark text for high contrast against gold */font-weight: 700;font-size: 0.9rem;padding: 4px 12px;border-radius: 20px;margin: 8px 0;box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);letter-spacing: 0.5px;}
+.award-badge .trophy {font-size: 1.1rem;} 
+   
 /* ==========================================================================
    8. TEAM PAGE
    ========================================================================== */
@@ -807,23 +812,29 @@ footer{ background:var(--bg); border-top:1px solid var(--border); padding:2.4rem
               </div>
             </div>
              
-            <div class="glass-card conference-card">
-              <div class="conference-top">
-                <div class="conference-date">
-                  <span class="conference-day">13</span>
-                  <span class="conference-month">SEP</span>
-                  <span class="conference-year">2026</span>
-                </div>
-                <div class="conference-heading">
-                  <div class="conference-type">Poster Presentation</div>
-                  <div class="conference-event">ভারতে মৌলিক বিজ্ঞান গবেষণা ও উন্নত প্রযুক্তির বিকাশ (Frontier Research in Basic Sciences and Development of Advanced Technologies)</div>
-                </div>
-              </div>
-              <div class="conference-title">ট্রিপটোফ্যান স্ব-সংযোজন প্রতিরোধে বিভিন্ন কার্যকরী গ্রুপের প্রক্রিয়াগত ভূমিকা:অ্যারোম্যাটিক ও নন-অ্যারোম্যাটিক হাইড্রক্সিল-সমৃদ্ধ যৌগের তুলনামূলক অধ্যয়ন(Mechanistic Role of Different Functional Groups in Inhibiting Tryptophan Self-Assembly: Comparison between Aromatic and Nonaromatic Hydroxyl Moiety-Rich Chemical Compounds)</div>
-              <div class="conference-footer">
-                <div class="conference-location"><span>⌖</span>IEM, Gurukul Campus</div>
-              </div>
-            </div>
+<div class="glass-card conference-card award-winning">
+  <div class="conference-top">
+    <div class="conference-date">
+      <span class="conference-day">13</span>
+      <span class="conference-month">SEP</span>
+      <span class="conference-year">2026</span>
+    </div>
+    <div class="conference-heading">
+      <div class="conference-type">Poster Presentation</div>
+      
+      <!-- HIGHLIGHTED AWARD BADGE -->
+      <div class="award-badge">
+        <span class="trophy">🏆</span> Best Poster Award
+      </div>
+
+      <div class="conference-event">ভারতে মৌলিক বিজ্ঞান গবেষণা ও উন্নত প্রযুক্তির বিকাশ (Frontier Research in Basic Sciences and Development of Advanced Technologies)</div>
+    </div>
+  </div>
+  <div class="conference-title">ট্রিপটোফ্যান স্ব-সংযোজন প্রতিরোধে বিভিন্ন কার্যকরী গ্রুপের প্রক্রিয়াগত ভূমিকা:অ্যারোম্যাটিক ও নন-অ্যারোম্যাটিক হাইড্রক্সিল-সমৃদ্ধ যৌগের তুলনামূলক অধ্যয়ন(Mechanistic Role of Different Functional Groups in Inhibiting Tryptophan Self-Assembly: Comparison between Aromatic and Nonaromatic Hydroxyl Moiety-Rich Chemical Compounds)</div>
+  <div class="conference-footer">
+    <div class="conference-location"><span>⌖</span>IEM, Gurukul Campus</div>
+  </div>
+</div>
              
           </div>
         </section>
