@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Figure Palette Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDF1; --panel:#FFFFFF; --field:#F6F8FA; --ink:#1B2230; --ink2:#5B6577; --rule:#D3D9E0; --rule2:#E4E8ED;
+  --sel:#1B2230; --good:#1E7B4F; --mid:#9C5700; --bad:#B5171B; --goodbg:#E3F2EA; --midbg:#FBF0DC; --badbg:#FBE3E3;
+  --ui:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif; --head:"Newsreader",Georgia,serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161C;--panel:#1A2029;--field:#212834;--ink:#E6EAF0;--ink2:#9EA8B7;--rule:#2C3542;--rule2:#252D39;--sel:#E6EAF0;--good:#6FCF9B;--mid:#E8B15A;--bad:#F08A8A;--goodbg:#173A29;--midbg:#3A2C12;--badbg:#3E1C1C}}
+:root[data-theme="dark"]{--bg:#12161C;--panel:#1A2029;--field:#212834;--ink:#E6EAF0;--ink2:#9EA8B7;--rule:#2C3542;--rule2:#252D39;--sel:#E6EAF0;--good:#6FCF9B;--mid:#E8B15A;--bad:#F08A8A;--goodbg:#173A29;--midbg:#3A2C12;--badbg:#3E1C1C}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html,body{height:100%}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--ui);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.pane,.desk,dialog .bd{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.pane::-webkit-scrollbar,.desk::-webkit-scrollbar{width:9px;height:9px}.pane::-webkit-scrollbar-thumb,.desk::-webkit-scrollbar-thumb{background:var(--rule);border-radius:9px;border:2px solid var(--panel)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+.top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--rule)}
+.brand{font-family:var(--head);font-weight:600;font-size:20px;margin-right:4px;white-space:nowrap}
+@media (max-width:1560px){.brand small{display:none}}
+@media (max-width:1400px){.seg button{padding:4px 7px;font-size:12px}.lab{font-size:11.5px}.figbar{gap:6px 8px}}
+.brand small{font-family:var(--ui);font-weight:400;font-size:12.5px;color:var(--ink2);margin-left:8px}
+.top .sp{flex:1}
+.in{background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:6px 9px}
+.btn{background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:6px 11px;cursor:pointer;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--ink2)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.pri{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.sm{padding:3px 8px;font-size:12.5px}
+.tabs{display:none;gap:4px;padding:8px 12px 0}
+.tabs button{flex:1;border:1px solid var(--rule);background:var(--panel);border-radius:6px 6px 0 0;padding:7px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.app{display:grid;grid-template-columns:var(--wl,330px) 10px minmax(0,1fr) 10px var(--wr,310px);gap:0;padding:10px;height:calc(100vh - var(--hh,58px));height:calc(100dvh - var(--hh,58px))}
+.split{cursor:col-resize;position:relative;touch-action:none;outline-offset:-2px}
+.split::after{content:"";position:absolute;top:50%;left:50%;width:3px;height:40px;margin:-20px 0 0 -1.5px;border-radius:3px;background:var(--rule);transition:height .15s,margin .15s,background .15s}
+.split:hover::after,.split.drag::after,.split:focus-visible::after{background:var(--ink2);height:72px;margin-top:-36px}
+body.dragging{cursor:col-resize;user-select:none}
+.pane .rail{display:none}
+.pane.collapsed{overflow:hidden}
+.pane.collapsed>.hd,.pane.collapsed>.bd{display:none}
+.pane.collapsed .rail{display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;height:100%;border:0;background:var(--panel);cursor:pointer;writing-mode:vertical-rl;padding:14px 0;font-weight:600;color:var(--ink);font-size:13.5px}
+.pane.collapsed .rail:hover{background:var(--field)}
+.pane.collapsed .rail .sig{writing-mode:horizontal-tb}
+.hdrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.colbtn{flex:none;width:28px;height:28px;padding:0;font-size:15px;line-height:1}
+#pFig{display:flex;flex-direction:column}
+#pFig>.bd{flex:1;display:flex;flex-direction:column;min-height:0}
+.pane{background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:auto;min-height:0}
+.pane>.hd{position:sticky;top:0;background:var(--panel);z-index:2;padding:12px 14px 8px;border-bottom:1px solid var(--rule2)}
+.pane>.bd{padding:10px 14px 16px}
+h2{font-family:var(--head);font-weight:600;font-size:18px;margin:0}
+h3{font-size:12.5px;font-weight:600;color:var(--ink2);margin:16px 0 6px}
+.muted{color:var(--ink2);font-size:12.5px}
+@media (max-width:1180px){
+  .tabs{display:flex}
+  .split,.colbtn,.pane .rail{display:none!important}
+  .pane.collapsed>.hd,.pane.collapsed>.bd{display:block}
+  .app{grid-template-columns:1fr;height:auto;padding-top:0}
+  .pane{display:none;overflow:visible}
+  .pane.on{display:block}
+  .pane>.hd{position:static}
+}
+/* series list */
+.ser{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ser li{display:grid;grid-template-columns:28px minmax(0,1fr) 32px 40px auto;gap:4px;align-items:center;padding:4px;border:1px solid transparent;border-radius:6px}
+.ser li.on{border-color:var(--sel);background:var(--field)}
+.ser .chip{width:30px;height:26px;border-radius:5px;border:1px solid rgba(0,0,0,.15);cursor:pointer;padding:0}
+.ser input.lbl{width:100%;min-width:0;background:transparent;border:1px solid transparent;border-radius:4px;padding:3px 3px;font-size:13.5px}
+.ser input.lbl:hover,.ser input.lbl:focus{border-color:var(--rule);background:var(--panel)}
+.ser select{width:100%;background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:3px 2px;font-size:12px;-webkit-appearance:none;appearance:none;text-align:center;text-align-last:center;cursor:pointer}
+.ser .ctl{display:flex;gap:1px}
+.ser .ctl button{width:17px;height:24px;border:0;background:none;cursor:pointer;color:var(--ink2);border-radius:4px;padding:0}
+.ser .ctl button:hover:not(:disabled){background:var(--rule2);color:var(--ink)}
+.ser .ctl button:disabled{opacity:.3}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.check{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer}
+.score{border:1px solid var(--rule);border-radius:8px;padding:10px;margin-top:6px}
+.score .big{font-family:var(--head);font-size:20px;font-weight:600}
+.score .big.good{color:var(--good)} .score .big.mid{color:var(--mid)} .score .big.bad{color:var(--bad)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 10px;font-size:12.5px;margin-top:6px}
+.kv b{font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.matrix{border-collapse:collapse;margin-top:8px;font-size:11px;font-variant-numeric:tabular-nums}
+.matrix td,.matrix th{width:26px;height:24px;text-align:center;padding:0;border:1px solid var(--panel)}
+.matrix th i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.15);vertical-align:middle}
+.matrix td.good{background:var(--goodbg);color:var(--good)} .matrix td.mid{background:var(--midbg);color:var(--mid)} .matrix td.bad{background:var(--badbg);color:var(--bad);font-weight:600}
+.matrix td.self{background:var(--rule2)}
+.legendkey{display:flex;gap:10px;font-size:11.5px;color:var(--ink2);margin-top:6px;flex-wrap:wrap}
+.legendkey span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.legendkey .g::before{background:var(--goodbg);border:1px solid var(--good)} .legendkey .m::before{background:var(--midbg);border:1px solid var(--mid)} .legendkey .b::before{background:var(--badbg);border:1px solid var(--bad)}
+/* figure pane */
+.figbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:6px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;border-right:1px solid var(--rule);background:var(--field);padding:5px 9px;cursor:pointer;font-size:12.5px}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.lab{font-size:12px;color:var(--ink2);display:flex;gap:5px;align-items:center}
+.lab select,.lab input[type=number]{background:var(--field);border:1px solid var(--rule);border-radius:5px;padding:3px 5px;font-size:12.5px}
+.lab input[type=number]{width:52px}
+.desk{background:repeating-linear-gradient(45deg,var(--rule2) 0 1px,transparent 1px 9px);border-radius:6px;padding:12px;display:flex;justify-content:center;align-items:flex-start;overflow:auto;flex:none}
+.desk.zoomed{justify-content:flex-start}
+.paper{background:#FFFFFF;box-shadow:0 1px 2px rgba(0,0,0,.12),0 6px 20px rgba(0,0,0,.08);flex:none;margin:auto}
+.paper svg{display:block;width:100%;height:auto}
+.cap{font-size:12px;color:var(--ink2);margin-top:6px;text-align:center}
+details.cmd{margin-top:12px;border:1px solid var(--rule2);border-radius:8px;padding:0 12px}
+details.cmd summary{cursor:pointer;padding:9px 0;font-weight:600;font-size:13px;color:var(--ink2)}
+details.cmd[open]{padding-bottom:12px}
+.plotsel{display:flex;gap:4px;align-items:center}
+.plotsel select{background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:5px 8px;font-size:13px;font-weight:600;max-width:360px}
+/* publication signal */
+.pub{border-radius:999px;padding:5px 12px 5px 9px;font-weight:600;border:1px solid;cursor:pointer;display:inline-flex;gap:7px;align-items:center;white-space:nowrap;font-size:13px}
+.pub i{font-style:normal;width:18px;height:18px;border-radius:50%;display:inline-grid;place-items:center;font-size:11px;color:#fff}
+.pub.ok{background:var(--goodbg);color:var(--good);border-color:var(--good)} .pub.ok i{background:#1E7B4F}
+.pub.no{background:var(--badbg);color:var(--bad);border-color:var(--bad)} .pub.no i{background:#B5171B}
+.chip{position:relative}
+.sig{position:absolute;right:-5px;bottom:-5px;width:15px;height:15px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;border:1.5px solid var(--panel);line-height:1}
+.sig.ok{background:#1E7B4F} .sig.no{background:#B5171B}
+.rail .sig{position:static;width:18px;height:18px;font-size:10px}
+.publist{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
+.publist li{display:grid;grid-template-columns:16px 1fr;gap:7px;font-size:12.5px;cursor:pointer;padding:3px 4px;border-radius:5px}
+.publist li:hover{background:var(--field)}
+.publist .dot{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;margin-top:1px}
+.publist .dot.ok{background:#1E7B4F} .publist .dot.no{background:#B5171B}
+.publist small{display:block;color:var(--ink2);font-size:11.5px}
+.pubbox{margin-top:10px;border-radius:8px;border:1.5px solid;overflow:hidden}
+.pubbox.ok{border-color:var(--good)} .pubbox.no{border-color:var(--bad)}
+.pubbox .ban{display:flex;gap:9px;align-items:center;padding:8px 10px;font-weight:600}
+.pubbox.ok .ban{background:var(--goodbg);color:var(--good)} .pubbox.no .ban{background:var(--badbg);color:var(--bad)}
+.pubbox .ban i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;flex:none}
+.pubbox.ok .ban i{background:#1E7B4F} .pubbox.no .ban i{background:#B5171B}
+.pubbox .ban small{display:block;font-weight:400;font-size:11.5px;color:var(--ink2)}
+.pubbox ul{list-style:none;margin:0;padding:7px 10px 9px;display:flex;flex-direction:column;gap:5px}
+.pubbox li{display:grid;grid-template-columns:16px 1fr;gap:7px;font-size:12.5px}
+.pubbox li b{font-weight:600}
+.pubbox li small{display:block;color:var(--ink2);font-size:11.5px}
+.pubbox .ck{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;margin-top:1px}
+.pubbox .ck.ok{background:#1E7B4F} .pubbox .ck.no{background:#B5171B} .pubbox .ck.note{background:#9C5700}
+.cmap{display:grid;grid-template-columns:1fr;gap:6px;margin-top:4px}
+.strip{height:18px;border-radius:4px;border:1px solid var(--rule)}
+/* color pane */
+.ed{display:grid;grid-template-columns:84px 1fr;gap:10px}
+.swbig{height:84px;border-radius:7px;border:1px solid var(--rule);position:relative;overflow:hidden}
+.swbig input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0}
+.ed label{display:block;font-size:11.5px;color:var(--ink2);margin-bottom:5px}
+.ed input[type=text]{width:100%;background:var(--field);border:1px solid var(--rule);border-radius:5px;padding:4px 7px;margin-top:2px;font-variant-numeric:tabular-nums}
+.ed input.badin{border-color:var(--bad)}
+.sl{display:grid;grid-template-columns:16px 1fr 38px;gap:2px 8px;align-items:center;font-size:12px;color:var(--ink2);margin-top:8px}
+.sl input{width:100%}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}
+.stats div{border:1px solid var(--rule2);border-radius:5px;padding:4px 7px;font-size:11px;color:var(--ink2)}
+.stats b{display:block;font-size:14px;color:var(--ink);font-weight:600}
+.cvd{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:8px;font-size:10.5px;color:var(--ink2);text-align:center}
+.cvd i{display:block;height:20px;border-radius:4px;border:1px solid rgba(0,0,0,.12)}
+.shades{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:6px}
+.shades button{height:22px;border-radius:4px;border:1px solid rgba(0,0,0,.12);cursor:pointer;padding:0}
+.shades button.cur{outline:2px solid var(--sel);outline-offset:1px}
+.sugg{display:flex;flex-direction:column;gap:3px}
+.sugg button{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;text-align:left;border:1px solid var(--rule2);background:var(--panel);border-radius:5px;padding:3px 6px 3px 3px;cursor:pointer;font-size:12.5px}
+.sugg button:hover{border-color:var(--ink2)}
+.sugg i{width:24px;height:20px;border-radius:3px;border:1px solid rgba(0,0,0,.12)}
+.sugg em{font-style:normal;color:var(--ink2);font-size:11.5px;font-variant-numeric:tabular-nums}
+.fams{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0}
+.fams button{border:1px solid var(--rule);background:var(--field);border-radius:5px;padding:2px 7px;font-size:12px;cursor:pointer}
+.fams button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:3px}
+.libgrid button{aspect-ratio:1.25;border-radius:4px;border:1px solid rgba(0,0,0,.12);cursor:pointer;padding:0}
+.libgrid button:hover{transform:scale(1.12);position:relative;z-index:1}
+.hover{font-size:12px;color:var(--ink2);min-height:18px;margin-top:4px}
+/* export dialog */
+dialog{border:1px solid var(--rule);border-radius:10px;padding:0;background:var(--panel);color:var(--ink);width:min(760px,94vw);max-height:90vh}
+dialog::backdrop{background:rgba(10,14,20,.45)}
+dialog .hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--rule2)}
+dialog .bd{padding:12px 16px 16px;overflow:auto;max-height:calc(90vh - 60px)}
+.fmtgrid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.fmtgrid button{border:1px solid var(--rule);background:var(--field);border-radius:5px;padding:4px 9px;font-size:12.5px;cursor:pointer}
+.fmtgrid button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+textarea.code{width:100%;min-height:220px;background:var(--field);border:1px solid var(--rule);border-radius:6px;padding:9px;font:12.5px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:8px 14px;border-radius:6px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+.toast.show{opacity:1}
+.toast.act{pointer-events:auto;display:flex;gap:12px;align-items:center}
+.toast button{background:transparent;color:inherit;border:1px solid currentColor;border-radius:5px;padding:2px 9px;cursor:pointer;font-size:12.5px}
+.resetopts{display:flex;flex-direction:column;gap:8px}
+.resetopts button{display:block;text-align:left;border:1px solid var(--rule);background:var(--field);border-radius:8px;padding:10px 12px;cursor:pointer}
+.resetopts button:hover{border-color:var(--ink2)}
+.resetopts button b{display:block;font-weight:600;margin-bottom:2px}
+.resetopts button span{font-size:12.5px;color:var(--ink2)}
+.resetopts button.danger b{color:var(--bad)}
+.kbd{font-size:11px;color:var(--ink2);margin-top:4px;text-align:center}
+@media (max-height:860px){.kbd{display:none}.cap{margin-top:4px}}
+.kbd kbd{font:inherit;border:1px solid var(--rule);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--field);color:var(--ink)}
+.edbtns{display:flex;gap:5px;margin-top:6px}
+@media (max-width:600px){.brand small{display:none}#pname{flex:1 1 140px}#load{flex:1 1 100%}.desk{padding:8px}.top{padding:8px 10px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.libgrid button:hover{transform:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Figure Palette Lab<small>colors for manuscript figures on a white page</small></div>
+  <input class="in" id="pname" aria-label="Palette name" style="width:150px">
+  <select class="in" id="load" aria-label="Load a palette" style="width:210px"></select>
+  <button class="btn" id="saveP">Save palette</button>
+  <button class="pub" id="pubPill" title="Publication check for every color in the palette"></button>
+  <span class="sp"></span>
+  <select class="in" id="theme" aria-label="Appearance" title="Appearance"><option value="auto">Auto theme</option><option value="light">Light</option><option value="dark">Dark</option></select>
+  <button class="btn" id="undo">Undo</button>
+  <button class="btn" id="redo">Redo</button>
+  <button class="btn" id="openReset" title="Return to the original settings">Reset…</button>
+  <button class="btn pri" id="openExport">Export</button>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-p="pSeries" aria-selected="false">Palette</button>
+  <button role="tab" data-p="pFig" aria-selected="true">Figure</button>
+  <button role="tab" data-p="pColor" aria-selected="false">Colors</button>
+</nav>
+
+<div class="app">
+  <!-- LEFT: series -->
+  <section class="pane" id="pSeries" aria-labelledby="h1">
+    <button class="rail" data-expand="L" aria-label="Show palette panel"><span class="sig" id="railSigL"></span>Palette ›</button>
+    <div class="hd"><div class="hdrow"><h2 id="h1">Palette</h2><button class="btn colbtn" data-col="L" title="Collapse this panel" aria-label="Collapse palette panel">‹</button></div><div class="muted">One row per data series. Rename it to match your systems; the label is used in the figure and exports.</div></div>
+    <div class="bd">
+      <ul class="ser" id="ser"></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="btn sm" id="addS">Add series</button>
+        <button class="btn sm" id="autoS" title="Auto-assign different marker shapes and line styles">Vary markers &amp; lines</button>
+        <button class="btn sm" id="fix">Fix clashes</button>
+      </div>
+      <label class="check" style="margin-top:8px"><input type="checkbox" id="keepFam"> When fixing, keep each color's family</label>
+      <h3>Paste colors</h3>
+      <div class="row"><input class="in" id="paste" placeholder="#1D4E89, #D55E00, …" style="flex:1;min-width:0"><button class="btn sm" id="pasteGo">Use</button></div>
+      <h3 id="pubHead">Publication check</h3>
+      <div class="score" id="pubCard"><div id="pubSum"></div><ul class="publist" id="pubList"></ul></div>
+      <h3>Readability details</h3>
+      <div class="score" id="score"></div>
+      <h3>Pair check</h3>
+      <div class="muted">Numbers are ΔE for the hardest case (normal vision or colorblind). Select a red cell to jump to that color.</div>
+      <div style="overflow:auto"><table class="matrix" id="matrix"></table></div>
+      <div class="legendkey"><span class="g">clear</span><span class="m">use markers</span><span class="b">clash</span></div>
+    </div>
+  </section>
+
+  <div class="split" id="splitL" role="separator" aria-orientation="vertical" aria-label="Resize palette panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
+  <!-- CENTER: figure -->
+  <section class="pane on" id="pFig" aria-labelledby="h2">
+    <div class="hd">
+      <div class="figbar">
+        <div class="plotsel"><button class="btn sm" id="prevP" title="Previous plot ( [ )" aria-label="Previous plot">‹</button>
+          <select id="layoutSel" aria-label="Plot type"></select>
+          <button class="btn sm" id="nextP" title="Next plot ( ] )" aria-label="Next plot">›</button></div>
+        <span style="flex:1"></span>
+        <div class="seg" id="zoom" role="group" aria-label="Preview size">
+          <button data-v="fit" title="Show the whole figure">Fit</button><button data-v="width" title="Fill the width of the panel">Width</button><button data-v="2" title="Zoom in to check detail">200%</button>
+        </div>
+        <button class="btn sm" id="focusBtn">Focus figure</button>
+      </div>
+      <div class="figbar" style="margin-top:8px">
+        <label class="lab">Width <select id="width"></select></label>
+        <label class="lab">Text <input type="number" id="font" min="5" max="10" step="0.5"> pt</label>
+        <label class="lab">Lines <input type="number" id="lw" min="0.5" max="2.5" step="0.25"> pt</label>
+        <label class="check"><input type="checkbox" id="bands"> Error bands</label>
+        <div class="seg" id="view" role="group" aria-label="Vision simulation">
+          <button data-v="none">Normal</button><button data-v="deutan">Deutan</button><button data-v="protan">Protan</button><button data-v="tritan">Tritan</button><button data-v="gray">Grayscale</button>
+        </div>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="desk"><div class="paper" id="paper"></div></div>
+      <div class="cap" id="cap"></div>
+      <div class="kbd" id="kbd"></div>
+      <details class="cmd" id="cmDetails"><summary>Colormap for energy maps, contact maps and heatmaps</summary>
+      <div class="row">
+        <label class="lab">Type <select id="cmType">
+          <option value="seq">Sequential from a series color</option>
+          <option value="div">Diverging between two series colors</option>
+          <option value="viridis">viridis</option><option value="cividis">cividis (colorblind-optimized)</option>
+        </select></label>
+        <label class="lab" id="cmAw">Color <select id="cmA"></select></label>
+        <label class="lab" id="cmBw">and <select id="cmB"></select></label>
+        <label class="check"><input type="checkbox" id="cmRev"> Reverse</label>
+      </div>
+      <div class="cmap"><div class="strip" id="cmStrip"></div><div class="strip" id="cmStripG" title="Grayscale check"></div>
+      <div class="muted">Bottom strip: the same colormap in grayscale. It should go smoothly from dark to light with no bumps.</div></div>
+      </details>
+    </div>
+  </section>
+
+  <div class="split" id="splitR" role="separator" aria-orientation="vertical" aria-label="Resize color panel" tabindex="0" title="Drag to resize · double-click to reset"></div>
+  <!-- RIGHT: colors -->
+  <section class="pane" id="pColor" aria-labelledby="h3">
+    <button class="rail" data-expand="R" aria-label="Show color panel"><span class="sig" id="railSigR"></span>‹ Color</button>
+    <div class="hd"><div class="hdrow"><h2 id="h3">Color for <span id="selName"></span></h2><button class="btn colbtn" data-col="R" title="Collapse this panel" aria-label="Collapse color panel">›</button></div></div>
+    <div class="bd">
+      <div class="ed">
+        <div class="swbig" id="swbig"><input type="color" id="picker" aria-label="Color picker"></div>
+        <div><label>Hex<input type="text" id="hex" maxlength="7" spellcheck="false"></label><label>Library name<input type="text" id="cname" readonly tabindex="-1"></label>
+        <div class="edbtns"><button class="btn sm" id="revertC" title="Go back to the color this series had when it was added or loaded">Restore original color</button></div></div>
+      </div>
+      <div class="sl">
+        <span>H</span><input type="range" id="sH" min="0" max="360"><span id="vH"></span>
+        <span>S</span><input type="range" id="sS" min="0" max="100"><span id="vS"></span>
+        <span>L</span><input type="range" id="sL" min="0" max="100"><span id="vL"></span>
+      </div>
+      <div class="pubbox" id="pubBox"></div>
+      <div class="stats"><div>Grade<b id="stG"></b></div><div>On white<b id="stC"></b></div><div>Gray level<b id="stL"></b></div></div>
+      <div class="cvd" id="cvd"></div>
+      <h3>Shades</h3>
+      <div class="shades" id="shades"></div>
+      <h3>Best replacements for this series</h3>
+      <div class="muted" style="margin-bottom:5px">Library colors ranked by how clearly they stand apart from the other series, for normal and colorblind readers.</div>
+      <label class="check" style="margin-bottom:5px"><input type="checkbox" id="sameFam"> Same family only</label>
+      <div class="sugg" id="sugg"></div>
+      <h3>Library</h3>
+      <input class="in" id="q" placeholder="Search name or hex" style="width:100%">
+      <div class="fams" id="fams"></div>
+      <div class="libgrid" id="lib"></div>
+      <div class="hover" id="hov"></div>
+    </div>
+  </section>
+</div>
+
+<dialog id="exp" aria-labelledby="exh">
+  <div class="hd"><h2 id="exh">Export</h2><button class="btn sm" id="closeExp">Close</button></div>
+  <div class="bd">
+    <div class="fmtgrid" id="fmts"></div>
+    <textarea class="code" id="code" readonly aria-label="Export text"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn pri" id="copy">Copy</button>
+      <span class="sp" style="flex:1"></span>
+      <span id="dl" class="row" hidden>
+        <button class="btn" data-dl="svg">Figure SVG</button>
+        <button class="btn" data-dl="png">Figure PNG (600 dpi)</button>
+        <button class="btn" data-dl="json">Palette JSON</button>
+        <button class="btn" data-dl="md">Palette Markdown</button>
+        <button class="btn" data-dl="txt">This text (.txt)</button>
+      </span>
+    </div>
+    <p class="muted" id="dlnote"></p>
+  </div>
+</dialog>
+<dialog id="rst" aria-labelledby="rsth">
+  <div class="hd"><h2 id="rsth">Reset</h2><button class="btn sm" id="closeRst">Cancel</button></div>
+  <div class="bd">
+    <p class="muted" style="margin:0 0 10px">Choose what to return to the original state. Every reset can be undone right after.</p>
+    <div class="resetopts">
+      <button data-r="colors"><b>Restore original colors</b><span>Put every series back to the color it had when it was added or loaded. Labels, markers and settings stay.</span></button>
+      <button data-r="palette"><b>Reset palette</b><span>Back to the 5 default series (Premium manuscript colors, default labels, circles and solid lines).</span></button>
+      <button data-r="figure"><b>Reset figure settings</b><span>Plot type, width, text size, line width, error bands, vision view, zoom, colormap and panel sizes back to defaults.</span></button>
+      <button data-r="all"><b>Reset everything except saved palettes</b><span>Palette and figure settings back to defaults. Your saved palettes are kept.</span></button>
+      <button data-r="factory" class="danger"><b>Factory reset</b><span>Everything back to how the page first opened, including deleting your saved palettes.</span></button>
+    </div>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const LIB=[{"h":"#FF028D","n":"Vivid Pink / Neon Magenta","b":"Pink & magenta"},{"h":"#137E6D","n":"Deep Teal / Dark Turquoise","b":"Green"},{"h":"#FF6B6B","n":"Coral Red","b":"Red"},{"h":"#7B61FF","n":"Electric Violet / Periwinkle Purple","b":"Indigo"},{"h":"#0072B2","n":"Scientific Blue","b":"Blue"},{"h":"#009E73","n":"Emerald Green","b":"Green"},{"h":"#D55E00","n":"Vermilion Orange","b":"Orange"},{"h":"#CC79A7","n":"Muted Magenta","b":"Pink & magenta"},{"h":"#56B4E9","n":"Sky Blue","b":"Blue"},{"h":"#E69F00","n":"Golden Orange","b":"Orange"},{"h":"#332288","n":"Deep Indigo","b":"Indigo"},{"h":"#117733","n":"Forest Green","b":"Green"},{"h":"#264653","n":"Deep Ocean Blue","b":"Blue"},{"h":"#2A9D8F","n":"Persian Green","b":"Green"},{"h":"#E76F51","n":"Burnt Coral","b":"Red"},{"h":"#6A4C93","n":"Royal Purple","b":"Violet"},{"h":"#8ECAE6","n":"Powder Blue","b":"Blue"},{"h":"#A7C957","n":"Olive Green","b":"Green"},{"h":"#BC6C25","n":"Burnt Orange","b":"Orange"},{"h":"#5E548E","n":"Dusty Violet","b":"Indigo"},{"h":"#E5989B","n":"Dusty Rose","b":"Red"},{"h":"#3A86FF","n":"Bright Blue","b":"Blue"},{"h":"#8338EC","n":"Purple","b":"Violet"},{"h":"#06A77D","n":"Jade Green","b":"Green"},{"h":"#E63946","n":"Crimson Red","b":"Red"},{"h":"#277DA1","n":"Ocean Blue","b":"Blue"},{"h":"#9B5DE5","n":"Royal Violet","b":"Violet"},{"h":"#F15BB5","n":"Vibrant Pink","b":"Pink & magenta"},{"h":"#F4A261","n":"Warm Amber","b":"Orange"},{"h":"#00A6A6","n":"Deep Cyan","b":"Blue"},{"h":"#6D597A","n":"Muted Plum","b":"Violet"},{"h":"#D1495B","n":"Rose Red","b":"Red"},{"h":"#F0E442","n":"Yellow","b":"Yellow"},{"h":"#386641","n":"Moss Green","b":"Green"},{"h":"#B22222","n":"Firebrick","b":"Red"},{"h":"#008080","n":"Classic Teal","b":"Blue"},{"h":"#8B4513","n":"Saddle Brown","b":"Orange"},{"h":"#4682B4","n":"Steel Blue","b":"Blue"},{"h":"#B56576","n":"Antique Rose","b":"Red"},{"h":"#708238","n":"Olive Drab","b":"Green"},{"h":"#8F5E99","n":"Amethyst","b":"Violet"},{"h":"#C65D3B","n":"Copper","b":"Red"},{"h":"#5F9EA0","n":"Cadet Blue","b":"Blue"},{"h":"#A23B72","n":"Raspberry Wine","b":"Pink & magenta"},{"h":"#4C6A92","n":"Denim Blue","b":"Blue"},{"h":"#C17C3A","n":"Caramel","b":"Orange"},{"h":"#52796F","n":"Sage Teal","b":"Green"},{"h":"#7D3C98","n":"Grape Purple","b":"Violet"},{"h":"#C44536","n":"Persimmon","b":"Red"},{"h":"#8A9A5B","n":"Moss Sage","b":"Green"},{"h":"#477998","n":"Storm Blue","b":"Blue"},{"h":"#243B53","n":"Midnight Sapphire","b":"Blue"},{"h":"#9D4EDD","n":"Royal Amethyst","b":"Violet"},{"h":"#006D77","n":"Deep Emerald Teal","b":"Blue"},{"h":"#B23A48","n":"Ruby Red","b":"Red"},{"h":"#B08968","n":"Champagne Bronze","b":"Brown & earth"},{"h":"#5A189A","n":"Imperial Purple","b":"Violet"},{"h":"#C06C84","n":"Vintage Rose","b":"Pink & magenta"},{"h":"#3D5A80","n":"Royal Steel Blue","b":"Blue"},{"h":"#CA6702","n":"Burnished Copper","b":"Orange"},{"h":"#386FA4","n":"Sapphire Blue","b":"Blue"},{"h":"#7F5539","n":"Mocha Brown","b":"Brown & earth"},{"h":"#CDB4DB","n":"Lavender Mist","b":"Violet"},{"h":"#84A59D","n":"Eucalyptus","b":"Green"},{"h":"#4B0082","n":"Imperial Indigo","b":"Indigo"},{"h":"#C2185B","n":"Royal Raspberry","b":"Pink & magenta"},{"h":"#005F73","n":"Deep Peacock","b":"Blue"},{"h":"#B5171B","n":"Garnet Red","b":"Red"},{"h":"#3C096C","n":"Royal Plum","b":"Indigo"},{"h":"#007F5F","n":"Malachite Green","b":"Green"},{"h":"#9D0208","n":"Crimson Garnet","b":"Red"},{"h":"#560BAD","n":"Vivid Royal Purple","b":"Violet"},{"h":"#00509D","n":"Cobalt Sapphire","b":"Blue"},{"h":"#007C91","n":"Electric Teal","b":"Blue"},{"h":"#A4133C","n":"Deep Carmine","b":"Pink & magenta"},{"h":"#7209B7","n":"Ultraviolet","b":"Violet"},{"h":"#006400","n":"Deep Forest","b":"Green"},{"h":"#D00000","n":"Intense Scarlet","b":"Red"},{"h":"#023E8A","n":"Royal Cobalt","b":"Blue"},{"h":"#AD1457","n":"Deep Fuchsia","b":"Pink & magenta"},{"h":"#008148","n":"Emerald","b":"Green"},{"h":"#9C5700","n":"Burnished Gold","b":"Orange"},{"h":"#4477AA","n":"Tol Blue","b":"Blue"},{"h":"#EE6677","n":"Tol Red","b":"Red"},{"h":"#228833","n":"Tol Green","b":"Green"},{"h":"#CCBB44","n":"Tol Yellow","b":"Yellow"},{"h":"#66CCEE","n":"Tol Cyan","b":"Blue"},{"h":"#AA3377","n":"Tol Purple","b":"Pink & magenta"},{"h":"#0077BB","n":"Vibrant Blue","b":"Blue"},{"h":"#33BBEE","n":"Vibrant Cyan","b":"Blue"},{"h":"#009988","n":"Vibrant Teal","b":"Green"},{"h":"#EE7733","n":"Vibrant Orange","b":"Orange"},{"h":"#CC3311","n":"Vibrant Red","b":"Red"},{"h":"#EE3377","n":"Vibrant Magenta","b":"Pink & magenta"},{"h":"#88CCEE","n":"Muted Cyan","b":"Blue"},{"h":"#44AA99","n":"Muted Teal","b":"Green"},{"h":"#999933","n":"Muted Olive","b":"Yellow"},{"h":"#DDCC77","n":"Muted Sand","b":"Yellow"},{"h":"#CC6677","n":"Muted Rose","b":"Red"},{"h":"#882255","n":"Muted Wine","b":"Pink & magenta"},{"h":"#AA4499","n":"Muted Purple","b":"Pink & magenta"},{"h":"#E64B35","n":"NPG Red","b":"Red"},{"h":"#4DBBD5","n":"NPG Cyan","b":"Blue"},{"h":"#00A087","n":"NPG Teal","b":"Green"},{"h":"#3C5488","n":"NPG Navy","b":"Indigo"},{"h":"#F39B7F","n":"NPG Salmon","b":"Red"},{"h":"#8491B4","n":"NPG Lavender Blue","b":"Indigo"},{"h":"#91D1C2","n":"NPG Mint","b":"Green"},{"h":"#DC0000","n":"NPG Scarlet","b":"Red"},{"h":"#7E6148","n":"NPG Brown","b":"Brown & earth"},{"h":"#B09C85","n":"NPG Taupe","b":"Orange"},{"h":"#3B4992","n":"AAAS Blue","b":"Indigo"},{"h":"#EE0000","n":"AAAS Red","b":"Red"},{"h":"#008B45","n":"AAAS Green","b":"Green"},{"h":"#631879","n":"AAAS Purple","b":"Indigo"},{"h":"#008280","n":"AAAS Teal","b":"Green"},{"h":"#BB0021","n":"AAAS Crimson","b":"Red"},{"h":"#5F559B","n":"AAAS Violet","b":"Indigo"},{"h":"#A20056","n":"AAAS Magenta","b":"Pink & magenta"},{"h":"#000000","n":"Black","b":"Neutral"},{"h":"#555555","n":"Charcoal Grey","b":"Neutral"},{"h":"#999999","n":"Medium Grey","b":"Neutral"},{"h":"#1D4E89","n":"Prussian Blue","b":"Blue"},{"h":"#1F5FAD","n":"Cobalt Ink","b":"Blue"},{"h":"#2A7F9E","n":"Teal Blue","b":"Blue"},{"h":"#0B6E6E","n":"Petrol Teal","b":"Blue"},{"h":"#2E7D6B","n":"Viridian","b":"Green"},{"h":"#1E7B4F","n":"Pine Green","b":"Green"},{"h":"#3C6E57","n":"Juniper","b":"Green"},{"h":"#6B7F1E","n":"Olive Leaf","b":"Green"},{"h":"#B8860B","n":"Dark Goldenrod","b":"Yellow"},{"h":"#B5651D","n":"Ochre","b":"Orange"},{"h":"#A0522D","n":"Sienna","b":"Brown & earth"},{"h":"#A8431B","n":"Rust","b":"Orange"},{"h":"#B04A2F","n":"Deep Terracotta","b":"Brown & earth"},{"h":"#7A1F2B","n":"Oxblood","b":"Red"},{"h":"#800020","n":"Burgundy","b":"Red"},{"h":"#9F1D4B","n":"Deep Amaranth","b":"Pink & magenta"},{"h":"#8E244D","n":"Claret","b":"Pink & magenta"},{"h":"#7B2D6B","n":"Mulberry","b":"Pink & magenta"},{"h":"#4E2A4F","n":"Aubergine","b":"Violet"},{"h":"#5B3A8C","n":"Plum Violet","b":"Violet"},{"h":"#5D4FA3","n":"Iris","b":"Indigo"},{"h":"#3E4A89","n":"Slate Indigo","b":"Indigo"},{"h":"#1B2A49","n":"Ink Navy","b":"Indigo"},{"h":"#2F6F7E","n":"Steel Teal","b":"Blue"},{"h":"#6B4E31","n":"Sepia","b":"Brown & earth"},{"h":"#8C6D1F","n":"Antique Bronze","b":"Yellow"},{"h":"#3C4048","n":"Graphite","b":"Neutral"},{"h":"#D9D9D9","n":"Light Grey","b":"Neutral"}];
+const ORDER=["Violet", "Indigo", "Blue", "Green", "Yellow", "Orange", "Red", "Pink & magenta", "Brown & earth", "Neutral"];
+const PRESETS={"Premium manuscript": ["#1D4E89", "#D55E00", "#009988", "#800020", "#006400", "#9B5DE5", "#C2185B", "#7209B7"], "Okabe-Ito": ["#0072B2", "#D55E00", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#000000"], "Vivid VIBGYOR": ["#7209B7", "#5D4FA3", "#1F5FAD", "#006400", "#B8860B", "#D55E00", "#D00000"], "Colorblind-tuned VIBGYOR": ["#4E2A4F", "#8491B4", "#00509D", "#1E7B4F", "#999933", "#8B4513", "#EE6677"], "Paul Tol Bright": ["#4477AA", "#EE6677", "#228833", "#CCBB44", "#66CCEE", "#AA3377"], "Paul Tol Muted": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"], "Journal: Nature Portfolio": ["#0072B2", "#E69F00", "#56B4E9", "#CC79A7", "#009E73", "#D55E00"], "Journal: Science / AAAS": ["#3B4992", "#E69F00", "#008B45", "#A20056", "#EE0000", "#0072B2"], "Journal: Cell Press": ["#0077BB", "#E69F00", "#EE3377", "#243B53", "#33BBEE", "#009E73"], "Journal: ACS journals": ["#1D4E89", "#E69F00", "#800020", "#009988", "#D55E00", "#7B2D6B"], "Journal: Royal Society of Chemistry": ["#4477AA", "#EE6677", "#AA3377", "#228833", "#1D4E89", "#009988"], "Journal: Elsevier (grayscale-safe)": ["#1B2A49", "#E69F00", "#9D0208", "#9B5DE5", "#44AA99", "#AA3377"], "Journal: Wiley": ["#3D5A80", "#7F5539", "#84A59D", "#C06C84", "#A23B72", "#708238"], "Journal: Broad-readership & accessibility-focused": ["#332288", "#999933", "#44AA99", "#882255", "#CC6677", "#117733"]};
+/* ================= color math ================= */
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const validHex=h=>/^#[0-9A-F]{6}$/.test(h);
+const norm=h=>{h=String(h).trim().toUpperCase();if(!h.startsWith("#"))h="#"+h;if(/^#[0-9A-F]{3}$/.test(h))h="#"+h.slice(1).split("").map(c=>c+c).join("");return h};
+const toRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+const toHex=c=>"#"+c.map(v=>Math.round(clamp(v,0,1)*255).toString(16).padStart(2,"0")).join("").toUpperCase();
+const lin=v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);
+const delin=v=>v<=0.0031308?12.92*v:1.055*Math.pow(v,1/2.4)-0.055;
+const lum=h=>{const c=toRgb(h).map(lin);return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2]};
+const contrast=h=>1.05/(lum(h)+0.05);
+const LABC={};
+function lab(h){if(LABC[h])return LABC[h];const [r,g,b]=toRgb(h).map(lin);
+  let x=(0.4124*r+0.3576*g+0.1805*b)/0.95047,y=0.2126*r+0.7152*g+0.0722*b,z=(0.0193*r+0.1192*g+0.9505*b)/1.08883;
+  const f=t=>t>0.008856?Math.cbrt(t):7.787*t+16/116;x=f(x);y=f(y);z=f(z);return LABC[h]=[116*y-16,500*(x-y),200*(y-z)]}
+const dE=(a,b)=>{const p=lab(a),q=lab(b);return Math.hypot(p[0]-q[0],p[1]-q[1],p[2]-q[2])};
+const MAT={protan:[[0.152286,1.052583,-0.204868],[0.114503,0.786281,0.099216],[-0.003882,-0.048116,1.051998]],
+deutan:[[0.367322,0.860646,-0.227968],[0.280085,0.672501,0.047413],[-0.011820,0.042940,0.968881]],
+tritan:[[1.255528,-0.076749,-0.178779],[-0.078411,0.930809,0.147602],[0.004733,0.691367,0.303900]]};
+const SIMC={};
+function sim(h,t){if(t==="none")return h;const k=h+t;if(SIMC[k])return SIMC[k];const c=toRgb(h).map(lin);
+  if(t==="gray"){const y=0.2126*c[0]+0.7152*c[1]+0.0722*c[2];return SIMC[k]=toHex([y,y,y].map(delin))}
+  return SIMC[k]=toHex(MAT[t].map(r=>delin(clamp(r[0]*c[0]+r[1]*c[1]+r[2]*c[2],0,1))))}
+const dCVD=(a,b)=>Math.min(dE(sim(a,"protan"),sim(b,"protan")),dE(sim(a,"deutan"),sim(b,"deutan")),dE(sim(a,"tritan"),sim(b,"tritan")));
+const dL=(a,b)=>Math.abs(lab(a)[0]-lab(b)[0]);
+const pairQ=(a,b)=>Math.min(dE(a,b),dCVD(a,b)*1.25);
+function pairCls(a,b){const n=dE(a,b),c=dCVD(a,b);if(n<15||c<10)return "bad";if(c<16||n<22)return "mid";return "good"}
+function rgb2hsl([r,g,b]){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2;let h=0,s=0;
+  if(mx!==mn){const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);h=mx===r?((g-b)/d+(g<b?6:0)):mx===g?((b-r)/d+2):((r-g)/d+4);h*=60}return [h,s,l]}
+function hsl2rgb(h,s,l){const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1));return [f(0),f(8),f(4)]}
+function printRisk(h){const [r,g,b]=toRgb(h),mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx?(mx-mn)/mx:0,hh=rgb2hsl([r,g,b])[0]/360;return (s>0.75&&mx>0.85)||(hh>0.6&&hh<0.85&&s>0.6&&mx>0.8)}
+const chroma=h=>{const l=lab(h);return Math.hypot(l[1],l[2])};
+function grade(h){const cr=contrast(h);if(cr>=4.5&&chroma(h)>=12&&!printRisk(h))return "A";if(cr>=3&&!printRisk(h))return "B";return "C"}
+const mix=(h,t,f)=>toHex(toRgb(h).map(v=>v+(t-v)*f));
+const tint=h=>mix(h,1,0.72);
+const LIBMAP=Object.fromEntries(LIB.map(c=>[c.h,c]));
+function family(h){if(LIBMAP[h])return LIBMAP[h].b;const [H,S,L]=rgb2hsl(toRgb(h));
+  if(S<0.15||chroma(h)<8)return "Neutral";
+  if((H<55||H>=350)&&((S<0.6&&L<0.45&&H>=12&&H<55)||(S<0.4&&L<0.6&&H>=15&&H<55)))return "Brown & earth";
+  if(H>=345||H<15)return "Red";if(H<42)return "Orange";if(H<70)return "Yellow";if(H<180)return "Green";
+  if(H<220)return "Blue";if(H<258)return "Indigo";if(H<288&&L<0.3)return "Indigo";if(H<305)return "Violet";return "Pink & magenta"}
+const libName=h=>LIBMAP[h]?LIBMAP[h].n:"Custom";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ================= state ================= */
+const MARKERS=[["o","●"],["s","■"],["^","▲"],["D","◆"],["v","▼"],["x","✕"],["+","+"],["*","★"],["none","none"]];
+const DASHES=[["-","——"],["--","– –"],[":","···"],["-.","–·–"]];
+const WIDTHS=[["nat1","Nature · single column (89 mm)",89],["nat2","Nature · double column (183 mm)",183],["acs1","ACS · single column (82.5 mm)",82.5],["acs2","ACS · double column (178 mm)",178],
+["cell1","Cell Press · single column (85 mm)",85],["cell2","Cell Press · full width (174 mm)",174],["els1","Elsevier · single column (90 mm)",90],["els2","Elsevier · double column (190 mm)",190],["sci1","Science · single column (57 mm)",57],["sci2","Science · double column (121 mm)",121]];
+const KEY="figure-palette-lab-v1";
+const mkS=(label,hex,marker,dash)=>({label,hex:norm(hex),orig:norm(hex),marker:marker||"o",dash:dash||"-"});
+function defaultSeries(hexes){const labels=["Control","Inhibitor A","Inhibitor B","Inhibitor C","Inhibitor D","Inhibitor E","Inhibitor F","Inhibitor G","Inhibitor H","Inhibitor I","Inhibitor J","Inhibitor K"];
+  return hexes.slice(0,12).map((h,i)=>mkS(labels[i]||("Series "+(i+1)),h))}
+const FIG_DEFAULTS={layout:"figure",width:"nat2",font:7,lw:1,bands:true,view:"none",zoom:"fit",cm:{type:"seq",a:0,b:1,rev:false}};
+const PAL_DEFAULTS=()=>({name:"My palette",series:defaultSeries(PRESETS["Premium manuscript"].slice(0,5)),sel:0});
+const freshState=()=>Object.assign(PAL_DEFAULTS(),JSON.parse(JSON.stringify(FIG_DEFAULTS)),{fam:"",theme:"auto",focus:false,saved:{}});
+let S=freshState();
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&Array.isArray(s.series)&&s.series.length)S=Object.assign(S,s)}catch(e){}
+S.series.forEach(se=>{if(!se.orig)se.orig=se.hex});
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let past=[],future=[];
+const UNDO_KEYS=["name","series","sel","layout","width","font","lw","bands","view","zoom","cm"];
+const snap=()=>JSON.stringify(Object.fromEntries(UNDO_KEYS.map(k=>[k,S[k]])));
+function commit(){past.push(snap());if(past.length>60)past.shift();future=[];updUndo()}
+function restore(j){Object.assign(S,JSON.parse(j));renderAll()}
+function updUndo(){$("undo").disabled=!past.length;$("redo").disabled=!future.length}
+const $=id=>document.getElementById(id);
+function toast(t,action,fn){const e=$("toast");e.textContent=t;e.classList.toggle("act",!!action);
+  if(action){const b=document.createElement("button");b.textContent=action;b.onclick=()=>{e.classList.remove("show","act");fn()};e.appendChild(b)}
+  e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show","act"),action?7000:1700)}
+const cur=()=>S.series[S.sel]||S.series[0];
+const hexes=()=>S.series.map(s=>s.hex);
+
+/* ================= series pane ================= */
+function renderSeries(){
+  const ul=$("ser");ul.innerHTML="";
+  S.series.forEach((s,i)=>{const li=document.createElement("li");if(i===S.sel)li.className="on";
+    li.innerHTML=`<button class="chip" style="background:${s.hex}" aria-label="Edit color of ${esc(s.label)}" title="${s.hex}"><span class="sig"></span></button>
+    <input class="lbl" value="${esc(s.label)}" aria-label="Series label">
+    <select aria-label="Marker" title="Marker shape">${MARKERS.map(([v,n])=>`<option value="${v}" ${s.marker===v?"selected":""}>${n}</option>`).join("")}</select>
+    <select aria-label="Line style" title="Line style">${DASHES.map(([v,n])=>`<option value="${v}" ${s.dash===v?"selected":""}>${n}</option>`).join("")}</select>
+    <span class="ctl"><button aria-label="Move up" ${i?"":"disabled"}>↑</button><button aria-label="Move down" ${i<S.series.length-1?"":"disabled"}>↓</button><button aria-label="Remove" ${S.series.length>1?"":"disabled"}>×</button></span>`;
+    const [chip,lbl,mk,ds,up,dn,rm]=li.querySelectorAll("button,input,select");
+    const pick=()=>{if(S.sel!==i){S.sel=i;renderSeries();renderColor();}};
+    li.addEventListener("click",e=>{if(e.target===li)pick()});
+    chip.onclick=()=>{pick();showTab("pColor")};
+    lbl.onfocus=pick;
+    lbl.onchange=()=>{commit();s.label=lbl.value.trim()||("Series "+(i+1));persist();renderFigure();renderMatrix()};
+    mk.onchange=()=>{commit();s.marker=mk.value;persist();renderFigure();renderScore()};
+    ds.onchange=()=>{commit();s.dash=ds.value;persist();renderFigure();renderScore()};
+    up.onclick=()=>{commit();[S.series[i-1],S.series[i]]=[S.series[i],S.series[i-1]];S.sel=i-1;renderAll()};
+    dn.onclick=()=>{commit();[S.series[i+1],S.series[i]]=[S.series[i],S.series[i+1]];S.sel=i+1;renderAll()};
+    rm.onclick=()=>{commit();S.series.splice(i,1);S.sel=Math.min(S.sel,S.series.length-1);renderAll()};
+    ul.appendChild(li)});
+  $("addS").disabled=S.series.length>=12;
+  renderScore();renderMatrix();
+}
+$("addS").onclick=()=>{if(S.series.length>=12)return;commit();const h=bestCandidates(-1,false)[0].h;
+  S.series.push(mkS("Series "+(S.series.length+1),h));S.sel=S.series.length-1;renderAll();toast("Added "+libName(h))};
+$("autoS").onclick=()=>{commit();const m=["o","s","^","D","v","x","+","*"],d=["-","--",":","-."];S.series.forEach((s,i)=>{s.marker=m[i%8];s.dash=d[i%4]});renderAll();toast("Each series now has its own marker and line style")};
+$("fix").onclick=()=>{
+  const H=hexes();let worst=null;
+  for(let i=0;i<H.length;i++)for(let j=i+1;j<H.length;j++){const q=pairQ(H[i],H[j]);if(!worst||q<worst[0])worst=[q,i,j]}
+  if(!worst||pairCls(H[worst[1]],H[worst[2]])==="good"){toast("No clashes to fix");return}
+  commit();const j=worst[2],old=S.series[j].hex;const c=bestCandidates(j,$("keepFam").checked)[0];
+  S.series[j].hex=c.h;S.sel=j;renderAll();toast(`${S.series[j].label}: ${libName(old)} → ${c.n}`)};
+$("pasteGo").onclick=()=>{const m=($("paste").value.match(/#?[0-9a-fA-F]{6}\b/g)||[]).map(norm).filter(validHex);
+  if(!m.length){toast("No hex codes found. Use the form #1D4E89.");return}
+  commit();const old=S.series;S.series=m.slice(0,12).map((h,i)=>mkS(old[i]?old[i].label:"Series "+(i+1),h,old[i]&&old[i].marker,old[i]&&old[i].dash));S.sel=0;$("paste").value="";renderAll();toast(`Loaded ${S.series.length} colors`)};
+
+function renderScore(){const H=hexes();let mn=1e9,mc=1e9,ml=1e9,wp=null;
+  for(let i=0;i<H.length;i++)for(let j=i+1;j<H.length;j++){const n=dE(H[i],H[j]),c=dCVD(H[i],H[j]),l=dL(H[i],H[j]);if(n<mn)mn=n;if(c<mc){mc=c;wp=[i,j]}if(l<ml)ml=l}
+  const light=H.filter(h=>contrast(h)<2).length,weak=H.filter(h=>contrast(h)<3).length;
+  let cls,txt;
+  if(H.length<2){cls="good";txt="Add a second series to compare"}
+  else if(mn<15||mc<10||light){cls="bad";txt="Needs work"}
+  else if(mc<16||weak){cls="mid";txt="Good with markers"}
+  else{cls="good";txt="Clear for all readers"}
+  const markersOn=new Set(S.series.map(s=>s.marker+s.dash)).size===S.series.length&&S.series.length>1;
+  $("score").innerHTML=`<div class="big ${cls}">${txt}</div>
+  <div class="kv"><span>Closest pair, normal vision</span><b>${H.length>1?mn.toFixed(0):"—"}</b>
+  <span>Closest pair, colorblind</span><b>${H.length>1?mc.toFixed(0):"—"}${wp?` <span class="muted">(${wp[0]+1} & ${wp[1]+1})</span>`:""}</b>
+  <span>Closest pair in grayscale (ΔL)</span><b>${H.length>1?ml.toFixed(0):"—"}</b>
+  <span>Too light for lines (&lt; 3:1)</span><b>${weak}</b>
+  <span>Markers / line styles differ</span><b>${markersOn?"yes":"no"}</b></div>
+  <div class="muted" style="margin-top:6px">${cls==="good"?"Every pair stands apart on color alone.":cls==="mid"?"Colorblind readers may confuse a pair: give each series its own marker and line style.":"At least one pair clashes or a color is too light. Try “Fix clashes”."}</div>`;renderPub()}
+/* ================= publication check ================= */
+function pubCheck(i){const me=S.series[i],h=me.hex,items=[];
+  const cr=contrast(h);items.push({st:cr>=3?"ok":"no",t:"Visible on a white page",d:`${cr.toFixed(1)}:1 contrast on white${cr>=3?"":" — lines and markers need at least 3:1. Pick a darker shade."}`});
+  const pr=printRisk(h);items.push({st:pr?"no":"ok",t:"Prints true in CMYK",d:pr?"Very bright RGB color: it will look duller and shift in print. Choose a deeper shade.":"Within the range a journal printer can reproduce."});
+  const near=[],cvdBad=[],cvdMk=[],grayNear=[];
+  S.series.forEach((o,j)=>{if(j===i)return;const n=dE(h,o.hex),c=dCVD(h,o.hex),diff=o.marker!==me.marker||o.dash!==me.dash;
+    if(n<15)near.push(o.label);if(c<10){if(diff)cvdMk.push(o.label);else cvdBad.push(o.label)}if(dL(h,o.hex)<8)grayNear.push(o.label)});
+  items.push({st:near.length?"no":"ok",t:"Distinct from the other series",d:near.length?`Looks too similar to ${near.join(", ")} (ΔE < 15).`:"Clearly different from every other color."});
+  items.push({st:cvdBad.length?"no":"ok",t:"Readable for colorblind readers",d:cvdBad.length?`Confused with ${cvdBad.join(", ")} in colorblind vision, and they share the same marker and line style. Change the color, or give them different markers or line styles.`:cvdMk.length?`Close to ${cvdMk.join(", ")} for colorblind readers, but the different marker or line style keeps them apart. Keep those markers in the final figure.`:"Stays distinct in deuteranopia, protanopia and tritanopia."});
+  items.push({st:grayNear.length?"note":"ok",t:"Grayscale print (optional)",d:grayNear.length?`Similar gray level to ${grayNear.join(", ")}. Only matters if the journal prints in black and white.`:"Different gray level from every other series."});
+  return {ok:items.every(x=>x.st!=="no"),items,fails:items.filter(x=>x.st==="no").length}}
+function renderPub(){const R=S.series.map((_,i)=>pubCheck(i)),bad=R.filter(r=>!r.ok).length,issues=R.reduce((a,r)=>a+r.fails,0),allOk=bad===0;
+  const pill=$("pubPill");pill.className="pub "+(allOk?"ok":"no");
+  pill.innerHTML=allOk?`<i>✓</i>Ready for publication`:`<i>✕</i>Not ready · ${bad} color${bad>1?"s":""} to fix`;
+  pill.setAttribute("aria-label",allOk?"Publication check: all colors acceptable":`Publication check: ${bad} colors not acceptable`);
+  document.querySelectorAll("#ser .chip .sig").forEach((e,i)=>{const ok=R[i]&&R[i].ok;e.className="sig "+(ok?"ok":"no");e.textContent=ok?"✓":"✕"});
+  ["railSigL","railSigR"].forEach(id=>{const e=$(id);e.className="sig "+(allOk?"ok":"no");e.textContent=allOk?"✓":"✕"});
+  $("pubSum").innerHTML=`<div class="big ${allOk?"good":"bad"}">${allOk?"✓ Acceptable for publication":"✕ Not acceptable yet"}</div><div class="muted" style="margin-top:2px">${allOk?"Every color passes contrast, print, distinctness and colorblind checks.":`${bad} of ${S.series.length} colors fail at least one required check (${issues} issue${issues>1?"s":""}). Select a color to see why.`}</div>`;
+  $("pubList").innerHTML=S.series.map((s,i)=>{const r=R[i],f=r.items.filter(x=>x.st==="no").map(x=>x.t);
+    return `<li data-i="${i}"><span class="dot ${r.ok?"ok":"no"}" aria-hidden="true">${r.ok?"✓":"✕"}</span><span><b>${esc(s.label)}</b> <span class="muted">${s.hex}</span><small>${r.ok?"Acceptable":"Fix: "+f.join(" · ")}</small></span></li>`}).join("");
+  $("pubList").querySelectorAll("li").forEach(li=>li.onclick=()=>{S.sel=+li.dataset.i;renderSeries();renderColor();showPanel("R")});
+  const me=R[S.sel]||R[0];const box=$("pubBox");box.className="pubbox "+(me.ok?"ok":"no");
+  box.innerHTML=`<div class="ban"><i>${me.ok?"✓":"✕"}</i><span>${me.ok?"Acceptable for publication":"Not acceptable for publication"}<small>${me.ok?"Green signal: safe to use in the final figure.":"Red signal: fix the items marked ✕ below."}</small></span></div><ul>${me.items.map(x=>`<li><span class="ck ${x.st}">${x.st==="ok"?"✓":x.st==="no"?"✕":"!"}</span><span><b>${x.t}</b><small>${x.d}</small></span></li>`).join("")}</ul>`}
+$("pubPill").onclick=()=>{showPanel("L");setTimeout(()=>$("pubHead").scrollIntoView({behavior:"smooth",block:"start"}),60)};
+function renderMatrix(){const H=hexes(),t=$("matrix");
+  let s="<tr><th></th>"+H.map((h,i)=>`<th title="${esc(S.series[i].label)}"><i style="background:${h}"></i></th>`).join("")+"</tr>";
+  H.forEach((a,i)=>{s+=`<tr><th title="${esc(S.series[i].label)}"><i style="background:${a}"></i></th>`;
+    H.forEach((b,j)=>{if(i===j){s+=`<td class="self"></td>`;return}const c=pairCls(a,b),v=Math.min(dE(a,b),dCVD(a,b));
+      s+=`<td class="${c}" data-j="${j}" title="${esc(S.series[i].label)} vs ${esc(S.series[j].label)}: normal ΔE ${dE(a,b).toFixed(0)}, colorblind ΔE ${dCVD(a,b).toFixed(0)}">${v.toFixed(0)}</td>`});s+="</tr>"});
+  t.innerHTML=s;t.querySelectorAll("td[data-j]").forEach(td=>td.onclick=()=>{S.sel=+td.dataset.j;renderSeries();renderColor();showTab("pColor")})}
+
+/* ================= candidates ================= */
+function bestCandidates(idx,sameFam){const others=S.series.filter((_,i)=>i!==idx).map(s=>s.hex);
+  const fam=idx>=0?family(S.series[idx].hex):null;
+  const me=idx>=0?S.series[idx].hex:null;
+  return LIB.filter(c=>contrast(c.h)>=3&&!printRisk(c.h)&&c.h!==me&&!others.includes(c.h)&&(!sameFam||c.b===fam)).map(c=>{
+    const q=others.length?Math.min(...others.map(o=>pairQ(c.h,o))):50;return {h:c.h,n:c.n,b:c.b,q:q+0.15*Math.min(chroma(c.h),40)/4}}).sort((a,b)=>b.q-a.q)}
+
+/* ================= color pane ================= */
+function setHex(h,live){const s=cur();if(!live)commit();s.hex=h;persist();renderSeriesChips();renderColor(live);renderFigure();renderScore();renderMatrix();renderCmapSel()}
+let sliding=false;
+function renderSeriesChips(){document.querySelectorAll("#ser .chip").forEach((c,i)=>{c.style.background=S.series[i].hex;c.title=S.series[i].hex})}
+function renderColor(fromSlider){const s=cur(),h=s.hex;
+  $("selName").textContent=s.label;$("swbig").style.background=h;$("picker").value=h.toLowerCase();
+  if(document.activeElement!==$("hex"))$("hex").value=h;$("hex").classList.remove("badin");$("cname").value=libName(h)+" · "+family(h);
+  if(!fromSlider){const [H,Sa,L]=rgb2hsl(toRgb(h));$("sH").value=Math.round(H);$("sS").value=Math.round(Sa*100);$("sL").value=Math.round(L*100)}
+  $("vH").textContent=$("sH").value+"°";$("vS").textContent=$("sS").value+"%";$("vL").textContent=$("sL").value+"%";
+  $("revertC").disabled=!s.orig||s.orig===h;
+  $("stG").textContent=grade(h);$("stC").textContent=contrast(h).toFixed(1)+":1";$("stL").textContent=lab(h)[0].toFixed(0);
+  $("cvd").innerHTML=[["none","Normal"],["deutan","Deutan"],["protan","Protan"],["tritan","Tritan"],["gray","Gray"]].map(([t,l])=>`<div><i style="background:${sim(h,t)}"></i>${l}</div>`).join("");
+  const sh=[mix(h,0,.45),mix(h,0,.3),mix(h,0,.15),h,mix(h,1,.2),mix(h,1,.4),mix(h,1,.6)];
+  $("shades").innerHTML=sh.map((x,i)=>`<button style="background:${x}" class="${i===3?"cur":""}" title="${x}" aria-label="Use shade ${x}" data-h="${x}"></button>`).join("");
+  $("shades").querySelectorAll("button").forEach(b=>b.onclick=()=>setHex(b.dataset.h));
+  if(!fromSlider)renderSugg();
+}
+function renderSugg(){const c=bestCandidates(S.sel,$("sameFam").checked).slice(0,8);
+  $("sugg").innerHTML=c.length?c.map(x=>`<button data-h="${x.h}"><i style="background:${x.h}"></i><span>${esc(x.n)} <em>${x.h}</em></span><em>fit ${Math.round(Math.min(x.q,99))}</em></button>`).join(""):`<div class="muted">No library color in this family is clearly distinct. Turn off “Same family only”.</div>`;
+  $("sugg").querySelectorAll("button").forEach(b=>b.onclick=()=>{setHex(b.dataset.h);toast(cur().label+" → "+libName(b.dataset.h))})}
+$("sameFam").onchange=renderSugg;
+$("picker").oninput=e=>setHex(norm(e.target.value),true);
+$("picker").addEventListener("click",()=>commit());
+$("hex").oninput=e=>{const v=norm(e.target.value);if(validHex(v))setHex(v);else $("hex").classList.add("badin")};
+$("hex").onblur=()=>{$("hex").value=cur().hex;$("hex").classList.remove("badin")};
+["sH","sS","sL"].forEach(k=>{$(k).addEventListener("pointerdown",()=>commit());$(k).addEventListener("keydown",()=>{if(!sliding){commit();sliding=true}});$(k).addEventListener("keyup",()=>sliding=false);
+  $(k).oninput=()=>setHex(toHex(hsl2rgb(+$("sH").value,$("sS").value/100,$("sL").value/100)),true)});
+$("sH").parentElement.addEventListener("change",()=>renderSugg());
+/* library */
+const FAMS=["","Violet","Indigo","Blue","Green","Yellow","Orange","Red","Pink & magenta","Brown & earth","Neutral"];
+$("fams").innerHTML=FAMS.map(f=>`<button data-f="${f}">${f||"All"}</button>`).join("");
+$("fams").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.fam=b.dataset.f;persist();renderLib()});
+$("q").oninput=renderLib;
+function renderLib(){const q=$("q").value.trim().toLowerCase();
+  $("fams").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===S.fam?"true":"false"));
+  const items=LIB.filter(c=>(!S.fam||c.b===S.fam)&&(!q||c.n.toLowerCase().includes(q)||c.h.toLowerCase().includes(q)))
+    .sort((a,b)=>ORDER.indexOf(a.b)-ORDER.indexOf(b.b)||lab(a.h)[0]-lab(b.h)[0]);
+  $("lib").innerHTML=items.map(c=>`<button style="background:${c.h}" data-h="${c.h}" aria-label="${esc(c.n)} ${c.h}" title="${esc(c.n)} ${c.h} · grade ${grade(c.h)}"></button>`).join("")||`<div class="muted" style="grid-column:1/-1">No colors match. Clear the search or pick another family.</div>`;
+  $("lib").querySelectorAll("button").forEach(b=>{b.onclick=()=>{setHex(b.dataset.h);toast(cur().label+" → "+libName(b.dataset.h))};
+    b.onmouseenter=b.onfocus=()=>{$("hov").textContent=`${libName(b.dataset.h)} ${b.dataset.h} · grade ${grade(b.dataset.h)} · ${contrast(b.dataset.h).toFixed(1)}:1`}})}
+
+/* ================= figure ================= */
+const PT=72/25.4;
+function rng(seed){let s=seed*9301+49297;return()=>{s=(s*16807)%2147483647;return s/2147483647}}
+function niceTicks(lo,hi,n=5){const span=hi-lo,step0=span/n,mag=Math.pow(10,Math.floor(Math.log10(step0))),f=step0/mag;
+  const step=(f<1.5?1:f<3?2:f<7?5:10)*mag;const t=[];for(let v=Math.ceil(lo/step-1e-9)*step;v<=hi+1e-9;v+=step)t.push(+v.toFixed(10));return {t,step}}
+const fmt=(v,step)=>{const d=step<1?Math.min(3,Math.ceil(-Math.log10(step))):0;return v.toFixed(d)};
+function dashArr(d,lw){return d==="--"?`${4*lw} ${2*lw}`:d===":"?`${1*lw} ${1.6*lw}`:d==="-."?`${4*lw} ${1.6*lw} ${1*lw} ${1.6*lw}`:""}
+function marker(m,x,y,r,col,lw){const st=`fill="${col}" stroke="${mix(col,0,0.35)}" stroke-width="${0.4*lw}"`;
+  if(m==="none")return "";
+  if(m==="o")return `<circle cx="${x}" cy="${y}" r="${r}" ${st}/>`;
+  if(m==="s")return `<rect x="${x-r*0.9}" y="${y-r*0.9}" width="${r*1.8}" height="${r*1.8}" ${st}/>`;
+  if(m==="^")return `<path d="M${x},${y-r*1.15}L${x+r*1.05},${y+r*0.75}L${x-r*1.05},${y+r*0.75}Z" ${st}/>`;
+  if(m==="v")return `<path d="M${x},${y+r*1.15}L${x+r*1.05},${y-r*0.75}L${x-r*1.05},${y-r*0.75}Z" ${st}/>`;
+  if(m==="D")return `<path d="M${x},${y-r*1.2}L${x+r},${y}L${x},${y+r*1.2}L${x-r},${y}Z" ${st}/>`;
+  if(m==="x")return `<path d="M${x-r},${y-r}L${x+r},${y+r}M${x+r},${y-r}L${x-r},${y+r}" stroke="${col}" stroke-width="${0.9*lw}" fill="none"/>`;
+  if(m==="+")return `<path d="M${x-r*1.15},${y}L${x+r*1.15},${y}M${x},${y-r*1.15}L${x},${y+r*1.15}" stroke="${col}" stroke-width="${0.9*lw}" fill="none"/>`;
+  if(m==="*"){let p="";for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,rr=k%2?r*0.5:r*1.25;p+=(k?"L":"M")+(x+rr*Math.cos(a)).toFixed(2)+","+(y+rr*Math.sin(a)).toFixed(2)}return `<path d="${p}Z" ${st}/>`}
+  return ""}
+function axes(o){/* o: x,y,w,h, xr,yr, xl,yl, F, lw, xcat */
+  const {x,y,w,h,F,lw}=o;let s="";const X=v=>x+(v-o.xr[0])/(o.xr[1]-o.xr[0])*w,Y=v=>y+h-(v-o.yr[0])/(o.yr[1]-o.yr[0])*h;
+  const tk=3*lw,ax=`stroke="#000" stroke-width="${0.6*lw}"`;
+  s+=`<path d="M${x},${y}L${x},${y+h}L${x+w},${y+h}" fill="none" ${ax}/>`;
+  const yt=niceTicks(o.yr[0],o.yr[1],4);yt.t.forEach(v=>{const yy=Y(v);s+=`<line x1="${x-tk}" x2="${x}" y1="${yy}" y2="${yy}" ${ax}/><text x="${x-tk-1.5}" y="${yy+F*0.35}" text-anchor="end">${fmt(v,yt.step)}</text>`});
+  if(!o.xcat){const xt=niceTicks(o.xr[0],o.xr[1],5);xt.t.forEach(v=>{const xx=X(v);s+=`<line x1="${xx}" x2="${xx}" y1="${y+h}" y2="${y+h+tk}" ${ax}/><text x="${xx}" y="${y+h+tk+F}" text-anchor="middle">${fmt(v,xt.step)}</text>`})}
+  if(o.xl)s+=`<text x="${x+w/2}" y="${y+h+tk+F*2.2}" text-anchor="middle">${o.xl}</text>`;
+  if(o.yl)s+=`<text transform="translate(${x-F*2.9},${y+h/2}) rotate(-90)" text-anchor="middle">${o.yl}</text>`;
+  return {s,X,Y}}
+function legend(x,y,w,F,lw,showMk){let s="",cx=x,cy=y;const items=S.series.map(se=>{const tw=se.label.length*F*0.52+F*2.6;return [se,tw]});
+  items.forEach(([se,tw])=>{if(cx+tw>x+w&&cx>x){cx=x;cy+=F*1.35}const sw=F*1.6;
+    s+=`<line x1="${cx}" x2="${cx+sw}" y1="${cy-F*0.33}" y2="${cy-F*0.33}" stroke="${se.hex}" stroke-width="${1.3*lw}" stroke-dasharray="${dashArr(se.dash,lw)}"/>`;
+    if(showMk)s+=marker(se.marker,cx+sw/2,cy-F*0.33,F*0.26,se.hex,lw);
+    s+=`<text x="${cx+sw+F*0.35}" y="${cy}">${esc(se.label)}</text>`;cx+=tw+F*0.6});
+  return {s,h:cy-y+F*1.35}}
+function panelLetter(c,x,y,F){return `<text x="${x}" y="${y}" font-weight="bold" font-size="${F*1.25}">${c}</text>`}
+/* plot functions return svg string inside box b={x,y,w,h} */
+function plotTime(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};const R=rng(3);
+  const data=S.series.map((se,k)=>{const pl=0.16+0.55*k/Math.max(n-1,1),pts=[];for(let i=0;i<=100;i++){const t=i*5;let v=0.05+pl*(1-Math.exp(-t/60))+0.018*(R()-0.5)+0.012*Math.sin(i*0.7+k);pts.push([t,v])}return pts});
+  const ymax=Math.max(...data.flat().map(p=>p[1]))*1.12;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0,500],yr:[0,ymax],xl:"Time (ns)",yl:"RMSD (nm)",F,lw});let s=A.s;
+  data.forEach((pts,k)=>{const se=S.series[k];if(S.bands){const up=pts.map(p=>[A.X(p[0]),A.Y(p[1]+0.025)]),dn=pts.map(p=>[A.X(p[0]),A.Y(p[1]-0.025)]).reverse();
+      s+=`<path d="M${up.map(p=>p.map(v=>v.toFixed(1)).join(",")).join("L")}L${dn.map(p=>p.map(v=>v.toFixed(1)).join(",")).join("L")}Z" fill="${tint(se.hex)}" fill-opacity="0.55" stroke="none"/>`}});
+  data.forEach((pts,k)=>{const se=S.series[k];s+=`<path d="M${pts.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}" fill="none" stroke="${se.hex}" stroke-width="${lw}" stroke-dasharray="${dashArr(se.dash,lw)}" stroke-linejoin="round"/>`;
+    for(let i=10+k*2;i<=100;i+=20)s+=marker(se.marker,A.X(pts[i][0]),A.Y(pts[i][1]),F*0.24,se.hex,lw)});
+  return s}
+function plotResid(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};const R=rng(11);const N=42;
+  const data=S.series.map((se,k)=>{const pts=[];for(let i=1;i<=N;i++){const term=0.35*Math.exp(-(i-1)/2.5)+0.45*Math.exp(-(N-i)/2.2);const loop=0.12*Math.exp(-Math.pow((i-24)/3,2));
+    let v=0.1+term+loop*(1+0.3*k)+0.03*R()-0.04*k*Math.exp(-Math.pow((i-18)/6,2));pts.push([i,Math.max(0.05,v)])}return pts});
+  const ymax=Math.max(...data.flat().map(p=>p[1]))*1.1;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[1,N],yr:[0,ymax],xl:"Residue",yl:"RMSF (nm)",F,lw});let s=A.s;
+  data.forEach((pts,k)=>{const se=S.series[k];s+=`<path d="M${pts.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}" fill="none" stroke="${se.hex}" stroke-width="${lw}" stroke-dasharray="${dashArr(se.dash,lw)}" stroke-linejoin="round"/>`;
+    for(let i=k%3;i<N;i+=6)s+=marker(se.marker,A.X(pts[i][0]),A.Y(pts[i][1]),F*0.22,se.hex,lw)});
+  return s}
+function plotBars(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};const R=rng(5);
+  const vals=S.series.map((_,k)=>-(3+9*(k/Math.max(n-1,1)))-1.2*R()),err=vals.map(()=>0.6+0.6*R());
+  const ymin=Math.min(...vals.map((v,i)=>v-err[i]))*1.15;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0,n],yr:[ymin,0],yl:"ΔG bind (kcal mol⁻¹)",F,lw,xcat:true});let s=A.s;
+  const bw=(A.X(1)-A.X(0))*0.62;
+  vals.forEach((v,k)=>{const se=S.series[k],cx=A.X(k+0.5);
+    s+=`<rect x="${cx-bw/2}" y="${A.Y(0)}" width="${bw}" height="${A.Y(v)-A.Y(0)}" fill="${se.hex}" stroke="${mix(se.hex,0,0.35)}" stroke-width="${0.4*lw}"/>`;
+    s+=`<path d="M${cx},${A.Y(v-err[k])}L${cx},${A.Y(v+err[k])}M${cx-bw*0.18},${A.Y(v-err[k])}L${cx+bw*0.18},${A.Y(v-err[k])}" stroke="#000" stroke-width="${0.6*lw}" fill="none"/>`;
+    for(let r=0;r<3;r++){const pv=v+(R()-0.5)*err[k]*1.6;s+=`<circle cx="${cx+(r-1)*bw*0.22}" cy="${A.Y(pv)}" r="${F*0.17}" fill="#FFFFFF" stroke="#000" stroke-width="${0.4*lw}"/>`}
+    const sl=se.label.replace(/^Inhibitor\s*/i,"Inh. ");const lb=sl.length>9?sl.slice(0,8)+"…":sl;s+=`<text x="${cx}" y="${A.Y(0)-F*0.5}" text-anchor="middle" font-size="${F*0.85}" transform="rotate(0)">${esc(lb)}</text>`});
+  s+=`<line x1="${A.X(0)}" x2="${A.X(n)}" y1="${A.Y(0)}" y2="${A.Y(0)}" stroke="#000" stroke-width="${0.6*lw}"/>`;
+  return s}
+function plotScatter(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};const R=rng(17);
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[4,9],yr:[4,9],xl:"Experimental pIC₅₀",yl:"Predicted pIC₅₀",F,lw});let s=A.s;
+  s+=`<line x1="${A.X(4)}" y1="${A.Y(4)}" x2="${A.X(9)}" y2="${A.Y(9)}" stroke="#777" stroke-width="${0.6*lw}" stroke-dasharray="${3*lw} ${2*lw}"/>`;
+  S.series.forEach((se,k)=>{const cx=4.8+3.4*k/Math.max(n-1,1);for(let i=0;i<9;i++){const ex=cx+(R()-0.5)*1.1,py=ex+(R()-0.5)*0.8;
+    s+=marker(se.marker==="none"?"o":se.marker,A.X(ex),A.Y(py),F*0.3,se.hex,lw)}});
+  return s}
+function plotDist(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};
+  const g=(x,mu,sd)=>Math.exp(-0.5*Math.pow((x-mu)/sd,2))/(sd*Math.sqrt(2*Math.PI));
+  const data=S.series.map((_,k)=>{const mu=1.05+0.38*k/Math.max(n-1,1),sd=0.045+0.012*(k%3),pts=[];for(let i=0;i<=120;i++){const x=0.85+i*0.0075;pts.push([x,0.75*g(x,mu,sd)+0.25*g(x,mu+0.09,sd*1.4)])}return pts});
+  const ymax=Math.max(...data.flat().map(p=>p[1]))*1.1;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0.85,1.75],yr:[0,ymax],xl:"Radius of gyration (nm)",yl:"Probability density",F,lw});let s=A.s;
+  data.forEach((pts,k)=>{const se=S.series[k];if(S.bands)s+=`<path d="M${A.X(pts[0][0])},${A.Y(0)}L${pts.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}L${A.X(pts.at(-1)[0])},${A.Y(0)}Z" fill="${tint(se.hex)}" fill-opacity="0.45"/>`});
+  data.forEach((pts,k)=>{const se=S.series[k];s+=`<path d="M${pts.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}" fill="none" stroke="${se.hex}" stroke-width="${lw}" stroke-dasharray="${dashArr(se.dash,lw)}"/>`});
+  return s}
+function plotFel(b,F,lw){const m={l:F*4.2,r:F*6.6,t:F*0.6,bt:F*3.3};
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[-3,3],yr:[-2,2],xl:"PC1",yl:"PC2",F,lw});
+  const nx=48,ny=32;let s="";const E=(x,y)=>{const w1=Math.exp(-((x+1.2)**2/0.5+(y-0.4)**2/0.3)),w2=Math.exp(-((x-1.1)**2/0.4+(y+0.6)**2/0.35)),w3=Math.exp(-((x-0.2)**2/1.5+(y-1.1)**2/0.2))*0.5;
+    return -Math.log(0.002+w1+0.8*w2+w3)};
+  let emin=1e9,emax=-1e9;const V=[];for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const x=-3+6*(i+0.5)/nx,y=-2+4*(j+0.5)/ny,e=E(x,y);V.push(e);emin=Math.min(emin,e);emax=Math.max(emax,e)}
+  const cw=(A.X(3)-A.X(-3))/nx,ch=(A.Y(-2)-A.Y(2))/ny;
+  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const t=(V[j*nx+i]-emin)/(emax-emin);s+=`<rect x="${(A.X(-3)+i*cw).toFixed(2)}" y="${(A.Y(-2)-(j+1)*ch).toFixed(2)}" width="${(cw+0.3).toFixed(2)}" height="${(ch+0.3).toFixed(2)}" fill="${cmap(t)}"/>`}
+  s+=A.s;
+  const bx=A.X(3)+F*0.9,by=b.y+m.t,bh=b.h-m.t-m.bt,bwid=F*0.8;
+  for(let k=0;k<40;k++)s+=`<rect x="${bx}" y="${(by+bh*(1-(k+1)/40)).toFixed(2)}" width="${bwid}" height="${(bh/40+0.3).toFixed(2)}" fill="${cmap(k/39)}"/>`;
+  s+=`<rect x="${bx}" y="${by}" width="${bwid}" height="${bh}" fill="none" stroke="#000" stroke-width="${0.5*lw}"/>`;
+  const ticks=[0,0.25,0.5,0.75,1];ticks.forEach(t=>{const yy=by+bh*(1-t);s+=`<line x1="${bx+bwid}" x2="${bx+bwid+2*lw}" y1="${yy}" y2="${yy}" stroke="#000" stroke-width="${0.5*lw}"/><text x="${bx+bwid+F*0.5}" y="${yy+F*0.35}">${(t*(emax-emin)*2.49).toFixed(0)}</text>`});
+  s+=`<text transform="translate(${bx+bwid+F*3.0},${by+bh/2}) rotate(90)" text-anchor="middle">ΔG (kJ mol⁻¹)</text>`;
+  return s}
+function plotStack(b,F,lw,n){const m={l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3};const R=rng(23);
+  const cats=["Coil","β-sheet","Helix","Turn","Bend"].slice(0,Math.min(5,n)),nc=cats.length;
+  const sys=["Apo","+ Inh. A","+ Inh. B","+ Inh. C"];
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r-F*5,h:b.h-m.t-m.bt,xr:[0,sys.length],yr:[0,100],yl:"Secondary structure (%)",F,lw,xcat:true});let s=A.s;
+  const bw=(A.X(1)-A.X(0))*0.6;
+  sys.forEach((sy,i)=>{let raw=cats.map((c,k)=>(k===1?40-8*i:k===0?30+5*i:12+6*R())+3*R());const tot=raw.reduce((a,b)=>a+b,0);raw=raw.map(v=>v/tot*100);let acc=0;const cx=A.X(i+0.5);
+    raw.forEach((v,k)=>{const se=S.series[k];s+=`<rect x="${cx-bw/2}" y="${A.Y(acc+v)}" width="${bw}" height="${A.Y(acc)-A.Y(acc+v)}" fill="${se.hex}" stroke="#FFFFFF" stroke-width="${0.5*lw}"/>`;acc+=v});
+    s+=`<text x="${cx}" y="${A.Y(0)+F*1.4}" text-anchor="middle">${sy}</text>`});
+  cats.forEach((c,k)=>{const yy=b.y+m.t+F*0.8+k*F*1.4,xx=A.X(sys.length)+F*0.8;s+=`<rect x="${xx}" y="${yy-F*0.75}" width="${F*0.9}" height="${F*0.9}" fill="${S.series[k].hex}"/><text x="${xx+F*1.3}" y="${yy}">${c}</text>`});
+  return s}
+const sq=x=>x*x;
+/* ---------- shared helpers for MD analysis plots ---------- */
+const M0=F=>({l:F*4.2,r:F*0.8,t:F*0.6,bt:F*3.3});
+const pth=(pts,A)=>"M"+pts.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L");
+const stepPth=(pts,A)=>{let d="M"+A.X(pts[0][0]).toFixed(1)+","+A.Y(pts[0][1]).toFixed(1);for(let i=1;i<pts.length;i++)d+="H"+A.X(pts[i][0]).toFixed(1)+"V"+A.Y(pts[i][1]).toFixed(1);return d};
+const frac=(k,n)=>n>1?k/(n-1):0;
+function lineEl(d,se,lw,extra=""){return `<path d="${d}" fill="none" stroke="${se.hex}" stroke-width="${lw}" stroke-dasharray="${dashArr(se.dash,lw)}" stroke-linejoin="round" ${extra}/>`}
+function catLabels(labels,X,y,F,size){return labels.map((l,i)=>`<text x="${X(i+0.5).toFixed(1)}" y="${y.toFixed(1)}" text-anchor="middle" font-size="${F*(size||0.9)}">${esc(l)}</text>`).join("")}
+const shortLbl=l=>{const s=l.replace(/^Inhibitor\s*/i,"Inh. ");return s.length>9?s.slice(0,8)+"…":s};
+function catLegend(items,x,y,F){return items.map(([lab,col,stroke],k)=>{const yy=y+k*F*1.45;return `<rect x="${x}" y="${yy-F*0.78}" width="${F*0.95}" height="${F*0.95}" fill="${col}" stroke="${stroke||"none"}" stroke-width="0.5"/><text x="${x+F*1.35}" y="${yy}">${lab}</text>`}).join("")}
+function colorbar(x,y,h,F,lw,lo,hi,label,inv){let s="";const w=F*0.8;
+  for(let k=0;k<40;k++)s+=`<rect x="${x}" y="${(y+h*(1-(k+1)/40)).toFixed(2)}" width="${w}" height="${(h/40+0.3).toFixed(2)}" fill="${cmap(inv?1-k/39:k/39)}"/>`;
+  s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#000" stroke-width="${0.5*lw}"/>`;
+  [0,0.5,1].forEach(t=>{const yy=y+h*(1-t),v=lo+(hi-lo)*t;s+=`<line x1="${x+w}" x2="${x+w+2*lw}" y1="${yy}" y2="${yy}" stroke="#000" stroke-width="${0.5*lw}"/><text x="${x+w+F*0.5}" y="${yy+F*0.35}">${Math.abs(hi-lo)<=2?v.toFixed(1):v.toFixed(0)}</text>`});
+  s+=`<text transform="translate(${x+w+F*3.0},${y+h/2}) rotate(90)" text-anchor="middle">${label}</text>`;return s}
+
+/* ---------- generic time series (Rg, SASA, H-bonds, distance, β-sheet, clusters) ---------- */
+function mkTS(cfg){return function(b,F,lw,n){const m=M0(F),R=rng(cfg.seed),N=cfg.N||100,xr=cfg.xr||[0,500];
+  const data=S.series.map((_,k)=>{const fr=frac(k,n),pts=[];for(let i=0;i<=N;i++){const t=xr[0]+(xr[1]-xr[0])*i/N;pts.push([t,cfg.f(fr,t,R,k)])}return pts});
+  const ys=data.flat().map(p=>p[1]);let lo=cfg.y0!==undefined?cfg.y0:Math.min(...ys),hi=Math.max(...ys);const pad=(hi-lo)*0.1||1;if(cfg.y0===undefined)lo-=pad;hi+=pad;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr,yr:[lo,hi],xl:cfg.xl||"Time (ns)",yl:cfg.yl,F,lw});let s=A.s;
+  if(cfg.smooth){data.forEach((pts,k)=>{s+=`<path d="${pth(pts,A)}" fill="none" stroke="${tint(S.series[k].hex)}" stroke-width="${0.5*lw}"/>`});
+    data.forEach((pts,k)=>{const w=5,sm=pts.map((p,i)=>{const a=pts.slice(Math.max(0,i-w),i+w+1);return [p[0],a.reduce((q,r)=>q+r[1],0)/a.length]});
+      s+=lineEl(pth(sm,A),S.series[k],lw*1.1);for(let i=8+k*2;i<sm.length;i+=20)s+=marker(S.series[k].marker,A.X(sm[i][0]),A.Y(sm[i][1]),F*0.24,S.series[k].hex,lw)})}
+  else{if(S.bands&&cfg.band)data.forEach((pts,k)=>{const up=pts.map(p=>[p[0],p[1]+cfg.band]),dn=pts.map(p=>[p[0],p[1]-cfg.band]).reverse();
+      s+=`<path d="${pth(up,A)}L${dn.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}Z" fill="${tint(S.series[k].hex)}" fill-opacity="0.55"/>`});
+    data.forEach((pts,k)=>{s+=lineEl(cfg.step?stepPth(pts,A):pth(pts,A),S.series[k],lw);const st=Math.max(1,Math.round(N/5));for(let i=Math.round(N/10)+k%3;i<=N;i+=st)s+=marker(S.series[k].marker,A.X(pts[i][0]),A.Y(pts[i][1]),F*0.24,S.series[k].hex,lw)})}
+  return s}}
+const plotRg=mkTS({seed:31,yl:"Rg (nm)",band:0.02,f:(fr,t,R,k)=>1.12+0.22*fr+0.32*Math.exp(-t/70)+0.012*(R()-0.5)+0.006*Math.sin(t/9+k)});
+const plotSasa=mkTS({seed:37,yl:"SASA (nm²)",band:0.9,f:(fr,t,R,k)=>44+9*fr+11*Math.exp(-t/90)+1.0*(R()-0.5)+0.5*Math.sin(t/11+k)});
+const plotHb=mkTS({seed:41,yl:"Hydrogen bonds",smooth:true,y0:0,f:(fr,t,R)=>Math.max(0,Math.round(1+6*fr*(1-Math.exp(-t/60))+4.5*(R()-0.5)))});
+const plotMind=mkTS({seed:43,yl:"Min. distance (nm)",band:0.025,y0:0,f:(fr,t,R)=>0.24+0.9*Math.exp(-t/(30+120*(1-fr)))+0.02*R()+(R()<0.02?0.12:0)});
+const plotBeta=mkTS({seed:47,yl:"β-sheet content (%)",y0:0,band:2,f:(fr,t,R)=>Math.max(0,48*(1-0.75*fr)/(1+Math.exp(-(t-160-120*fr)/45))+3*(R()-0.5))});
+const plotClus=mkTS({seed:53,yl:"Number of clusters",step:true,y0:0,N:50,f:(fr,t,R)=>Math.max(1,Math.round(8-(7-4*fr)*(1-Math.exp(-t/(110+150*fr)))+(R()<0.08?1:0)))});
+
+/* ---------- grouped bars helper ---------- */
+function groupedBars(b,F,lw,n,{cats,val,yl,seed,labelTop,maxS}){const m=M0(F),R=rng(seed),ns=Math.min(n,maxS||n);
+  const V=cats.map((_,c)=>S.series.slice(0,ns).map((_,k)=>val(c,frac(k,ns),R,k)));
+  const all=V.flat();let lo=Math.min(0,...all),hi=Math.max(0,...all);const pad=(hi-lo)*0.12;lo=lo<0?lo-pad:0;hi=hi>0?hi+pad:0;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0,cats.length],yr:[lo,hi],yl,F,lw,xcat:true});let s=A.s;
+  const gw=(A.X(1)-A.X(0))*0.8,bw=gw/ns;
+  V.forEach((row,c)=>row.forEach((v,k)=>{const se=S.series[k],x=A.X(c+0.5)-gw/2+k*bw,y0=A.Y(0),y1=A.Y(v);
+    s+=`<rect x="${(x+bw*0.06).toFixed(2)}" y="${Math.min(y0,y1).toFixed(2)}" width="${(bw*0.88).toFixed(2)}" height="${Math.abs(y1-y0).toFixed(2)}" fill="${se.hex}" stroke="${mix(se.hex,0,0.35)}" stroke-width="${0.35*lw}"/>`}));
+  s+=`<line x1="${A.X(0)}" x2="${A.X(cats.length)}" y1="${A.Y(0)}" y2="${A.Y(0)}" stroke="#000" stroke-width="${0.6*lw}"/>`;
+  const yb=b.y+m.t+(b.h-m.t-m.bt);s+=catLabels(cats,A.X,labelTop?A.Y(0)-F*0.5:yb+F*1.15,F,0.85);
+  if(n>ns)s+=`<text x="${b.x+b.w-F*0.5}" y="${b.y+m.t+F*0.8}" text-anchor="end" font-size="${F*0.8}" fill="#666">first ${ns} series</text>`;
+  return s}
+const RES=["K16","L17","V18","F19","F20","A21","E22","D23","V24","G25"],RESB=[-1.2,-2.8,-3.4,-5.6,-4.9,-1.8,1.4,0.9,-2.2,-0.6];
+function plotMMPBSA(b,F,lw,n){return groupedBars(b,F,lw,n,{cats:RES,seed:61,maxS:5,yl:"ΔG contribution (kcal mol⁻¹)",val:(c,fr,R)=>RESB[c]*(0.55+0.6*fr)+0.35*(R()-0.5)})}
+function plotOlig(b,F,lw,n){const m=M0(F);const s=groupedBars(b,F,lw,n,{cats:["1","2","3","4","5","6","7","8"],seed:67,maxS:6,yl:"Probability",
+  val:(c,fr)=>{const mu=6-4.2*fr,sd=1.2+0.3*fr,raw=Array.from({length:8},(_,i)=>Math.exp(-sq(i+1-mu)/(2*sd*sd)));return raw[c]/raw.reduce((a,b)=>a+b,0)}});
+  return s+`<text x="${b.x+m.l+(b.w-m.l-m.r)/2}" y="${b.y+b.h-F*0.5}" text-anchor="middle">Oligomer size (peptides)</text>`}
+function plotIE(b,F,lw,n){const m=M0(F),R=rng(71),ns=Math.min(n,6);const mR={...m,r:F*9};
+  const A=axes({x:b.x+mR.l,y:b.y+mR.t,w:b.w-mR.l-mR.r,h:b.h-mR.t-mR.bt,xr:[0,ns],yr:[-260,0],yl:"Interaction energy (kJ mol⁻¹)",F,lw,xcat:true});let s=A.s;
+  const gw=(A.X(1)-A.X(0))*0.7;
+  for(let k=0;k<ns;k++){const se=S.series[k],fr=frac(k,ns),lj=-(70+110*fr)-12*R(),co=-(25+70*fr)-10*R(),x=A.X(k+0.5)-gw/2;
+    s+=`<rect x="${x}" y="${A.Y(0)}" width="${gw/2-1}" height="${A.Y(lj)-A.Y(0)}" fill="${se.hex}" stroke="${mix(se.hex,0,0.35)}" stroke-width="${0.35*lw}"/>`;
+    s+=`<rect x="${x+gw/2+1}" y="${A.Y(0)}" width="${gw/2-1}" height="${A.Y(co)-A.Y(0)}" fill="${tint(se.hex)}" stroke="${se.hex}" stroke-width="${0.7*lw}"/>`;
+    s+=`<text x="${A.X(k+0.5)}" y="${A.Y(0)-F*0.5}" text-anchor="middle" font-size="${F*0.85}">${esc(shortLbl(se.label))}</text>`}
+  s+=`<line x1="${A.X(0)}" x2="${A.X(ns)}" y1="${A.Y(0)}" y2="${A.Y(0)}" stroke="#000" stroke-width="${0.6*lw}"/>`;
+  s+=catLegend([["Lennard-Jones","#777777"],["Coulomb","#E2E2E2","#777777"]],A.X(ns)+F*0.8,b.y+mR.t+F*1.2,F);
+  return s}
+function plotBox(b,F,lw,n){const m=M0(F),R=rng(73);
+  const D=S.series.map((_,k)=>{const mu=-(4+8*frac(k,n)),a=[];for(let i=0;i<12;i++){const g=(R()+R()+R()-1.5)*1.3;a.push(mu+g)}return a.sort((x,y)=>x-y)});
+  const all=D.flat(),lo=Math.min(...all)-1,hi=Math.max(...all)+1;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0,n],yr:[lo,hi],yl:"ΔG bind, replicas (kcal mol⁻¹)",F,lw,xcat:true});let s=A.s;
+  const q=(a,p)=>{const i=(a.length-1)*p,f=Math.floor(i);return a[f]+(a[Math.min(f+1,a.length-1)]-a[f])*(i-f)};const bw=(A.X(1)-A.X(0))*0.5;
+  D.forEach((a,k)=>{const se=S.series[k],cx=A.X(k+0.5),q1=q(a,.25),q2=q(a,.5),q3=q(a,.75),iq=q3-q1,wl=Math.max(a[0],q1-1.5*iq),wh=Math.min(a.at(-1),q3+1.5*iq);
+    s+=`<path d="M${cx},${A.Y(wl)}V${A.Y(q1)}M${cx},${A.Y(q3)}V${A.Y(wh)}M${cx-bw*0.25},${A.Y(wl)}H${cx+bw*0.25}M${cx-bw*0.25},${A.Y(wh)}H${cx+bw*0.25}" stroke="${se.hex}" stroke-width="${0.8*lw}" fill="none"/>`;
+    s+=`<rect x="${cx-bw/2}" y="${A.Y(q3)}" width="${bw}" height="${A.Y(q1)-A.Y(q3)}" fill="${tint(se.hex)}" stroke="${se.hex}" stroke-width="${0.9*lw}"/>`;
+    s+=`<line x1="${cx-bw/2}" x2="${cx+bw/2}" y1="${A.Y(q2)}" y2="${A.Y(q2)}" stroke="${mix(se.hex,0,0.4)}" stroke-width="${1.4*lw}"/>`;
+    a.forEach((v,i)=>{s+=marker(se.marker==="none"?"o":se.marker,cx+(((i*37)%11)/10-0.5)*bw*0.7,A.Y(v),F*0.17,se.hex,lw)})});
+  s+=catLabels(S.series.map(x=>shortLbl(x.label)),A.X,b.y+m.t+(b.h-m.t-m.bt)+F*1.15,F,0.85);return s}
+
+/* ---------- curves: RDF, PMF ---------- */
+function plotRDF(b,F,lw,n){const m=M0(F);
+  const data=S.series.map((_,k)=>{const fr=frac(k,n),pts=[];for(let i=0;i<=140;i++){const r=0.2+i*0.0093;let g=r<0.24?0:1+(1.6+2.2*fr)*Math.exp(-sq((r-0.28)/0.022))+0.55*Math.exp(-sq((r-0.48)/0.05))-0.35*Math.exp(-sq((r-0.36)/0.04))+0.12*Math.exp(-sq((r-0.72)/0.07));pts.push([r,Math.max(0,g)])}return pts});
+  const hi=Math.max(...data.flat().map(p=>p[1]))*1.1;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0.2,1.5],yr:[0,hi],xl:"r (nm)",yl:"g(r)",F,lw});let s=A.s;
+  s+=`<line x1="${A.X(0.2)}" x2="${A.X(1.5)}" y1="${A.Y(1)}" y2="${A.Y(1)}" stroke="#999" stroke-width="${0.5*lw}" stroke-dasharray="${2*lw} ${2*lw}"/>`;
+  data.forEach((pts,k)=>{s+=lineEl(pth(pts,A),S.series[k],lw);s+=marker(S.series[k].marker,A.X(pts[8][0]),A.Y(pts[8][1]),F*0.24,S.series[k].hex,lw)});return s}
+function plotPMF(b,F,lw,n){const m=M0(F),R=rng(79);
+  const data=S.series.map((_,k)=>{const D=8+16*frac(k,n),pts=[];for(let i=0;i<=110;i++){const x=0.4+i*0.019;pts.push([x,-D*Math.exp(-sq((x-0.62)/0.22))+0.18*D*Math.exp(-sq((x-1.05)/0.12))-0.6*D*Math.exp(-sq((x-1.45)/0.4))*0+0.3*(R()-0.5)])}return pts});
+  const ys=data.flat().map(p=>p[1]),lo=Math.min(...ys)*1.12,hi=Math.max(...ys)+3;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0.4,2.5],yr:[lo,hi],xl:"Center-of-mass distance (nm)",yl:"PMF (kJ mol⁻¹)",F,lw});let s=A.s;
+  s+=`<line x1="${A.X(0.4)}" x2="${A.X(2.5)}" y1="${A.Y(0)}" y2="${A.Y(0)}" stroke="#999" stroke-width="${0.5*lw}" stroke-dasharray="${2*lw} ${2*lw}"/>`;
+  if(S.bands)data.forEach((pts,k)=>{const up=pts.map(p=>[p[0],p[1]+1]),dn=pts.map(p=>[p[0],p[1]-1]).reverse();s+=`<path d="${pth(up,A)}L${dn.map(p=>A.X(p[0]).toFixed(1)+","+A.Y(p[1]).toFixed(1)).join("L")}Z" fill="${tint(S.series[k].hex)}" fill-opacity="0.55"/>`});
+  data.forEach((pts,k)=>{s+=lineEl(pth(pts,A),S.series[k],lw);for(let i=12+k*3;i<pts.length;i+=25)s+=marker(S.series[k].marker,A.X(pts[i][0]),A.Y(pts[i][1]),F*0.24,S.series[k].hex,lw)});return s}
+
+/* ---------- PCA projection ---------- */
+function plotPCA(b,F,lw,n){const m=M0(F),R=rng(83);const g=()=>(R()+R()+R()-1.5)*0.8;
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[-4,4],yr:[-3,3],xl:"PC1 (nm)",yl:"PC2 (nm)",F,lw});let s=A.s;
+  S.series.forEach((se,k)=>{const fr=frac(k,n),cx=-2.6+5.2*fr,cy=1.4*Math.sin(fr*Math.PI*1.3)-0.4,sp=1.1-0.5*fr;
+    for(let i=0;i<70;i++){const x=cx+g()*sp*1.3,y=cy+g()*sp;if(x<-4||x>4||y<-3||y>3)continue;s+=`<g opacity="0.7">${marker(se.marker==="none"?"o":se.marker,A.X(x),A.Y(y),F*0.17,se.hex,lw)}</g>`}});return s}
+
+/* ---------- contact map ---------- */
+function plotCmapRes(b,F,lw,n){const N=42,m={l:F*4.2,r:F*6.6,t:F*0.6,bt:F*3.3};const R=rng(89);
+  const size=Math.min(b.w-m.l-m.r,b.h-m.t-m.bt),x0=b.x+m.l+((b.w-m.l-m.r)-size)/2,y0=b.y+m.t;
+  const A=axes({x:x0,y:y0,w:size,h:size,xr:[1,N],yr:[1,N],xl:"Residue",yl:"Residue",F,lw});
+  const c=size/N;let s="";
+  for(let i=1;i<=N;i++)for(let j=1;j<=N;j++){const d=Math.abs(i-j);let p=d<=3?0.95-0.18*d:0;
+    const hp=Math.exp(-sq((i+j)-52)/6)*(i>=15&&i<=37&&j>=15&&j<=37?1:0)*0.85;const core=Math.exp(-(sq(i-19)+sq(j-33))/18)*0.6+Math.exp(-(sq(j-19)+sq(i-33))/18)*0.6;
+    p=Math.max(p,hp,core)*(i<j?1:0.55)+0.04*R();p=Math.min(1,p);
+    s+=`<rect x="${(x0+(i-1)*c).toFixed(2)}" y="${(y0+size-j*c).toFixed(2)}" width="${(c+0.25).toFixed(2)}" height="${(c+0.25).toFixed(2)}" fill="${cmap(1-p)}"/>`}
+  s+=A.s+`<line x1="${x0}" y1="${y0+size}" x2="${x0+size}" y2="${y0}" stroke="#000" stroke-width="${0.3*lw}" stroke-dasharray="${1.5*lw} ${1.5*lw}"/>`;
+  const s1=S.series[0].label,s2=(S.series[1]||S.series[0]).label;
+  s+=`<text x="${x0+F*0.4}" y="${y0+F*1.1}" font-size="${F*0.85}">${esc(s1)} (upper)</text><text x="${x0+size-F*0.4}" y="${y0+size-F*0.5}" text-anchor="end" font-size="${F*0.85}">${esc(s2)} (lower)</text>`;
+  s+=colorbar(x0+size+F*0.9,y0,size,F,lw,0,1,"Contact probability",true);return s}
+
+/* ---------- DSSP secondary structure timeline ---------- */
+function plotDSSP(b,F,lw,n){const m={l:F*4.2,r:F*7.2,t:F*0.6,bt:F*3.3},R=rng(97),Nt=100,Nr=42;
+  const col=k=>S.series[k%n].hex;
+  const cats=[["Coil","#EDEDED"],["β-sheet",col(0)],["β-bridge",col(1)],["Bend",col(2)],["Turn",col(3)],["α-helix",col(4)],["3₁₀-helix",col(5)]];
+  const A=axes({x:b.x+m.l,y:b.y+m.t,w:b.w-m.l-m.r,h:b.h-m.t-m.bt,xr:[0,500],yr:[1,Nr],xl:"Time (ns)",yl:"Residue",F,lw});
+  const cw=(A.X(500)-A.X(0))/Nt,ch=(A.Y(1)-A.Y(Nr))/(Nr-1);let s="";
+  for(let r=1;r<=Nr;r++)for(let t=0;t<Nt;t++){const tn=t*5,u=R();let c=0;
+    if(r>=13&&r<=24&&tn<110+40*u)c=5;
+    else if(((r>=17&&r<=21)||(r>=30&&r<=35))&&tn>140+60*u)c=u<0.06?2:1;
+    else if(r>=25&&r<=29)c=u<0.6?4:3;
+    else if(u<0.14)c=3;else if(u<0.17&&r>8&&r<38)c=6;
+    if(c)s+=`<rect x="${(A.X(0)+t*cw).toFixed(2)}" y="${(A.Y(r)-ch/2).toFixed(2)}" width="${(cw+0.25).toFixed(2)}" height="${(ch+0.25).toFixed(2)}" fill="${cats[c][1]}"/>`}
+  s=`<rect x="${A.X(0)}" y="${A.Y(Nr)-ch/2}" width="${A.X(500)-A.X(0)}" height="${A.Y(1)-A.Y(Nr)+ch}" fill="#EDEDED"/>`+s+A.s;
+  s+=catLegend(cats,A.X(500)+F*0.9,b.y+m.t+F*1.0,F);
+  s+=`<text x="${A.X(0)}" y="${b.y+m.t-F*0.1}" font-size="${F*0.85}" fill="#444">${esc(S.series[0].label)}</text>`;return s}
+
+/* ---------- registry ---------- */
+const PLOTS={time:plotTime,rg:plotRg,sasa:plotSasa,hbond:plotHb,mind:plotMind,beta:plotBeta,clus:plotClus,
+  resid:plotResid,mmpbsa:plotMMPBSA,cmapres:plotCmapRes,dssp:plotDSSP,
+  bars:plotBars,ie:plotIE,box:plotBox,
+  dist:plotDist,rdf:plotRDF,pmf:plotPMF,fel:plotFel,pca:plotPCA,olig:plotOlig,scatter:plotScatter,stack:plotStack};
+const FIGS={figure:["time","resid","bars","fel"],fig_stab:["time","rg","sasa","hbond"],fig_agg:["beta","clus","dssp","cmapres"],
+  fig_bind:["bars","mmpbsa","mind","ie"],fig_fe:["fel","pmf"],fig_six:["time","resid","rg","sasa","hbond","mmpbsa"]};
+const NOLEG=new Set(["fel","stack","dssp","cmapres"]);
+const PLOT_DEFS=[
+ ["Multi-panel figures",[["figure","MD overview · RMSD, RMSF, ΔG, energy map"],["fig_stab","Stability · RMSD, Rg, SASA, H-bonds"],["fig_agg","Aggregation · β-sheet, clusters, DSSP, contact map"],["fig_bind","Inhibitor binding · ΔG, per-residue, distance, energy"],["fig_fe","Free energy · energy map, PMF"],["fig_six","Six-panel overview · RMSD to per-residue ΔG"]]],
+ ["Time series",[["time","RMSD"],["rg","Radius of gyration (Rg)"],["sasa","SASA"],["hbond","Hydrogen bonds (raw + running mean)"],["mind","Minimum distance"],["beta","β-sheet content"],["clus","Number of clusters (aggregation)"]]],
+ ["Per residue",[["resid","RMSF"],["mmpbsa","MM-PBSA per-residue decomposition"],["cmapres","Contact map"],["dssp","DSSP secondary structure timeline"]]],
+ ["Energy & binding",[["bars","Binding free energy (bars + replicas)"],["box","Binding free energy (box plot)"],["ie","Interaction energy (LJ + Coulomb)"]]],
+ ["Distributions & landscapes",[["dist","Rg distribution"],["rdf","Radial distribution function g(r)"],["pmf","Potential of mean force (PMF)"],["fel","Free energy landscape (PC1 vs PC2)"],["pca","PCA projection"],["olig","Oligomer size distribution"],["scatter","Predicted vs experimental (ML)"],["stack","Secondary structure fractions"]]]];
+
+const FILTERS=`<defs>
+<filter id="f-protan" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0"/></filter>
+<filter id="f-deutan" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0"/></filter>
+<filter id="f-tritan" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0"/></filter>
+<filter id="f-gray" color-interpolation-filters="linearRGB"><feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/></filter></defs>`;
+function buildSVG(forExport){
+  const wmm=WIDTHS.find(w=>w[0]===S.width)[2],W=wmm*PT,F=+S.font,lw=+S.lw,n=S.series.length;
+  const showMk=S.series.some(s=>s.marker!=="none");
+  let body="",H;
+  const lg=legend(F*0.6,F*1.3,W-F*1.2,F,lw,showMk);
+  if(!PLOTS[S.layout]&&!FIGS[S.layout])S.layout="figure";
+  if(FIGS[S.layout]){
+    const keys=FIGS[S.layout],np=keys.length,cols=W<110*PT?1:2,rows=Math.ceil(np/cols),needLg=keys.some(k=>!NOLEG.has(k));
+    const top=needLg?lg.h+F*0.9:F*0.4,ph=cols===1?W*0.62:(np===2?W*0.42:W*0.36);H=top+rows*ph;
+    keys.forEach((k,i)=>{const c=i%cols,r=Math.floor(i/cols),bx={x:c*W/cols,y:top+r*ph,w:W/cols,h:ph};
+      body+=panelLetter("abcdef"[i],bx.x+F*0.4,bx.y+F*1.2,F);body+=`<g transform="translate(0,${F*0.6})">`+PLOTS[k]({x:bx.x+F*0.2,y:bx.y+F*0.6,w:bx.w-F*0.4,h:bx.h-F*1.6},F,lw,n)+"</g>"});
+    body=(needLg?lg.s:"")+body}
+  else{const top=NOLEG.has(S.layout)?F*0.6:lg.h+F*0.9;const ph=Math.min(W*0.62,95*PT);H=top+ph;
+    body=(top>F?lg.s:"")+PLOTS[S.layout]({x:F*0.2,y:top,w:W-F*0.4,h:ph-F*0.6},F,lw,n)}
+  const filt=!forExport&&S.view!=="none"?` filter="url(#f-${S.view})"`:"";
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${(W/PT).toFixed(1)}mm" height="${(H/PT).toFixed(1)}mm" viewBox="0 0 ${W.toFixed(2)} ${H.toFixed(2)}" font-family="Arial, Helvetica, sans-serif" font-size="${F}" fill="#000">${forExport?"":FILTERS}<g${filt}><rect width="${W.toFixed(2)}" height="${H.toFixed(2)}" fill="#FFFFFF"/>${body}</g></svg>`;
+  return {svg,wmm,hmm:H/PT}}
+function renderFigure(){const f=buildSVG(false);$("paper").innerHTML=f.svg;
+  const svgEl=$("paper").querySelector("svg");svgEl.removeAttribute("width");svgEl.removeAttribute("height");svgEl.setAttribute("role","img");svgEl.setAttribute("aria-label","Preview figure using your palette");
+  lastAspect=f.hmm/f.wmm;fitPaper();
+  $("cap").textContent=`Printed size ${f.wmm.toFixed(0)} × ${f.hmm.toFixed(0)} mm · ${S.font} pt text · ${S.lw} pt lines${S.view!=="none"?" · simulated "+({deutan:"deuteranopia",protan:"protanopia",tritan:"tritanopia",gray:"grayscale"})[S.view]:""}. Sample data for illustration only.`}
+/* controls */
+$("width").innerHTML=WIDTHS.map(w=>`<option value="${w[0]}">${w[1]}</option>`).join("");
+function syncControls(){$("width").value=S.width;$("font").value=S.font;$("lw").value=S.lw;$("bands").checked=S.bands;
+  $("layoutSel").value=S.layout;
+  document.querySelectorAll("#view button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.view?"true":"false"));
+  $("cmType").value=S.cm.type;$("cmRev").checked=S.cm.rev;$("pname").value=S.name;
+  document.querySelectorAll("#zoom button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===S.zoom?"true":"false"));
+  $("theme").value=S.theme||"auto";applyTheme();
+  applyPanes(true)}
+$("layoutSel").innerHTML=PLOT_DEFS.map(([g,items])=>`<optgroup label="${g}">${items.map(([k,n])=>`<option value="${k}">${n}</option>`).join("")}</optgroup>`).join("");
+const PLOT_KEYS=PLOT_DEFS.flatMap(([g,items])=>items.map(x=>x[0]));
+function setLayout(v){if(S.layout!==v)commit();S.layout=v;persist();syncControls();renderFigure()}
+$("layoutSel").onchange=e=>setLayout(e.target.value);
+const stepPlot=d=>{const i=PLOT_KEYS.indexOf(S.layout);setLayout(PLOT_KEYS[(i+d+PLOT_KEYS.length)%PLOT_KEYS.length])};
+$("prevP").onclick=()=>stepPlot(-1);$("nextP").onclick=()=>stepPlot(1);
+document.querySelectorAll("#view button").forEach(b=>b.onclick=()=>{S.view=b.dataset.v;persist();syncControls();renderFigure()});
+$("width").onchange=e=>{commit();S.width=e.target.value;persist();renderFigure()};
+$("font").onchange=e=>{commit();S.font=clamp(+e.target.value||7,5,10);persist();syncControls();renderFigure()};
+$("lw").onchange=e=>{commit();S.lw=clamp(+e.target.value||1,0.5,2.5);persist();syncControls();renderFigure()};
+$("bands").onchange=e=>{commit();S.bands=e.target.checked;persist();renderFigure()};
+/* colormap */
+const VIRIDIS=["#440154","#482878","#3E4A89","#31688E","#26828E","#1F9E89","#35B779","#6DCD59","#B4DE2C","#FDE725"];
+const CIVIDIS=["#00204D","#123570","#3B496C","#575D6D","#707173","#8A8779","#A69D75","#C4B56C","#E4CF5B","#FFEA46"];
+function cmStops(){const a=(S.series[S.cm.a]||S.series[0]).hex,b=(S.series[S.cm.b]||S.series[1]||S.series[0]).hex;let st;
+  if(S.cm.type==="viridis")st=VIRIDIS.slice();else if(S.cm.type==="cividis")st=CIVIDIS.slice();
+  else if(S.cm.type==="div")st=[mix(a,0,0.45),a,mix(a,1,0.55),"#F7F7F7",mix(b,1,0.55),b,mix(b,0,0.45)];
+  else st=[mix(a,0,0.55),mix(a,0,0.25),a,mix(a,1,0.4),mix(a,1,0.75),mix(a,1,0.94)];
+  return S.cm.rev?st.reverse():st}
+function cmap(t){const st=cmStops(),p=clamp(t,0,1)*(st.length-1),i=Math.min(Math.floor(p),st.length-2),f=p-i;
+  const A=toRgb(st[i]).map(lin),B=toRgb(st[i+1]).map(lin);return toHex(A.map((v,k)=>delin(v+(B[k]-v)*f)))}
+function renderCmapSel(){const opts=S.series.map((s,i)=>`<option value="${i}">${i+1}. ${esc(s.label)}</option>`).join("");
+  $("cmA").innerHTML=opts;$("cmB").innerHTML=opts;S.cm.a=Math.min(S.cm.a,S.series.length-1);S.cm.b=Math.min(S.cm.b,S.series.length-1);$("cmA").value=S.cm.a;$("cmB").value=S.cm.b;
+  $("cmAw").style.display=S.cm.type==="seq"||S.cm.type==="div"?"":"none";$("cmBw").style.display=S.cm.type==="div"?"":"none";
+  const g=Array.from({length:24},(_,k)=>cmap(k/23));$("cmStrip").style.background=`linear-gradient(90deg,${g.join(",")})`;
+  $("cmStripG").style.background=`linear-gradient(90deg,${g.map(h=>sim(h,"gray")).join(",")})`}
+$("cmType").onchange=e=>{commit();S.cm=Object.assign({},S.cm);S.cm.type=e.target.value;persist();renderCmapSel();renderFigure()};
+$("cmA").onchange=e=>{commit();S.cm=Object.assign({},S.cm);S.cm.a=+e.target.value;persist();renderCmapSel();renderFigure()};
+$("cmB").onchange=e=>{commit();S.cm=Object.assign({},S.cm);S.cm.b=+e.target.value;persist();renderCmapSel();renderFigure()};
+$("cmRev").onchange=e=>{commit();S.cm=Object.assign({},S.cm);S.cm.rev=e.target.checked;persist();renderCmapSel();renderFigure()};
+
+/* ================= palettes: save / load ================= */
+function renderLoad(){const sv=Object.keys(S.saved||{});
+  $("load").innerHTML=`<option value="">Load a palette…</option>`+(sv.length?`<optgroup label="My saved palettes">${sv.map(k=>`<option value="s:${esc(k)}">${esc(k)}</option>`).join("")}</optgroup>`:"")+
+  `<optgroup label="Presets">${Object.keys(PRESETS).map(k=>`<option value="p:${esc(k)}">${esc(k)}</option>`).join("")}</optgroup>`}
+$("load").onchange=e=>{const v=e.target.value;if(!v)return;commit();
+  if(v.startsWith("p:")){const k=v.slice(2),old=S.series;S.series=PRESETS[k].slice(0,12).map((h,i)=>mkS(old[i]?old[i].label:"Series "+(i+1),h,old[i]&&old[i].marker,old[i]&&old[i].dash));S.name=k}
+  else{const k=v.slice(2);S.series=JSON.parse(JSON.stringify(S.saved[k]));S.series.forEach(se=>{if(!se.orig)se.orig=se.hex});S.name=k}
+  S.sel=0;e.target.value="";renderAll();toast("Loaded "+S.name)};
+$("pname").onchange=e=>{S.name=e.target.value.trim()||"My palette";persist()};
+$("saveP").onclick=()=>{S.name=$("pname").value.trim()||"My palette";S.saved=S.saved||{};S.saved[S.name]=JSON.parse(JSON.stringify(S.series));persist();renderLoad();toast("Saved “"+S.name+"”")};
+$("undo").onclick=()=>{if(!past.length)return;future.push(snap());restore(past.pop());updUndo()};
+$("redo").onclick=()=>{if(!future.length)return;past.push(snap());restore(future.pop());updUndo()};
+document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();e.shiftKey?$("redo").click():$("undo").click()}});
+
+/* ================= export ================= */
+const FMTS=[["py","Python list"],["mpl","matplotlib"],["mplstyle",".mplstyle"],["sns","seaborn"],["gg","R ggplot2"],["gnu","gnuplot"],["grace","xmgrace (.xvg)"],["origin","Origin / Prism / Excel"],["vmd","VMD"],["pymol","PyMOL"],["chx","ChimeraX"],["cmap","Colormap (matplotlib)"],["css","CSS"],["json","JSON"]];
+let fmtSel="mpl";
+$("fmts").innerHTML=FMTS.map(([k,n])=>`<button data-k="${k}">${n}</button>`).join("");
+$("fmts").querySelectorAll("button").forEach(b=>b.onclick=()=>{fmtSel=b.dataset.k;renderExport()});
+const r3=h=>toRgb(h).map(v=>v.toFixed(3));const r255=h=>toRgb(h).map(v=>Math.round(v*255));
+const pyStr=s=>JSON.stringify(s);
+function exportText(k){const L=S.series,H=hexes(),labels=L.map(s=>s.label),mk=L.map(s=>s.marker==="none"?"None":s.marker),ds=L.map(s=>s.dash);
+  const head=`# ${S.name} — ${L.length} colors (Figure Palette Lab)\n`;
+  if(k==="py")return head+`colors = [${H.map(pyStr).join(", ")}]\nbands  = [${H.map(h=>pyStr(tint(h))).join(", ")}]  # light tints for error bands\nlabels = [${labels.map(pyStr).join(", ")}]`;
+  if(k==="mpl")return head+`import matplotlib as mpl\nimport matplotlib.pyplot as plt\nfrom cycler import cycler\n\ncolors  = [${H.map(pyStr).join(", ")}]\nmarkers = [${mk.map(pyStr).join(", ")}]\nstyles  = [${ds.map(pyStr).join(", ")}]\nbands   = [${H.map(h=>pyStr(tint(h))).join(", ")}]\n\nmpl.rcParams.update({\n    "axes.prop_cycle": cycler(color=colors) + cycler(marker=markers) + cycler(linestyle=styles),\n    "font.family": "sans-serif", "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],\n    "font.size": ${S.font}, "axes.linewidth": ${(0.6*S.lw).toFixed(2)}, "lines.linewidth": ${S.lw},\n    "lines.markersize": 3, "lines.markevery": 10,\n    "xtick.major.width": ${(0.6*S.lw).toFixed(2)}, "ytick.major.width": ${(0.6*S.lw).toFixed(2)},\n    "axes.spines.top": False, "axes.spines.right": False,\n    "savefig.dpi": 600, "pdf.fonttype": 42, "svg.fonttype": "none",\n})\n\n# figure ${WIDTHS.find(w=>w[0]===S.width)[1]}\nfig_width_in = ${(WIDTHS.find(w=>w[0]===S.width)[2]/25.4).toFixed(2)}\n\n# example with error band:\n# ax.plot(t, y, label=labels[0])\n# ax.fill_between(t, y - sd, y + sd, color=bands[0], lw=0)\nlabels = [${labels.map(pyStr).join(", ")}]`;
+  if(k==="mplstyle")return `# ${S.name}.mplstyle — save as a .mplstyle file, then plt.style.use("${S.name.replace(/\s+/g,"_")}.mplstyle")\naxes.prop_cycle : (cycler('color', [${H.map(h=>`'${h.slice(1)}'`).join(", ")}]) + cycler('linestyle', [${ds.map(d=>`'${d}'`).join(", ")}]))\nfont.family      : sans-serif\nfont.sans-serif  : Arial, Helvetica, DejaVu Sans\nfont.size        : ${S.font}\naxes.linewidth   : ${(0.6*S.lw).toFixed(2)}\nlines.linewidth  : ${S.lw}\nlines.markersize : 3\naxes.spines.top  : False\naxes.spines.right: False\nxtick.major.width: ${(0.6*S.lw).toFixed(2)}\nytick.major.width: ${(0.6*S.lw).toFixed(2)}\nsavefig.dpi      : 600\npdf.fonttype     : 42\nsvg.fonttype     : none`;
+  if(k==="sns")return head+`import seaborn as sns\n\npalette = [${H.map(pyStr).join(", ")}]\nsns.set_theme(style="ticks", palette=palette, font="Arial", font_scale=${(S.font/10).toFixed(2)})\n# or per plot: sns.lineplot(..., palette=dict(zip([${labels.map(pyStr).join(", ")}], palette)))`;
+  if(k==="gg")return `# ${S.name}\npal <- c(${L.map(s=>`"${s.label.replace(/"/g,"'")}" = "${s.hex}"`).join(",\n         ")})\n\nggplot(df, aes(x, y, colour = system, fill = system)) +\n  geom_line(linewidth = ${(S.lw*0.35).toFixed(2)}) +\n  scale_colour_manual(values = pal) +\n  scale_fill_manual(values = scales::alpha(pal, 0.25)) +\n  theme_classic(base_size = ${S.font}, base_family = "Arial")`;
+  if(k==="gnu")return `# ${S.name} — gnuplot line types\n`+L.map((s,i)=>`set linetype ${i+1} lc rgb "${s.hex}" lw ${(S.lw*1.5).toFixed(1)} pt ${[7,5,9,13,11,2,1,3][MARKERS.findIndex(m=>m[0]===s.marker)%8]||7} ps 0.6 dt ${({"-":1,"--":2,":":3,"-.":4})[s.dash]}   # ${s.label}`).join("\n")+`\nset style increment user`;
+  if(k==="grace")return `# ${S.name} — paste at the top of a GROMACS .xvg file (xmgrace).\n# Colors 16+ are defined here and assigned to data sets s0, s1, ...\n`+L.map((s,i)=>`@map color ${16+i} to (${r255(s.hex).join(", ")}), "${s.label.replace(/"/g,"'")}"`).join("\n")+"\n"+L.map((s,i)=>`@    s${i} line color ${16+i}\n@    s${i} line linewidth ${(S.lw*1.5).toFixed(1)}\n@    s${i} legend "${s.label.replace(/"/g,"'")}"`).join("\n");
+  if(k==="origin")return `${S.name}\nName\tHex\tR\tG\tB\n`+L.map(s=>`${s.label}\t${s.hex}\t${r255(s.hex).join("\t")}`).join("\n")+`\n\nOrigin: Format > Color Manager, or Plot Details > Line > Color > Custom.\nGraphPad Prism: Change > Colors > Custom > enter the hex codes.\nExcel: Format Data Series > Line > Color > More Colors > Hex.`;
+  if(k==="vmd")return `# ${S.name} — VMD: redefines color IDs 21-${20+Math.min(L.length,12)}\n`+L.slice(0,12).map((s,i)=>`color change rgb ${21+i} ${r3(s.hex).join(" ")}  ;# ${s.label} ${s.hex}`).join("\n")+`\n# then: Graphics > Representations > Coloring Method > ColorID > 21 ...`;
+  if(k==="pymol")return `# ${S.name} — PyMOL\n`+L.map((s,i)=>`cmd.set_color("pal${i+1}", [${r3(s.hex).join(", ")}])  # ${s.label} ${s.hex}`).join("\n")+`\n# usage: color pal1, chain A`;
+  if(k==="chx")return `# ${S.name} — ChimeraX (replace the selections with your own)\n`+L.map((s,i)=>`color #1/${String.fromCharCode(65+i)} ${s.hex}   # ${s.label}`).join("\n");
+  if(k==="cmap"){const st=cmStops();return `# colormap: ${$("cmType").selectedOptions[0].text}${S.cm.rev?" (reversed)":""}\nfrom matplotlib.colors import LinearSegmentedColormap\n\nstops = [${st.map(pyStr).join(", ")}]\ncmap = LinearSegmentedColormap.from_list("${S.name.replace(/\W+/g,"_").toLowerCase()}_cmap", stops, N=256)\n# ax.contourf(X, Y, G, levels=20, cmap=cmap); fig.colorbar(...)`}
+  if(k==="css")return `:root {\n`+L.map((s,i)=>`  --series-${i+1}: ${s.hex}; /* ${s.label} */`).join("\n")+`\n}`;
+  if(k==="json")return JSON.stringify({name:S.name,series:L.map(s=>({label:s.label,hex:s.hex,band:tint(s.hex),marker:s.marker,linestyle:s.dash,grade:grade(s.hex),contrast_on_white:+contrast(s.hex).toFixed(2)})),figure:{width_mm:WIDTHS.find(w=>w[0]===S.width)[2],font_pt:S.font,line_pt:S.lw},colormap:cmStops()},null,2);
+  return ""}
+function renderExport(){$("fmts").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.k===fmtSel?"true":"false"));$("code").value=exportText(fmtSel)}
+$("openExport").onclick=()=>{renderExport();$("exp").showModal()};
+$("closeExp").onclick=()=>$("exp").close();
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText($("code").value);toast("Copied")}catch(e){$("code").focus();$("code").select();try{document.execCommand("copy");toast("Copied")}catch(_){toast("Select the text and copy it")}}};
+let DL=null;
+$("dlnote").textContent="Checking whether file downloads are available…";
+(async()=>{try{if(window.claude&&window.claude.use){DL=await window.claude.use("downloads")}}catch(e){DL=null}
+  if(DL){$("dl").hidden=false;$("dlnote").textContent=""}else{$("dlnote").textContent="File downloads aren't available in this view. Copy the text above, or right-click the figure preview to save it."}})();
+async function save(filename,data){if(!DL)return;try{await DL.save({filename,data});toast("Saved "+filename)}catch(e){const c=e&&e.code;
+  if(c==="declined")return;if(c==="rate_limited"){toast("A save prompt is already open");return}
+  if(c==="unavailable"||c==="not_granted"||c==="capability_disabled"||c==="capability_removed"){$("dl").hidden=true;$("dlnote").textContent="File downloads aren't available in this view. Copy the text instead.";return}
+  toast("Couldn't save "+filename)}}
+const fname=ext=>(S.name.replace(/[^\w\-]+/g,"_").replace(/^_+|_+$/g,"")||"palette")+ext;
+function pngBlob(){return new Promise((res,rej)=>{const f=buildSVG(true),px=Math.round(f.wmm/25.4*600),py=Math.round(f.hmm/25.4*600);
+  const img=new Image();img.onload=()=>{const c=document.createElement("canvas");c.width=px;c.height=py;const x=c.getContext("2d");x.fillStyle="#FFFFFF";x.fillRect(0,0,px,py);x.drawImage(img,0,0,px,py);c.toBlob(b=>b?res(b):rej(),"image/png")};
+  img.onerror=rej;img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(f.svg)})}
+document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=async()=>{const t=b.dataset.dl;
+  if(t==="svg")return save(fname("_figure.svg"),buildSVG(true).svg);
+  if(t==="png"){try{const bl=await pngBlob();return save(fname("_figure_600dpi.png"),bl)}catch(e){toast("Couldn't render the PNG");return}}
+  if(t==="json")return save(fname(".json"),exportText("json"));
+  if(t==="md")return save(fname(".md"),`# ${S.name}\n\n| # | Swatch | Series | Hex | Band tint | Marker | Line | Grade |\n|---|:---:|---|---|---|---|---|:---:|\n`+S.series.map((s,i)=>`| ${i+1} | ![${s.hex}](https://placehold.co/24x24/${s.hex.slice(1)}/${s.hex.slice(1)}.png) | ${s.label} | \`${s.hex}\` | \`${tint(s.hex)}\` | ${s.marker} | ${s.dash} | ${grade(s.hex)} |`).join("\n"));
+  if(t==="txt")return save(fname("_"+fmtSel+".txt"),$("code").value)});
+
+/* ================= preview sizing, focus, theme ================= */
+let lastAspect=0.75;
+function fitPaper(){const desk=document.querySelector(".desk"),paper=$("paper");if(!desk||!paper)return;
+  const pane=$("pFig"),hd=pane.querySelector(".hd"),availW=desk.clientWidth-32;
+  const below=$("cap").offsetHeight+$("kbd").offsetHeight+24;
+  const availH=pane.clientHeight-hd.offsetHeight-below-40;
+  let w;
+  if(S.zoom==="width")w=availW;
+  else if(S.zoom==="2")w=availW*2;
+  else w=Math.min(availW,Math.max(260,availH/lastAspect));
+  paper.style.width=Math.max(260,Math.floor(w))+"px";
+  desk.classList.toggle("zoomed",S.zoom==="2");
+  desk.style.maxHeight=S.zoom==="fit"?"":Math.max(300,availH+32)+"px"}
+new ResizeObserver(()=>fitPaper()).observe($("pFig"));
+window.addEventListener("resize",()=>{document.documentElement.style.setProperty("--hh",document.querySelector(".top").offsetHeight+"px");fitPaper()});
+document.documentElement.style.setProperty("--hh",document.querySelector(".top").offsetHeight+"px");
+document.querySelectorAll("#zoom button").forEach(b=>b.onclick=()=>{S.zoom=b.dataset.v;persist();syncControls();fitPaper()});
+/* ---- resizable / collapsible side panels ---- */
+const defL=()=>window.innerWidth<=1500?300:350,defR=()=>window.innerWidth<=1500?290:330;
+if(!S.paneL)S.paneL=defL();if(!S.paneR)S.paneR=defR();
+function applyPanes(noFit){const a=document.querySelector(".app");
+  a.style.setProperty("--wl",(S.colL?44:S.paneL)+"px");a.style.setProperty("--wr",(S.colR?44:S.paneR)+"px");
+  $("pSeries").classList.toggle("collapsed",!!S.colL);$("pColor").classList.toggle("collapsed",!!S.colR);
+  $("focusBtn").textContent=(S.colL&&S.colR)?"Show side panels":"Focus figure";
+  if(!noFit)requestAnimationFrame(fitPaper)}
+function showPanel(side){if(window.matchMedia("(max-width:1180px)").matches){showTab(side==="L"?"pSeries":"pColor");return}
+  if(side==="L"&&S.colL){S.colL=false;persist();applyPanes()}if(side==="R"&&S.colR){S.colR=false;persist();applyPanes()}}
+document.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{if(b.dataset.col==="L")S.colL=true;else S.colR=true;persist();applyPanes()});
+document.querySelectorAll("[data-expand]").forEach(b=>b.onclick=()=>{if(b.dataset.expand==="L")S.colL=false;else S.colR=false;persist();applyPanes()});
+$("focusBtn").onclick=()=>{const both=S.colL&&S.colR;S.colL=S.colR=!both;persist();applyPanes()};
+function clampPane(side,w){const appW=document.querySelector(".app").clientWidth-20,other=side==="L"?(S.colR?44:S.paneR):(S.colL?44:S.paneL);
+  return Math.round(Math.max(260,Math.min(w,560,appW-other-20-460)))}
+["L","R"].forEach(side=>{const el=$("split"+side);let x0=0,w0=0;
+  el.addEventListener("pointerdown",e=>{e.preventDefault();el.setPointerCapture(e.pointerId);x0=e.clientX;
+    if(side==="L"&&S.colL){S.colL=false;S.paneL=260}if(side==="R"&&S.colR){S.colR=false;S.paneR=260}
+    w0=side==="L"?S.paneL:S.paneR;el.classList.add("drag");document.body.classList.add("dragging")});
+  el.addEventListener("pointermove",e=>{if(!el.hasPointerCapture(e.pointerId))return;const dx=e.clientX-x0,w=clampPane(side,side==="L"?w0+dx:w0-dx);
+    if(side==="L")S.paneL=w;else S.paneR=w;applyPanes()});
+  const end=e=>{if(!el.classList.contains("drag"))return;el.classList.remove("drag");document.body.classList.remove("dragging");persist()};
+  el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end);
+  el.addEventListener("dblclick",()=>{if(side==="L"){S.paneL=defL();S.colL=false}else{S.paneR=defR();S.colR=false}persist();applyPanes()});
+  el.addEventListener("keydown",e=>{const d=e.key==="ArrowLeft"?-16:e.key==="ArrowRight"?16:0;if(!d)return;e.preventDefault();
+    if(side==="L"){S.colL=false;S.paneL=clampPane("L",S.paneL+d)}else{S.colR=false;S.paneR=clampPane("R",S.paneR-d)}persist();applyPanes()})});
+function applyTheme(){const t=S.theme||"auto";if(t==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",t)}
+$("theme").onchange=e=>{S.theme=e.target.value;persist();applyTheme()};
+const isMac=/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent);
+const MOD=isMac?"⌘":"Ctrl+";
+$("undo").title=`Undo (${MOD}Z)`;$("redo").title=`Redo (${isMac?"⇧⌘Z":"Ctrl+Shift+Z"})`;
+$("kbd").innerHTML=`<kbd>${MOD}Z</kbd> undo · <kbd>${isMac?"⇧⌘Z":"Ctrl+Shift+Z"}</kbd> redo · <kbd>F</kbd> focus figure · <kbd>[</kbd> <kbd>]</kbd> previous / next plot · <kbd>E</kbd> export · drag the bars beside the figure to resize panels`;
+document.addEventListener("keydown",e=>{if(e.metaKey||e.ctrlKey||e.altKey)return;if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(document.querySelector("dialog[open]"))return;
+  const k=e.key.toLowerCase();
+  if(k==="f"){e.preventDefault();$("focusBtn").click()}
+  else if(k==="e"){e.preventDefault();$("openExport").click()}
+  else if(k==="["){e.preventDefault();stepPlot(-1)}
+  else if(k==="]"){e.preventDefault();stepPlot(1)}});
+/* restore original color of one series */
+$("revertC").onclick=()=>{const s=cur();if(!s.orig||s.orig===s.hex){toast("This series already has its original color");return}setHex(s.orig);toast(s.label+" restored to "+libName(s.orig))};
+/* reset dialog */
+$("openReset").onclick=()=>$("rst").showModal();
+$("closeRst").onclick=()=>$("rst").close();
+document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const r=b.dataset.r;const backup=JSON.stringify(S);
+  if(r!=="factory")commit();
+  if(r==="colors")S.series.forEach(se=>{se.hex=se.orig||se.hex});
+  if(r==="palette"||r==="all")Object.assign(S,PAL_DEFAULTS());
+  if(r==="figure"||r==="all"){Object.assign(S,JSON.parse(JSON.stringify(FIG_DEFAULTS)));S.paneL=defL();S.paneR=defR();S.colL=S.colR=false}
+  if(r==="factory"){S=freshState();S.paneL=defL();S.paneR=defR();past=[];future=[];try{localStorage.removeItem(KEY)}catch(e){}}
+  $("rst").close();renderAll();
+  const msg={colors:"Original colors restored",palette:"Palette reset",figure:"Figure settings reset",all:"Palette and figure settings reset",factory:"Factory reset done"}[r];
+  toast(msg,"Undo reset",()=>{S=JSON.parse(backup);renderAll();toast("Reset undone")})});
+
+/* ================= tabs (mobile) ================= */
+function showTab(id){if(!window.matchMedia("(max-width:1180px)").matches)return;document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id===id));
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.p===id?"true":"false"));window.scrollTo({top:0})}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>showTab(b.dataset.p));
+
+function renderAll(){persist();syncControls();renderSeries();renderColor();renderLib();renderCmapSel();renderFigure();renderLoad();updUndo()}
+renderAll();
+</script>
+</body>
+</html>
