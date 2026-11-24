@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scientific Unit Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: precise but lively — a lab reference card printed in full colour.
+   IDEA: a colour-coded field instrument: every quantity owns a hue, like the bands on a survey map legend.
+   PICTURE: the live result, large and white on a gradient in the quantity's colour; below, a powers-of-ten ruler.
+   COLOUR and TYPE: deep navy header, one accent per tab (violet, blue, teal, rose…), soft grey-white ground; Overpass 800/400.
+   LAYOUT: colourful tab bands in the header, input card beside the result, ruler full width, every unit in a table. */
+:root{color-scheme:light dark;--acc:#7c3aed;
+--bg:light-dark(#f3f5fa,#0a1020);--ink:light-dark(#0f172a,#e6eaf3);--muted:light-dark(#56617a,#9aa6bf);
+--line:light-dark(#0f172a1c,#e6eaf31f);--panel:light-dark(#ffffff,#121a2d);
+--acc2:color-mix(in srgb,var(--acc) 62%,#0a0f1f);--tint:color-mix(in srgb,var(--acc) 11%,var(--panel));
+--brown:light-dark(var(--acc),color-mix(in srgb,var(--acc) 65%,#fff));--mag:light-dark(var(--acc2),color-mix(in srgb,var(--acc) 55%,#fff));
+--shadow:light-dark(0 1px 2px #0f172a14,0 0 0 #0000),light-dark(0 10px 30px -12px #0f172a30,0 0 0 #0000)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(22px,3.5vw,48px) max(5vw,16px)}.np{padding-top:0}
+.wrap{max-width:1240px;margin:0 auto}
+.hero{background:radial-gradient(60% 120% at 100% 0%,color-mix(in srgb,var(--acc) 70%,transparent),transparent 70%),radial-gradient(40% 90% at 0% 100%,color-mix(in srgb,var(--acc) 35%,transparent),transparent 70%),#0d1426;color:#fff;margin-bottom:clamp(22px,3vw,40px);transition:background .4s}
+.hero .sub{color:#c9d2e6}
+h1{font-weight:800;font-size:clamp(30px,4.4vw,48px);line-height:1.05;margin:0 0 6px;text-wrap:balance}
+h2{font-weight:800;font-size:22px;line-height:1.2;margin:0 0 4px}
+h3{font-weight:800;font-size:17px;margin:18px 0 6px}
+.sub{color:var(--muted);margin:0}
+.trow{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:start;margin-top:14px}
+.tl{font-weight:800;color:#aab6d3;padding-top:10px;font-size:15px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{font:600 15px Overpass,sans-serif;min-height:42px;padding:7px 15px 7px 12px;border-radius:999px;border:1.5px solid #ffffff2e;background:#ffffff12;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,border-color .2s}
+.tabs button::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--h);box-shadow:0 0 0 3px color-mix(in srgb,var(--h) 30%,transparent);flex:none}
+.tabs button:hover{background:#ffffff22}
+.tabs button[aria-selected=true]{background:var(--h);border-color:var(--h);box-shadow:0 6px 18px -6px var(--h)}
+.tabs button[aria-selected=true]::before{background:#fff;box-shadow:none}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hero button:focus-visible{outline-color:#fff}
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:clamp(16px,3vw,32px);align-items:stretch}
+.ctl{display:grid;gap:14px;align-content:start;background:var(--panel);border-radius:20px;padding:clamp(18px,2.5vw,28px);box-shadow:var(--shadow);border:1px solid var(--line)}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:4px}
+input,select{width:100%;font:16px Overpass,sans-serif;min-height:48px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:light-dark(#f8f9fc,#0e1526);color:var(--ink);transition:border-color .2s}
+input:hover,select:hover{border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
+#val{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--brown)}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr);gap:8px;align-items:end}
+.g2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:8px;align-items:end}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#swap{min-height:48px;border-radius:12px;border:0;background:var(--acc);color:#fff;font-size:20px;cursor:pointer;box-shadow:0 6px 14px -6px var(--acc)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:light-dark(#f8f9fc,#0e1526)}
+.seg button{font:600 15px Overpass,sans-serif;min-height:44px;min-width:44px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--acc);color:#fff}
+.tbox{width:210px}[hidden]{display:none!important}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font:600 14px Overpass,sans-serif;min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--acc) 30%,transparent);background:var(--tint);color:var(--ink);cursor:pointer;transition:background .15s}
+.chips button:hover{background:color-mix(in srgb,var(--acc) 22%,var(--panel))}
+.err{color:var(--mag);font-size:14px;min-height:1.2em;margin:4px 0 0;font-weight:600}
+.readout{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(140deg,var(--acc),var(--acc2));color:#fff;border-radius:22px;padding:clamp(22px,3vw,38px);display:flex;flex-direction:column;justify-content:center;gap:10px;box-shadow:0 22px 40px -22px var(--acc)}
+.readout::before,.readout::after{content:"";position:absolute;z-index:-1;border-radius:50%;border:2px solid #ffffff26}
+.readout::before{width:340px;height:340px;right:-120px;top:-140px;background:#ffffff10}
+.readout::after{width:220px;height:220px;right:-40px;bottom:-130px}
+.readout .k{font-weight:600;color:#ffffffcc}
+.big{font-weight:800;font-size:clamp(36px,6.2vw,70px);line-height:1.05;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-shadow:0 2px 12px #00000026}
+.big .u{font-size:.4em;font-weight:600;margin-left:.3em;white-space:nowrap;opacity:.88}
+.x{white-space:nowrap}sup{font-size:.6em;line-height:0}
+.eq{font-variant-numeric:tabular-nums;margin:0;font-size:15px;color:#ffffffe6}
+.eq span,.kv b{white-space:nowrap}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;margin:4px 0 0;font-size:15px;font-variant-numeric:tabular-nums}
+.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-weight:600}
+.readout .kv{background:#00000021;border-radius:14px;padding:12px 14px}
+.readout .kv dt{color:#ffffffc4}.readout .kv dd{color:#fff}
+.ctl .kv{background:var(--tint);border-radius:12px;padding:10px 12px}
+.copy{align-self:start;font:800 15px Overpass,sans-serif;min-height:44px;padding:8px 18px;border-radius:999px;border:0;background:#fff;color:var(--acc2);cursor:pointer}
+.fig{position:relative;min-height:250px;margin-top:10px;background:linear-gradient(180deg,var(--panel),var(--tint));border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow)}
+.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.note{font-size:13px;color:var(--muted);margin:8px 0 0}
+.scroll,pre{overflow-x:auto}
+pre{background:light-dark(#0f172a,#070b16);color:#e6eaf3;border-radius:14px;padding:14px 16px;font:14px/1.55 ui-monospace,Menlo,Consolas,monospace;margin:6px 0;border-top:4px solid var(--acc)}
+.snip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.snip h3{margin:6px 0 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2::before{content:"";display:inline-block;width:12px;height:12px;border-radius:4px;background:var(--acc);margin-right:10px;vertical-align:1px}
+table{width:100%;border-collapse:separate;border-spacing:0;margin-top:12px;font-variant-numeric:tabular-nums;background:var(--panel);border-radius:18px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:14px;color:#fff;font-weight:600;background:var(--acc2)}
+td.v,th.v{text-align:right}td.v{font-weight:800}
+tr.on td{background:color-mix(in srgb,var(--acc) 18%,var(--panel))}
+tbody tr[data-u]{cursor:pointer}tbody tr[data-u]:hover td{background:var(--tint)}
+.mini{font:600 13px Overpass,sans-serif;min-height:36px;padding:4px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);background:var(--tint);color:var(--ink);cursor:pointer}
+pre+.mini,.snip .mini{background:var(--acc);color:#fff;border:0}
+.grp td{font-size:13px;color:var(--brown);font-weight:800;padding-top:16px;background:light-dark(#fafbfd,#0f1729)}
+footer{background:#0d1426;color:#c9d2e6;margin-top:clamp(28px,4vw,56px)}
+footer p{font-size:14px;max-width:80ch;margin:0 0 8px}footer b{color:#fff}
+@media(max-width:900px){.snip{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:760px){.calc{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){table{font-size:14px}th,td{padding:8px 8px}.hide-s{display:none}.trow{grid-template-columns:minmax(0,1fr);gap:4px}.tl{padding-top:0}.g3{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:no-preference){.big{transition:opacity .2s}.flash{opacity:.55}.readout{transition:background .4s}}
+@media(prefers-reduced-motion:reduce){.hero,.readout{transition:none}}
+
+/* ---- colour & clarity layer ---- */
+body{font-size:17px;background:radial-gradient(1100px 520px at 85% 430px,color-mix(in srgb,var(--acc) 13%,transparent),transparent 70%),radial-gradient(900px 600px at 0% 900px,color-mix(in srgb,var(--acc) 8%,transparent),transparent 70%),var(--bg);background-attachment:fixed}
+label{font-size:15px}
+.hint{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0 4px;padding:0;list-style:none;color:#e6ebf7;font-size:15px}
+.hint li{display:flex;align-items:center;gap:8px}
+.hint b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-size:13px}
+.tabs button::before{display:none}
+.tabs .ic{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:color-mix(in srgb,var(--h) 85%,#000);color:#fff;flex:none}
+.tabs button[aria-selected=true] .ic{background:#fff;color:var(--h)}
+.ic svg{width:15px;height:15px}
+.ctl{background-image:linear-gradient(180deg,var(--tint),var(--panel) 160px)}
+#val{border:2px solid color-mix(in srgb,var(--acc) 45%,transparent);background:var(--panel)}
+.readout .wm{position:absolute;right:26px;top:22px;width:92px;height:92px;color:#fff;opacity:.22;z-index:-1}
+.readout .wm svg{width:100%;height:100%}
+.pill{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;background:#ffffff26;border:1px solid #ffffff40;border-radius:999px;padding:4px 12px 4px 6px;font-weight:700;font-size:14px}
+.pill .ic{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--acc2)}
+.pill .ic svg{width:14px;height:14px}
+tbody tr[data-u]:nth-child(even) td{background:light-dark(#f8f9fd,#0f1729)}
+tbody tr[data-u].on td{background:color-mix(in srgb,var(--acc) 20%,var(--panel))}
+tbody tr[data-u]:hover td{background:var(--tint)}
+td.v{color:var(--brown)}
+h2{font-size:24px}
+.tool .ctl h3{color:var(--brown)}
+</style>
+</head>
+<body>
+<header class="band hero"><div class="wrap">
+  <h1>Scientific unit converter</h1>
+  <p class="sub">General units, the quantities MD simulations use every day, and tools for setting up and analysing runs. Exact SI definitions and CODATA 2018 constants.</p>
+  <ul class="hint"><li><b>1</b>Pick a quantity or tool</li><li><b>2</b>Type a number (1.5e-3 works)</li><li><b>3</b>Choose units — results update instantly</li></ul>
+  <div id="tabrows"></div>
+</div></header>
+
+<main>
+<!-- Unit converter -->
+<div id="conv">
+<section class="band np"><div class="wrap calc">
+  <div class="ctl">
+    <div>
+      <label for="val">Value</label>
+      <input id="val" inputmode="decimal" autocomplete="off" spellcheck="false" value="1">
+      <p class="err" id="err" aria-live="polite"></p>
+    </div>
+    <div class="pair">
+      <div><label for="from">From</label><select id="from"></select></div>
+      <button id="swap" type="button" aria-label="Swap units" title="Swap units">⇄</button>
+      <div><label for="to">To</label><select id="to"></select></div>
+    </div>
+    <div class="row">
+      <div><label id="sigl">Significant figures</label><div class="seg" role="group" aria-labelledby="sigl" id="sig"></div></div>
+      <div class="tbox" id="tbox"><label for="temp">Temperature for k<sub>B</sub>T (K)</label><input id="temp" inputmode="decimal" value="300"></div>
+    </div>
+    <div><label>Quick conversions</label><div class="chips" id="presets"></div></div>
+    <p class="note" id="catNote"></p>
+  </div>
+  <div class="readout" aria-live="polite"><div class="wm" aria-hidden="true"></div><span class="pill"></span>
+    <div class="k" id="rk">Result</div>
+    <div class="big" id="big">—</div>
+    <p class="eq" id="eq1"></p>
+    <p class="eq" id="eq2"></p>
+    <button class="copy" id="copy" type="button">Copy result</button>
+  </div>
+</div></section>
+<section class="band np"><div class="wrap">
+  <h2>Where it sits on the scale</h2>
+  <p class="sub" id="scaleSub">One tick per power of ten. The coloured pin is your value.</p>
+  <div class="fig"><svg id="scale" role="img" aria-label="Scale with reference landmarks"></svg></div>
+  <p class="note">Landmarks are typical, rounded values for orientation only.</p>
+</div></section>
+<section class="band np"><div class="wrap">
+  <h2>In every unit</h2>
+  <p class="sub">Tap a row to make it the target unit.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Unit</th><th class="hide-s">Symbol</th><th class="v">Value</th><th><span class="hide-s">Copy</span></th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table></div>
+</div></section>
+</div>
+
+<!-- Tool: box ⇄ concentration -->
+<section class="band np tool" id="t-box" hidden><div class="wrap calc">
+  <div class="ctl">
+    <div class="g2">
+      <div><label for="bShape">Box shape</label><select id="bShape">
+        <option value="cubic">Cubic</option><option value="rect">Rectangular (triclinic angles 90°)</option>
+        <option value="dodec">Rhombic dodecahedron (xy-square)</option><option value="octa">Truncated octahedron</option></select></div>
+      <div><label for="bA" id="bAl">Box vector a (nm)</label><input id="bA" inputmode="decimal" value="10"></div>
+    </div>
+    <div class="g2" id="bBC"><div><label for="bB">Box vector b (nm)</label><input id="bB" inputmode="decimal" value="10"></div><div><label for="bC">Box vector c (nm)</label><input id="bC" inputmode="decimal" value="10"></div></div>
+    <div class="g2">
+      <div><label for="bConc">Concentration (molar, per litre)</label><input id="bConc" inputmode="decimal" value="10"></div>
+      <div><label for="bCu">Unit</label><select id="bCu"><option value="1">M (mol/L)</option><option value="1e-3" selected>mM (mmol/L)</option><option value="1e-6">µM (µmol/L)</option><option value="1e-9">nM (nmol/L)</option></select></div>
+    </div>
+    <div><label for="bN">…or number of molecules</label><input id="bN" inputmode="numeric"></div>
+    <p class="err" id="bErr" aria-live="polite"></p>
+    <div><label for="bTg">Find the box size: target concentration for this many molecules (unit above)</label><input id="bTg" inputmode="decimal" value="96"></div>
+    <dl class="kv" id="bFind"></dl>
+    <p class="note">For a dodecahedron or octahedron, enter the box vector length d (the distance between periodic images), as GROMACS <code>editconf</code> reports it. Volume = 0.7071 d³ and 0.7698 d³ respectively. Use the same calculation for salt: N ion pairs for a given NaCl molarity, plus neutralising counter-ions.</p>
+  </div>
+  <div class="readout" aria-live="polite"><div class="wm" aria-hidden="true"></div><span class="pill"></span>
+    <div class="k" id="bK">Molecules to insert</div>
+    <div class="big" id="bBig">—</div>
+    <dl class="kv" id="bKv"></dl>
+  </div>
+</div></section>
+
+<!-- Tool: ΔG ⇄ Kd -->
+<section class="band np tool" id="t-kd" hidden><div class="wrap calc">
+  <div class="ctl">
+    <div class="g2">
+      <div><label for="kG">Binding free energy ΔG°</label><input id="kG" inputmode="decimal" value="-10"></div>
+      <div><label for="kGu">Unit</label><select id="kGu"><option value="4.184">kcal/mol</option><option value="1">kJ/mol</option></select></div>
+    </div>
+    <div class="g2">
+      <div><label for="kD">…or dissociation constant K<sub>d</sub></label><input id="kD" inputmode="decimal"></div>
+      <div><label for="kDu">Unit</label><select id="kDu"><option value="1">M (mol/L)</option><option value="1e-3">mM (mmol/L)</option><option value="1e-6">µM (µmol/L)</option><option value="1e-9" selected>nM (nmol/L)</option><option value="1e-12">pM (pmol/L)</option></select></div>
+    </div>
+    <div class="tbox"><label for="kT">Temperature (K)</label><input id="kT" inputmode="decimal" value="298.15"></div>
+    <p class="err" id="kErr" aria-live="polite"></p>
+    <h3>Two-state populations</h3>
+    <div><label for="kDD">ΔΔG between states A and B (G<sub>B</sub> − G<sub>A</sub>, same unit as above)</label><input id="kDD" inputmode="decimal" value="1"></div>
+    <dl class="kv" id="kPop"></dl>
+    <p class="note">ΔG° = RT ln(K<sub>d</sub>/c°) with standard state c° = 1 mol/L. An IC<sub>50</sub> equals K<sub>i</sub> only under specific assay conditions (Cheng–Prusoff), so convert it with care.</p>
+  </div>
+  <div class="readout" aria-live="polite"><div class="wm" aria-hidden="true"></div><span class="pill"></span>
+    <div class="k" id="kK">Dissociation constant</div>
+    <div class="big" id="kBig">—</div>
+    <dl class="kv" id="kKv"></dl>
+  </div>
+</div></section>
+
+<!-- Tool: run planner -->
+<section class="band np tool" id="t-run" hidden><div class="wrap">
+  <div class="calc">
+    <div class="ctl">
+      <div class="g3">
+        <div><label for="rDt">Time step (fs)</label><input id="rDt" inputmode="decimal" value="2"></div>
+        <div><label for="rLen">Run length (ns)</label><input id="rLen" inputmode="decimal" value="100"></div>
+        <div><label for="rOut">Save frame every (ps)</label><input id="rOut" inputmode="decimal" value="10"></div>
+      </div>
+      <div class="g3">
+        <div><label for="rAt">Atoms in system</label><input id="rAt" inputmode="numeric" value="50000"></div>
+        <div><label for="rSave">Atoms saved</label><input id="rSave" inputmode="numeric" value="50000"></div>
+        <div><label for="rPerf">Speed (ns/day)</label><input id="rPerf" inputmode="decimal" value="100"></div>
+      </div>
+      <p class="err" id="rErr" aria-live="polite"></p>
+      <p class="note">A 2 fs step needs bonds to hydrogen constrained (LINCS/SHAKE); 4 fs needs hydrogen mass repartitioning as well. Saving only the solute (compressed-x-grps in GROMACS) shrinks trajectories a lot.</p>
+    </div>
+    <div class="readout" aria-live="polite"><div class="wm" aria-hidden="true"></div><span class="pill"></span>
+      <div class="k">Steps to run</div>
+      <div class="big" id="rBig">—</div>
+      <dl class="kv" id="rKv"></dl>
+    </div>
+  </div>
+  <div class="snip" style="margin-top:20px">
+    <div><h3>GROMACS .mdp <button class="mini" data-snip="sG" type="button">Copy</button></h3><pre id="sG"></pre></div>
+    <div><h3>AMBER mdin <button class="mini" data-snip="sA" type="button">Copy</button></h3><pre id="sA"></pre></div>
+    <div><h3>NAMD config <button class="mini" data-snip="sN" type="button">Copy</button></h3><pre id="sN"></pre></div>
+  </div>
+</div></section>
+</main>
+
+<footer class="band"><div class="wrap">
+  <p><b>Constants (exact SI 2019 or CODATA 2018):</b> N<sub>A</sub> = 6.02214076×10<sup>23</sup> mol<sup>−1</sup>; e = 1.602176634×10<sup>−19</sup> C; h = 6.62607015×10<sup>−34</sup> J s; c = 299 792 458 m/s; k<sub>B</sub> = 1.380649×10<sup>−23</sup> J/K; R = 8.314462618 J/(mol K); E<sub>h</sub> = 4.3597447222071×10<sup>−18</sup> J; a<sub>0</sub> = 5.29177210903×10<sup>−11</sup> m; 1 Da = 1.66053906660×10<sup>−27</sup> kg; 1 D = 10<sup>−21</sup>/c C·m.</p>
+  <p><b>Conventions:</b> cal and kcal are thermochemical (1 cal = 4.184 J exactly), as used by AMBER, CHARMM and NAMD. GROMACS works in nm, ps, kJ/mol, bar and e. Per-molecule units in the molar tab (eV, Hartree, cm<sup>−1</sup>, K, k<sub>B</sub>T) are multiplied by N<sub>A</sub>. 1 Da equals 1 g/mol per molecule. Input accepts 1.5e-3, 6.022×10^23 or 1,000.</p>
+</div></footer>
+
+<script>
+{
+//DATA
+const NA=6.02214076e23,E=1.602176634e-19,H=6.62607015e-34,CL=299792458,KB=1.380649e-23,
+EH=4.3597447222071e-18,A0=5.29177210903e-11,DA=1.66053906660e-27,ME=9.1093837015e-31,MP=1.67262192369e-27,CAL=4.184,HC=H*CL,DEB=1e-21/CL,MOLJ=1/NA;
+const u=(id,name,sym,f,g)=>({id,name,sym,f,g});
+const tu=(id,name,sym,to,from,g)=>({id,name,sym,to,from,g});
+const CATS=[
+{id:'distance',row:0,name:'Distance',lo:-3,hi:18,units:[
+ u('m','metre','m',1,'SI'),u('km','kilometre','km',1e3,'SI'),u('cm','centimetre','cm',1e-2,'SI'),u('mm','millimetre','mm',1e-3,'SI'),
+ u('in','inch','in',0.0254,'Imperial / US'),u('ft','foot','ft',0.3048,'Imperial / US'),u('yd','yard','yd',0.9144,'Imperial / US'),u('mi','mile','mi',1609.344,'Imperial / US'),u('nmi','nautical mile','nmi',1852,'Imperial / US'),
+ u('AU','astronomical unit','AU',149597870700,'Astronomical'),u('ly','light-year','ly',9460730472580800,'Astronomical'),u('pc','parsec','pc',3.0856775814913673e16,'Astronomical'),u('kpc','kiloparsec','kpc',3.0856775814913673e19,'Astronomical')],
+ refs:[['Human height',1.7],['Football pitch',105],['Mount Everest',8849],['Earth radius',6.371e6],['Earth–Moon',3.844e8],['Earth–Sun (1 AU)',1.496e11],['Neptune orbit',4.5e12],['1 light-year',9.461e15],['Proxima Centauri',4.02e16]],
+ presets:[['1 mile → km','1','mi','km'],['1 AU → km','1','AU','km'],['1 ly → AU','1','ly','AU'],['1 pc → ly','1','pc','ly'],['10 km → mi','10','km','mi']],def:['1','km','mi']},
+{id:'volume',row:0,name:'Volume',lo:-31,hi:4,units:[
+ u('m3','cubic metre','m³',1,'SI'),u('cm3','cubic centimetre','cm³',1e-6,'SI'),u('mm3','cubic millimetre','mm³',1e-9,'SI'),u('um3','cubic micrometre','µm³',1e-18,'SI'),u('nm3','cubic nanometre','nm³',1e-27,'SI'),
+ u('A3','cubic ångström','Å³',1e-30,'Molecular'),u('b3','cubic bohr','a₀³',A0**3,'Molecular'),
+ u('L','litre','L',1e-3,'Litres'),u('mL','millilitre','mL',1e-6,'Litres'),u('uL','microlitre','µL',1e-9,'Litres'),u('nL','nanolitre','nL',1e-12,'Litres'),u('pL','picolitre','pL',1e-15,'Litres'),u('fL','femtolitre','fL',1e-18,'Litres'),
+ u('galUS','US gallon','gal (US)',3.785411784e-3,'Imperial / US'),u('galUK','imperial gallon','gal (UK)',4.54609e-3,'Imperial / US'),u('floz','US fluid ounce','fl oz',2.95735295625e-5,'Imperial / US'),u('ft3','cubic foot','ft³',0.028316846592,'Imperial / US'),u('in3','cubic inch','in³',1.6387064e-5,'Imperial / US')],
+ refs:[['Water molecule',3e-29],['50 kDa protein',6.5e-26],['Virus',1e-21],['E. coli cell',1e-18],['Human cell',2e-15],['Pipette drop',5e-8],['Teaspoon',5e-6],['1 litre',1e-3],['Bathtub',0.3],['Olympic pool',2500]],
+ presets:[['1 nm³ → L','1','nm3','L'],['1 Å³ → cm³','1','A3','cm3'],['1 L → cm³','1','L','cm3'],['1 µL → nL','1','uL','nL'],['1 US gal → L','1','galUS','L']],def:['1','nm3','L']},
+{id:'molar-energy',row:0,name:'kJ/mol ↔ kcal/mol',lo:0,hi:7,units:[
+ u('kJmol','kilojoule per mole','kJ/mol',1e3,'Molar'),u('kcalmol','kilocalorie per mole','kcal/mol',1e3*CAL,'Molar'),u('Jmol','joule per mole','J/mol',1,'Molar'),u('calmol','calorie per mole','cal/mol',CAL,'Molar'),
+ u('eV','electronvolt per molecule','eV',E*NA,'Per molecule × Nₐ'),u('meV','millielectronvolt per molecule','meV',1e-3*E*NA,'Per molecule × Nₐ'),u('Eh','hartree per molecule','Eₕ',EH*NA,'Per molecule × Nₐ'),u('Ry','rydberg per molecule','Ry',EH/2*NA,'Per molecule × Nₐ'),
+ u('cm1','wavenumber','cm⁻¹',HC*100*NA,'Per molecule × Nₐ'),u('K','kelvin (E/k_B)','K',KB*NA,'Per molecule × Nₐ'),u('kT','thermal energy k_BT','k_BT',T=>KB*NA*T,'Per molecule × Nₐ'),u('zJ','zeptojoule (pN·nm) per molecule','zJ',1e-21*NA,'Per molecule × Nₐ')],
+ refs:[['1 cm⁻¹',HC*100*NA],['k_BT',T=>KB*NA*T],['π–π stacking',1e4],['H-bond',2e4],['ATP hydrolysis ΔG°′',3.05e4],['1 eV',E*NA],['C–C bond',3.48e5],['O–H bond',4.63e5],['1 Hartree',EH*NA]],
+ presets:[['1 kcal/mol → kJ/mol','1','kcalmol','kJmol'],['1 kJ/mol → kcal/mol','1','kJmol','kcalmol'],['k_BT → kcal/mol','1','kT','kcalmol'],['1 eV → kJ/mol','1','eV','kJmol'],['1 Hartree → kcal/mol','1','Eh','kcalmol'],['1 cm⁻¹ → kJ/mol','1','cm1','kJmol']],def:['1','kcalmol','kJmol']},
+{id:'length',row:0,name:'Length (molecular)',lo:-16,hi:-1,units:[
+ u('m','metre','m',1,'SI'),u('cm','centimetre','cm',1e-2,'SI'),u('mm','millimetre','mm',1e-3,'SI'),u('um','micrometre','µm',1e-6,'SI'),u('nm','nanometre','nm',1e-9,'SI'),u('pm','picometre','pm',1e-12,'SI'),u('fm','femtometre','fm',1e-15,'SI'),
+ u('A','ångström','Å',1e-10,'Molecular'),u('bohr','bohr radius','a₀',A0,'Molecular'),u('mil','mil (thou)','mil',2.54e-5,'Imperial / US'),u('in','inch','in',0.0254,'Imperial / US')],
+ refs:[['Proton',8.4e-16],['Bohr radius',A0],['C–C bond',1.54e-10],['Water molecule',2.8e-10],['Globular protein',5e-9],['Amyloid fibril width',1e-8],['Virus',1e-7],['Bacterium',2e-6],['Red blood cell',8e-6],['Human hair',7e-5],['Sand grain',5e-4]],
+ presets:[['1 Å → nm','1','A','nm'],['1 nm → Å','1','nm','A'],['1 bohr → Å','1','bohr','A'],['1 µm → nm','1','um','nm'],['1 pm → Å','1','pm','A']],def:['1','A','nm']},
+{id:'mass',row:0,name:'Mass',lo:-31,hi:4,units:[
+ u('kg','kilogram','kg',1,'SI'),u('g','gram','g',1e-3,'SI'),u('mg','milligram','mg',1e-6,'SI'),u('ug','microgram','µg',1e-9,'SI'),u('ng','nanogram','ng',1e-12,'SI'),u('pg','picogram','pg',1e-15,'SI'),u('t','tonne','t',1e3,'SI'),
+ u('Da','dalton (≡ g/mol per molecule)','Da',DA,'Atomic'),u('kDa','kilodalton','kDa',1e3*DA,'Atomic'),u('MDa','megadalton','MDa',1e6*DA,'Atomic'),u('me','electron mass','mₑ',ME,'Atomic'),u('mp','proton mass','mₚ',MP,'Atomic'),
+ u('lb','pound','lb',0.45359237,'Imperial / US'),u('oz','ounce','oz',0.028349523125,'Imperial / US')],
+ refs:[['Electron',ME],['Proton',MP],['Water molecule',2.99e-26],['Ubiquitin',1.43e-23],['Haemoglobin',1.07e-22],['Ribosome',4.2e-21],['E. coli cell',1e-15],['Grain of rice',2.5e-5],['Paperclip',1e-3],['Human',70],['Car',1500]],
+ presets:[['1 Da → g','1','Da','g'],['50 kDa → g','50','kDa','g'],['1 mₚ → Da','1','mp','Da'],['1 lb → kg','1','lb','kg'],['1 µg → ng','1','ug','ng']],def:['50','kDa','g']},
+{id:'energy',row:0,name:'Energy',lo:-24,hi:7,units:[
+ u('J','joule','J',1,'SI'),u('kJ','kilojoule','kJ',1e3,'SI'),u('MJ','megajoule','MJ',1e6,'SI'),u('zJ','zeptojoule','zJ',1e-21,'SI'),u('pNnm','piconewton nanometre','pN·nm',1e-21,'SI'),u('erg','erg','erg',1e-7,'SI'),
+ u('cal','calorie (thermochemical)','cal',CAL,'Calories'),u('kcal','kilocalorie','kcal',1e3*CAL,'Calories'),u('calIT','calorie (International Table)','cal_IT',4.1868,'Calories'),
+ u('eV','electronvolt','eV',E,'Atomic / spectroscopic'),u('meV','millielectronvolt','meV',1e-3*E,'Atomic / spectroscopic'),u('keV','kiloelectronvolt','keV',1e3*E,'Atomic / spectroscopic'),u('Eh','hartree','Eₕ',EH,'Atomic / spectroscopic'),u('Ry','rydberg','Ry',EH/2,'Atomic / spectroscopic'),
+ u('cm1','wavenumber (hc·ṽ)','cm⁻¹',HC*100,'Atomic / spectroscopic'),u('THz','terahertz (hν)','THz',H*1e12,'Atomic / spectroscopic'),u('K','kelvin (k_B·T)','K',KB,'Atomic / spectroscopic'),u('kT','thermal energy k_BT','k_BT',T=>KB*T,'Atomic / spectroscopic'),
+ u('Wh','watt-hour','Wh',3600,'Engineering'),u('kWh','kilowatt-hour','kWh',3.6e6,'Engineering'),u('BTU','British thermal unit','BTU',1055.05585262,'Engineering'),u('ftlbf','foot-pound force','ft·lbf',1.3558179483314004,'Engineering')],
+ refs:[['1 cm⁻¹',HC*100],['k_BT',T=>KB*T],['H-bond',3.3e-20],['ATP hydrolysis',5.1e-20],['Visible photon',3.97e-19],['C–C bond',5.78e-19],['1 Hartree',EH],['1 erg',1e-7],['Food Calorie',4184],['1 kWh',3.6e6]],
+ presets:[['1 eV → J','1','eV','J'],['1 Hartree → eV','1','Eh','eV'],['1 kcal → kJ','1','kcal','kJ'],['k_BT → pN·nm','1','kT','pNnm'],['1 eV → cm⁻¹','1','eV','cm1']],def:['1','eV','J']},
+// ---- MD quantities ----
+{id:'time',row:1,name:'Time',lo:-16,hi:5,units:[
+ u('fs','femtosecond','fs',1e-15,'MD'),u('ps','picosecond','ps',1e-12,'MD'),u('ns','nanosecond','ns',1e-9,'MD'),u('us','microsecond','µs',1e-6,'MD'),u('ms','millisecond','ms',1e-3,'MD'),
+ u('s','second','s',1,'Clock'),u('min','minute','min',60,'Clock'),u('h','hour','h',3600,'Clock'),u('d','day','d',86400,'Clock'),
+ u('au','atomic unit of time (ħ/Eₕ)','ħ/Eₕ',2.4188843265857e-17,'Atomic'),u('akma','AKMA time unit (CHARMM)','AKMA',4.888821e-14,'Atomic')],
+ refs:[['MD time step',2e-15],['Bond vibration',1e-14],['Water reorientation',2e-12],['Side-chain rotamer',1e-9],['Fast folding',1e-6],['Enzyme turnover',1e-3],['Amyloid lag phase',3.6e4]],
+ presets:[['2 fs → ps','2','fs','ps'],['1 µs → ns','1','us','ns'],['500 ns → µs','500','ns','us'],['1 ps → fs','1','ps','fs']],def:['2','fs','ps'],
+ note:'GROMACS uses ps for time and dt; AMBER dt is also in ps; NAMD timestep is in fs.'},
+{id:'temperature',row:1,name:'Temperature',lin:[150,500],units:[
+ tu('K','kelvin','K',x=>x,x=>x,'Scales'),tu('C','degree Celsius','°C',x=>x+273.15,x=>x-273.15,'Scales'),tu('F','degree Fahrenheit','°F',x=>(x+459.67)*5/9,x=>x*9/5-459.67,'Scales'),tu('R','degree Rankine','°R',x=>x*5/9,x=>x*9/5,'Scales')],
+ refs:[['Water freezes',273.15],['Standard state',298.15],['Body',310.15],['Water boils',373.15]],
+ presets:[['37 °C → K','37','C','K'],['300 K → °C','300','K','C'],['25 °C → K','25','C','K'],['98.6 °F → °C','98.6','F','C']],def:['300','K','C'],
+ extra:si=>`k<sub>B</sub>T at ${fmt(si,5)} K = ${fmt(KB*NA*si/1e3,5)} kJ/mol = ${fmt(KB*NA*si/4184,5)} kcal/mol; RT ln 10 = ${fmt(KB*NA*si*Math.LN10/4184,4)} kcal/mol`},
+{id:'pressure',row:1,name:'Pressure',lo:2,hi:12,units:[
+ u('Pa','pascal','Pa',1,'SI'),u('kPa','kilopascal','kPa',1e3,'SI'),u('MPa','megapascal','MPa',1e6,'SI'),u('GPa','gigapascal','GPa',1e9,'SI'),
+ u('bar','bar','bar',1e5,'Common'),u('atm','standard atmosphere','atm',101325,'Common'),u('Torr','torr','Torr',101325/760,'Common'),u('mmHg','millimetre of mercury','mmHg',133.322387415,'Common'),u('psi','pound per square inch','psi',6894.757293168,'Common'),
+ u('kJnm3','kJ/mol per nm³ (GROMACS internal)','kJ mol⁻¹ nm⁻³',1e3*MOLJ/1e-27,'Molecular'),u('kcalA3','kcal/mol per Å³','kcal mol⁻¹ Å⁻³',4184*MOLJ/1e-30,'Molecular')],
+ refs:[['Blood pressure',1.6e4],['1 atm',101325],['Car tyre',3.2e5],['Deep ocean floor',1.1e8],['Pressure denaturation',3e8],['Diamond anvil',1e11]],
+ presets:[['1 atm → bar','1','atm','bar'],['1 bar → atm','1','bar','atm'],['1 kJ/mol/nm³ → bar','1','kJnm3','bar'],['1 GPa → bar','1','GPa','bar']],def:['1','atm','bar'],
+ note:'GROMACS pressure is in bar; water compressibility for Parrinello–Rahman is 4.5×10⁻⁵ bar⁻¹.'},
+{id:'force',row:1,name:'Force',lo:-14,hi:-7,units:[
+ u('N','newton','N',1,'SI'),u('nN','nanonewton','nN',1e-9,'SI'),u('pN','piconewton','pN',1e-12,'SI'),u('dyn','dyne','dyn',1e-5,'SI'),
+ u('kJmolnm','kJ/mol per nm (GROMACS)','kJ mol⁻¹ nm⁻¹',1e3*MOLJ/1e-9,'Molecular'),u('kcalmolA','kcal/mol per Å (AMBER, CHARMM)','kcal mol⁻¹ Å⁻¹',4184*MOLJ/1e-10,'Molecular'),u('kJmolA','kJ/mol per Å','kJ mol⁻¹ Å⁻¹',1e3*MOLJ/1e-10,'Molecular'),
+ u('eVA','eV per Å','eV/Å',E/1e-10,'Atomic'),u('Ehb','hartree per bohr','Eₕ/a₀',EH/A0,'Atomic'),u('kTnm','k_BT per nm (300 K)','k_BT/nm',KB*300/1e-9,'Atomic')],
+ refs:[['k_BT/nm (300 K)',KB*300/1e-9],['Kinesin stall',6e-12],['Protein unfolding (AFM)',1.5e-10],['emtol 1000 kJ/mol/nm',1.66e-9],['Covalent bond rupture',4e-9]],
+ presets:[['1 kJ/mol/nm → pN','1','kJmolnm','pN'],['1 kcal/mol/Å → pN','1','kcalmolA','pN'],['1000 kJ/mol/nm → nN','1000','kJmolnm','nN'],['1 eV/Å → kJ/mol/nm','1','eVA','kJmolnm']],def:['1','kJmolnm','pN'],
+ note:'Steered MD and energy-minimisation (emtol, Fmax) forces are reported in kJ/mol/nm in GROMACS.'},
+{id:'force-constant',row:1,name:'Force constant',lo:-6,hi:4,units:[
+ u('kJnm2','kJ/mol per nm² — V = ½k(x−x₀)² (GROMACS, PLUMED)','kJ mol⁻¹ nm⁻²',1e3*MOLJ/1e-18,'Harmonic V = ½k(x−x₀)²'),u('kJA2','kJ/mol per Å² — V = ½k(x−x₀)²','kJ mol⁻¹ Å⁻²',1e3*MOLJ/1e-20,'Harmonic V = ½k(x−x₀)²'),
+ u('kcalA2','kcal/mol per Å² — V = ½k(x−x₀)² (CHARMM-style ½k)','kcal mol⁻¹ Å⁻² (½k)',4184*MOLJ/1e-20,'Harmonic V = ½k(x−x₀)²'),
+ u('Nm','newton per metre','N/m',1,'Harmonic V = ½k(x−x₀)²'),u('pNnm','piconewton per nm','pN/nm',1e-3,'Harmonic V = ½k(x−x₀)²'),u('eVA2','eV per Å²','eV/Å²',E/1e-20,'Harmonic V = ½k(x−x₀)²'),u('Ehb2','hartree per bohr²','Eₕ/a₀²',EH/A0**2,'Harmonic V = ½k(x−x₀)²'),
+ u('kcalA2amb','kcal/mol per Å² — V = k(x−x₀)² (AMBER bonds/restraints, CHARMM bonds)','kcal mol⁻¹ Å⁻² (AMBER)',2*4184*MOLJ/1e-20,'No ½: V = k(x−x₀)²')],
+ refs:[['Optical trap',5e-5],['AFM cantilever',3e-2],['Umbrella 1000 kJ/mol/nm²',1.66],['C–C bond stretch',4.3e2]],
+ presets:[['AMBER 10 kcal/mol/Å² → GROMACS','10','kcalA2amb','kJnm2'],['1000 kJ/mol/nm² → kcal/mol/Å² (AMBER)','1000','kJnm2','kcalA2amb'],['1 kcal/mol/Å² (½k) → kJ/mol/nm²','1','kcalA2','kJnm2'],['1 pN/nm → kJ/mol/nm²','1','pNnm','kJnm2']],def:['10','kcalA2amb','kJnm2'],
+ note:'AMBER (and CHARMM bond terms) write V = k(x−x₀)²; GROMACS and PLUMED write V = ½k(x−x₀)². The AMBER units here include the factor of 2, so 1 kcal/mol/Å² (AMBER) = 836.8 kJ/mol/nm² in GROMACS.'},
+{id:'concentration',row:1,name:'Concentration',lo:-7,hi:5,units:[
+ u('M','molar — mol/L','mol/L (M)',1e3,'Molar (per litre)'),u('mM','millimolar — mmol/L','mmol/L (mM)',1,'Molar (per litre)'),u('uM','micromolar — µmol/L','µmol/L (µM)',1e-3,'Molar (per litre)'),u('nM','nanomolar — nmol/L','nmol/L (nM)',1e-6,'Molar (per litre)'),u('pM','picomolar — pmol/L','pmol/L (pM)',1e-9,'Molar (per litre)'),u('molm3','mol per m³ (= mmol/L)','mol/m³',1,'SI'),
+ u('pnm3','molecules per nm³','nm⁻³',MOLJ/1e-27,'Number density'),u('pA3','molecules per Å³','Å⁻³',MOLJ/1e-30,'Number density')],
+ refs:[['Strong binder Kd 1 nM',1e-6],['Aβ in vitro 10 µM',1e-2],['1 molecule in (10 nm)³',1.66],['Physiological NaCl',150],['Pure water',5.55e4]],
+ presets:[['1 molecule/nm³ → mol/L','1','pnm3','M'],['0.15 mol/L → molecules/nm³','0.15','M','pnm3'],['1 mmol/L → molecules/nm³','1','mM','pnm3'],['1 mmol/L → mol/L','1','mM','M'],['33.4 nm⁻³ (water) → mol/L','33.4','pnm3','M']],def:['0.15','M','pnm3'],
+ note:'To get a molecule count for a whole box, use the Box ⇄ concentration tool.'},
+{id:'density',row:1,name:'Density',lo:-1,hi:4,units:[
+ u('kgm3','kilogram per m³ (GROMACS energy output)','kg/m³',1,'SI'),u('gcm3','gram per cm³','g/cm³',1e3,'SI'),u('gmL','gram per mL','g/mL',1e3,'SI'),
+ u('amuA3','dalton per Å³','Da/Å³',DA/1e-30,'Molecular'),u('amunm3','dalton per nm³','Da/nm³',DA/1e-27,'Molecular')],
+ refs:[['Air',1.2],['Water 25 °C',997],['Protein interior',1350],['NaCl crystal',2165]],
+ presets:[['997 kg/m³ → g/cm³','997','kgm3','gcm3'],['1 g/cm³ → Da/Å³','1','gcm3','amuA3'],['1 Da/Å³ → g/cm³','1','amuA3','gcm3']],def:['997','kgm3','gcm3'],
+ note:'Check NPT equilibration with gmx energy → Density (kg/m³); TIP3P water sits near 985–1000 kg/m³ at 300 K.'},
+{id:'diffusion',row:1,name:'Diffusion',lo:-14,hi:-7,units:[
+ u('m2s','square metre per second','m²/s',1,'SI'),u('cm2s','square centimetre per second','cm²/s',1e-4,'SI'),u('e5cm2s','10⁻⁵ cm²/s (gmx msd output)','×10⁻⁵ cm²/s',1e-9,'SI'),u('um2s','square micrometre per second','µm²/s',1e-12,'SI'),
+ u('nm2ps','square nm per ps','nm²/ps',1e-6,'MD'),u('nm2ns','square nm per ns','nm²/ns',1e-9,'MD'),u('A2ps','square Å per ps','Å²/ps',1e-8,'MD'),u('A2fs','square Å per fs','Å²/fs',1e-5,'MD')],
+ refs:[['Lipid lateral',1e-12],['Lysozyme',1.1e-10],['Drug-like molecule',6e-10],['Water 25 °C (exp.)',2.3e-9],['TIP3P water',5.5e-9]],
+ presets:[['gmx msd 2.3 → m²/s','2.3','e5cm2s','m2s'],['1 nm²/ns → µm²/s','1','nm2ns','um2s'],['1 Å²/ps → cm²/s','1','A2ps','cm2s']],def:['2.3','e5cm2s','nm2ns'],
+ note:'From an MSD slope in 3D, D = slope/6 (2D: slope/4). Periodic boxes underestimate D; correct with Yeh–Hummer.'},
+{id:'velocity',row:1,name:'Velocity',lo:-3,hi:5,units:[
+ u('ms','metre per second','m/s',1,'SI'),u('kms','kilometre per second','km/s',1e3,'SI'),
+ u('nmps','nm per ps (GROMACS)','nm/ps',1e3,'MD'),u('nmns','nm per ns','nm/ns',1,'MD'),u('Aps','Å per ps','Å/ps',100,'MD'),u('Afs','Å per fs','Å/fs',1e5,'MD')],
+ refs:[['SMD 0.01 nm/ns',0.01],['SMD 0.001 nm/ps',1],['Water molecule, rms thermal',645],['Sound in water',1480]],
+ presets:[['0.001 nm/ps → m/s','0.001','nmps','ms'],['1 nm/ns → Å/ps','1','nmns','Aps'],['1 Å/ps → nm/ps','1','Aps','nmps']],def:['0.001','nmps','nmns'],
+ note:'Steered-MD pull rates (pull-coord1-rate) are in nm/ps in GROMACS; experimental AFM pulls at ~µm/s are 10⁶–10⁸ times slower.'},
+{id:'dipole',row:1,name:'Dipole moment',lo:-31,hi:-27,units:[
+ u('D','debye','D',DEB,'Common'),u('Cm','coulomb metre','C·m',1,'SI'),u('eA','e × Å','e·Å',E*1e-10,'Molecular'),u('enm','e × nm (GROMACS)','e·nm',E*1e-9,'Molecular'),u('au','atomic unit (e·a₀)','e·a₀',E*A0,'Atomic')],
+ refs:[['Water (gas)',1.85*DEB],['TIP3P water',2.35*DEB],['Peptide bond',3.7*DEB],['α-helix, 10 residues',35*DEB]],
+ presets:[['1 e·Å → D','1','eA','D'],['1 D → e·nm','1','D','enm'],['1 a.u. → D','1','au','D']],def:['1','eA','D'],
+ note:'gmx dipoles reports in debye.'},
+// ---- tools ----
+{id:'box',row:2,name:'Box ⇄ concentration',tool:'t-box'},
+{id:'kd',row:2,name:'ΔG ⇄ Kd',tool:'t-kd'},
+{id:'run',row:2,name:'Run planner',tool:'t-run'}];
+//END
+const COL={distance:'#2563eb',volume:'#0891b2','molar-energy':'#7c3aed',length:'#db2777',mass:'#ea580c',energy:'#dc2626',time:'#0d9488',temperature:'#e11d48',pressure:'#4f46e5',force:'#c2410c','force-constant':'#9333ea',concentration:'#059669',density:'#0369a1',diffusion:'#0e7490',velocity:'#b45309',dipole:'#be185d',box:'#2563eb',kd:'#7c3aed',run:'#0f766e'};
+const ICP={distance:'M3 17l6-6 4 4 8-8M14 7h7v7',volume:'M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7 15h10','molar-energy':'M13 2L4 14h7l-1 8 9-12h-7z',length:'M3 17L17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2',mass:'M6 8h12l2 13H4zM9 8a3 3 0 1 1 6 0',energy:'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 1 2 2 3 3 3 0-3-1-5 0-8z',time:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7v5l3 2',temperature:'M10 4a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0zM12 9v7',pressure:'M4 18a8 8 0 1 1 16 0M12 18l4-6',force:'M4 12h14M13 6l6 6-6 6','force-constant':'M2 12h3l2-5 3 10 3-10 3 10 2-5h4',concentration:'M6 6h.01M12 9h.01M17 5h.01M8 14h.01M15 13h.01M11 19h.01M18 18h.01M4 19h.01',density:'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5',diffusion:'M12 12L5 5M12 12l7-7M12 12l-7 7M12 12l7 7M5 9V5h4M15 5h4v4M19 15v4h-4M9 19H5v-4',velocity:'M3 8h9M5 12h11M3 16h9M15 6l6 6-6 6',dipole:'M3 12h6M6 9v6M15 12h6M10 12h4',box:'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5M15 15h.01M9 9h.01',kd:'M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0M2 12h6M16 12h6',run:'M7 4l13 8-13 8z'};
+const ico=id=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${id==='concentration'?3.4:2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ICP[id]}"/></svg>`;
+const ROWS=['Basic','MD quantities','MD tools'];
+const $=id=>document.getElementById(id);
+const SIGS=[3,4,6,8,10];
+let S={cat:'molar-energy',sig:6,T:300,per:{},tools:{}};
+try{const s=JSON.parse(localStorage.getItem('sciconv2')||'null');if(s)S=Object.assign(S,s)}catch(e){}
+const hashCat=location.hash.slice(1);if(CATS.some(c=>c.id===hashCat))S.cat=hashCat;
+if(!CATS.some(c=>c.id===S.cat))S.cat='molar-energy';
+const cat=()=>CATS.find(c=>c.id===S.cat);
+const st=()=>{const c=cat();if(!S.per[c.id]){const[v,f,t]=c.def;S.per[c.id]={v,from:f,to:t}}return S.per[c.id]};
+const fac=un=>typeof un.f==='function'?un.f(S.T):un.f;
+const toSI=(un,v)=>un.to?un.to(v):v*fac(un),fromSI=(un,s)=>un.from?un.from(s):s/fac(un);
+const save=()=>{try{localStorage.setItem('sciconv2',JSON.stringify(S))}catch(e){}};
+const sym=s=>s.replace(/k_BT/g,'k<sub>B</sub>T').replace(/cal_IT/g,'cal<sub>IT</sub>').replace(/k_B/g,'k<sub>B</sub>');
+const txt=s=>s.replace(/_/g,'');
+function parse(s){
+  s=String(s).trim().replace(/[\s,]/g,'').replace(/−/g,'-');
+  const m=s.match(/^([+-]?(?:\d+\.?\d*|\.\d+))(?:[eE]([+-]?\d+)|[x×*·]10\^?\(?([+-]?\d+)\)?)?$/);
+  if(!m)return NaN;return parseFloat(m[1])*10**(+(m[2]??m[3]??0));
+}
+function fmt(x,sig){
+  if(!isFinite(x))return '—';if(x===0)return '0';const a=Math.abs(x);
+  if(a>=1e-3&&a<1e6)return x.toLocaleString('en-US',{maximumSignificantDigits:sig}).replace('-','−');
+  let[m,e]=x.toExponential(sig-1).split('e');m=m.replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');
+  return `${m.replace('-','−')}<span class="x"> × 10<sup>${String(+e).replace('-','−')}</sup></span>`;
+}
+const plain=(x,sig)=>Number(x.toPrecision(sig)).toString();
+const int=n=>Math.round(n).toLocaleString('en-US');
+function tabs(){
+  $('tabrows').innerHTML=ROWS.map((r,i)=>`<div class="trow"><div class="tl">${r}</div><div class="tabs" role="tablist" aria-label="${r}">${CATS.filter(c=>c.row===i).map(c=>`<button role="tab" style="--h:${COL[c.id]}" id="tab-${c.id}" data-c="${c.id}" aria-selected="${c.id===S.cat}"><span class="ic">${ico(c.id)}</span><span>${c.name.replace('Kd','K<sub>d</sub>')}</span></button>`).join('')}</div></div>`).join('');
+}
+function fill(){
+  const c=cat(),p=st(),groups=[...new Set(c.units.map(x=>x.g))];
+  const opts=groups.map(g=>`<optgroup label="${g}">${c.units.filter(x=>x.g===g).map(x=>`<option value="${x.id}">${txt(x.sym)} — ${txt(x.name)}</option>`).join('')}</optgroup>`).join('');
+  $('from').innerHTML=opts;$('to').innerHTML=opts;$('from').value=p.from;$('to').value=p.to;$('val').value=p.v;
+  $('presets').innerHTML=c.presets.map((x,i)=>`<button type="button" data-p="${i}">${sym(x[0])}</button>`).join('');
+  $('tbox').hidden=!c.units.some(x=>x.id==='kT');$('temp').value=S.T;
+  $('catNote').textContent=c.note||'';
+}
+let last=NaN;
+function calc(){
+  const c=cat(),p=st(),v=parse(p.v),F=c.units.find(x=>x.id===p.from),T=c.units.find(x=>x.id===p.to),sig=S.sig;
+  $('sig').innerHTML=SIGS.map(n=>`<button type="button" data-s="${n}" aria-pressed="${n===sig}">${n}</button>`).join('');
+  if(!F||!T)return;
+  const si=isNaN(v)?NaN:toSI(F,v);
+  const bad=isNaN(v)?(p.v.trim()?'Enter a number such as 1.5e-3, 6.022×10^23 or 1,000.':''):(c.lin&&si<0?'That is below absolute zero.':'');
+  if(isNaN(v)||bad){$('err').textContent=bad;$('big').innerHTML='—';$('eq1').innerHTML='';$('eq2').innerHTML='';last=NaN;table(NaN);draw();save();return}
+  $('err').textContent='';
+  const r=fromSI(T,si);last=r;
+  $('rk').innerHTML=`${fmt(v,sig)} ${sym(F.sym)} equals`;
+  $('big').innerHTML=`${fmt(r,sig)}<span class="u">${sym(T.sym)}</span>`;
+  if(c.lin){$('eq1').innerHTML=`Temperature scales have offsets, so there is no single factor.`;$('eq2').innerHTML=c.extra(si)}
+  else{const k=fac(F)/fac(T);
+    $('eq1').innerHTML=`<span>1 ${sym(F.sym)}</span> = <span>${fmt(k,Math.max(sig,8))} ${sym(T.sym)}</span>`;
+    $('eq2').innerHTML=`<span>1 ${sym(T.sym)}</span> = <span>${fmt(1/k,Math.max(sig,8))} ${sym(F.sym)}</span>${c.units.some(x=>x.id==='kT')?` <span style="opacity:.75">· k<sub>B</sub>T at ${S.T} K</span>`:''}`;}
+  table(si);draw();save();
+}
+function table(si){
+  const c=cat(),p=st();let g='';
+  $('tbody').innerHTML=c.units.map(x=>{
+    const head=x.g!==g?(g=x.g,`<tr class="grp"><td colspan="4">${x.g}</td></tr>`):'';
+    return head+`<tr data-u="${x.id}" class="${x.id===p.to?'on':''}"><td>${x.name.replace(/k_B/g,'k<sub>B</sub>')}</td><td class="hide-s">${sym(x.sym)}</td><td class="v">${isNaN(si)?'—':fmt(fromSI(x,si),S.sig)}</td><td><button class="mini" type="button" data-cp="${x.id}" aria-label="Copy value in ${txt(x.name)}">Copy</button></td></tr>`;
+  }).join('');
+}
+const svg=$('scale');
+function draw(){
+  const c=cat();if(c.tool)return;const W=svg.clientWidth,Hh=svg.clientHeight;if(!W)return;
+  const pad=W<520?18:34,y=Hh-82,lin=c.lin,lo=lin?lin[0]:c.lo,hi=lin?lin[1]:c.hi;
+  const pos=v=>lin?v:Math.log10(v),X=e=>pad+(e-lo)/(hi-lo)*(W-2*pad);
+  const ink='var(--ink)',br='var(--brown)',mu='var(--muted)';
+  let o=`<defs><linearGradient id="rg" x1="0" x2="1"><stop offset="0" stop-color="#06b6d4"/><stop offset=".35" stop-color="#8b5cf6"/><stop offset=".7" stop-color="#ec4899"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><line x1="${pad}" x2="${W-pad}" y1="${y}" y2="${y}" stroke="url(#rg)" stroke-width="5" stroke-linecap="round"/>`;const LC=['#0ea5e9','#10b981','#f59e0b','#ec4899','#8b5cf6','#ef4444'];let li=0;
+  if(lin){const st=W<520?100:50;for(let t=Math.ceil(lo/10)*10;t<=hi;t+=10){const x=X(t),mj=t%st===0;
+      o+=`<line x1="${x}" x2="${x}" y1="${y-(mj?7:3)}" y2="${y+(mj?7:3)}" stroke="${br}" stroke-width="${mj?1.6:1}"/>`;
+      if(mj)o+=`<text x="${x}" y="${y+24}" text-anchor="middle" font-size="12" fill="${mu}">${t} K</text>`;}}
+  else{const step=Math.max(1,Math.ceil((hi-lo)/((W-2*pad)/(W<520?46:56))));
+    for(let e=lo;e<=hi;e++){const x=X(e),mj=(e-lo)%step===0;
+      o+=`<line x1="${x}" x2="${x}" y1="${y-(mj?7:4)}" y2="${y+(mj?7:4)}" stroke="${br}" stroke-width="${mj?1.6:1}"/>`;
+      if(mj)o+=`<text x="${x}" y="${y+24}" text-anchor="middle" font-size="12" fill="${mu}">10<tspan dy="-5" font-size="9">${String(e).replace('-','−')}</tspan></text>`;}}
+  const tiers=[y-26,y+44,y-48,y+62,y-70],ends=tiers.map(()=>-1e9);
+  const refs=c.refs.map(([n,v])=>[n,typeof v==='function'?v(S.T):v]).map(([n,v])=>[n,v,X(pos(v))]).filter(r=>r[2]>=pad-1&&r[2]<=W-pad+1).sort((a,b)=>a[2]-b[2]);
+  for(const[n,v,x]of refs){
+    const label=n.replace(/^k_BT$/,`kBT (${S.T} K)`).replace('k_BT','kBT'),w=label.length*6.3+10;
+    let t=-1;for(let i=0;i<tiers.length;i++){const lx=Math.min(Math.max(x-w/2,2),W-w-2);if(lx>ends[i]){t=i;ends[i]=lx+w;break}}
+    o+=`<circle cx="${x}" cy="${y}" r="6" fill="${LC[li%6]}" stroke="var(--panel)" stroke-width="2.5"><title>${label}: ${plain(v,3)} ${txt(c.units[0].sym)}</title></circle>`;
+    if(t>=0){const ty=tiers[t],lx=Math.min(Math.max(x,w/2+2),W-w/2-2);
+      o+=`<line x1="${x}" x2="${x}" y1="${y}" y2="${ty+(ty<y?4:-12)}" stroke="${LC[li%6]}" stroke-width="1.2" stroke-dasharray="3 2"/>`;
+      o+=`<text x="${lx}" y="${ty}" text-anchor="middle" font-size="12" fill="${ink}" stroke="var(--panel)" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${label.replace('kBT','k<tspan dy="3" font-size="9">B</tspan><tspan dy="-3">T</tspan>')}</text>`;}
+    li++;
+  }
+  const p=st(),v=parse(p.v),F=c.units.find(x=>x.id===p.from);
+  if(F&&isFinite(v)){let si=toSI(F,v);if(!lin)si=Math.abs(si);
+    if(lin||si>0){const e=pos(si),cl=Math.min(Math.max(e,lo),hi),x=X(cl),out=e<lo?'◀ below scale':e>hi?'beyond scale ▶':'',t2=out||'your value',tw=t2.length*7+8,tx=Math.min(Math.max(x,tw/2+2),W-tw/2-2);
+      o=`<line x1="${x}" x2="${x}" y1="${y-88}" y2="${y+8}" stroke="var(--mag)" stroke-width="2.5"/>`+o+`<circle cx="${x}" cy="${y}" r="14" fill="var(--acc)" opacity=".18"/><circle cx="${x}" cy="${y}" r="8" fill="var(--mag)" stroke="var(--panel)" stroke-width="2.5"/>`;
+      o+=`<text x="${tx}" y="${y-96}" text-anchor="middle" font-size="13" font-weight="800" fill="var(--mag)">${t2}</text>`;
+      $('scaleSub').textContent=lin?`Linear scale in kelvin. The coloured pin is your value: ${plain(si,5)} K.`:`One tick per power of ten${v<0?' (showing magnitude |x|)':''}. The coloured pin is your value: ${plain(si,4)} ${txt(c.units[0].sym)}.`;}}
+  svg.innerHTML=o;
+}
+const ro=new ResizeObserver(draw);ro.observe(svg);
+
+/* ---------- tools ---------- */
+const TD={box:{shape:'cubic',a:'10',b:'10',c:'10',conc:'10',cu:'1e-3',n:'',drive:'c',tg:'96'},kd:{g:'-10',gu:'4.184',d:'',du:'1e-9',T:'298.15',dd:'1',drive:'g'},run:{dt:'2',len:'100',out:'10',at:'50000',save:'50000',perf:'100'}};
+const tl=k=>S.tools[k]=Object.assign({},TD[k],S.tools[k]||{});
+const kv=rows=>rows.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('');
+const bestC=M=>{const U=[['mol/L',1],['mmol/L',1e-3],['µmol/L',1e-6],['nmol/L',1e-9],['pmol/L',1e-12]];const[n,f]=U.find(([,f])=>Math.abs(M)>=f)||U[4];return `${fmt(M/f,4)} ${n}`};
+const BIDS={shape:'bShape',a:'bA',b:'bB',c:'bC',conc:'bConc',cu:'bCu',n:'bN',tg:'bTg'};
+function box(init){
+  const B=tl('box');if(init)for(const k in BIDS)$(BIDS[k]).value=B[k];
+  $('bBC').hidden=B.shape!=='rect';$('bAl').textContent=B.shape==='rect'?'Box vector a (nm)':B.shape==='cubic'?'Box edge a (nm)':'Box vector length d (nm)';
+  const a=parse(B.a),b=parse(B.b),c=parse(B.c);
+  const V=B.shape==='rect'?a*b*c:B.shape==='cubic'?a**3:B.shape==='dodec'?a**3*Math.SQRT1_2:a**3*4*Math.sqrt(3)/9;
+  if(!(V>0)){$('bErr').textContent='Enter positive box dimensions in nm.';$('bBig').innerHTML='—';$('bKv').innerHTML='';return}
+  const L=V*1e-24,one=1/(NA*L);let N,M,exact;
+  if(B.drive==='c'){M=parse(B.conc)*parse(B.cu);if(!(M>=0)){$('bErr').textContent='Enter a concentration.';return}
+    exact=M*NA*L;N=Math.round(exact);$('bN').value=N;B.n=String(N);
+    $('bK').textContent='Molecules to insert';$('bBig').innerHTML=`${int(N)}<span class="u">molecules</span>`;}
+  else{N=parse(B.n);if(!(N>=0)){$('bErr').textContent='Enter a number of molecules.';return}
+    M=N/(NA*L);exact=N;const cv=plain(M/parse(B.cu),5);$('bConc').value=cv;B.conc=cv;
+    $('bK').textContent='Concentration';$('bBig').innerHTML=bestC(M);}
+  $('bErr').textContent='';
+  $('bKv').innerHTML=kv([['Box volume',`${fmt(V,5)} nm³`],['Volume in litres',`${fmt(L,5)} L`],['Concentration in mol/L',`${fmt(N*one,5)} mol/L`],['Formula','c (mol/L) = N / (N<sub>A</sub> · V<sub>L</sub>), V<sub>L</sub> = V<sub>nm³</sub> × 10<sup>−24</sup>'],
+    ['Exact count at that concentration',B.drive==='c'?fmt(exact,5):int(N)],
+    ['Actual concentration with '+int(N),bestC(N*one)],
+    ['One molecule in this box',bestC(one)],
+    ['Water molecules if box were pure water','≈ '+int(V*33.43)]]);
+  const tg=parse(B.tg)*parse(B.cu);
+  if(tg>0&&N>0){const Vn=N/(NA*tg)*1e24,fac={cubic:1,rect:1,dodec:Math.SQRT1_2,octa:4*Math.sqrt(3)/9}[B.shape],d=(Vn/fac)**(1/3);
+    $('bFind').innerHTML=kv([[`Volume for ${int(N)} molecules at ${bestC(tg)}`,`${fmt(Vn,5)} nm³ = ${fmt(Vn*1e-24,4)} L`],
+      [B.shape==='cubic'||B.shape==='rect'?'Cubic box edge':'Box vector length d',`<b>${fmt(d,4)} nm</b>`]].concat(B.shape==='rect'?[['(rectangular: any a·b·c giving this volume)','']]:[]))}
+  else $('bFind').innerHTML='';
+  save();
+}
+function kd(init){
+  const K=tl('kd');if(init){$('kG').value=K.g;$('kGu').value=K.gu;$('kD').value=K.d;$('kDu').value=K.du;$('kT').value=K.T;$('kDD').value=K.dd}
+  const T=parse(K.T),RT=KB*NA*T/1e3,gu=parse(K.gu),uName=gu===1?'kJ/mol':'kcal/mol';
+  if(!(T>0)){$('kErr').textContent='Enter a temperature in K.';return}
+  let G,Kd;
+  if(K.drive==='g'){G=parse(K.g)*gu;if(isNaN(G)){$('kErr').textContent='Enter ΔG.';return}Kd=Math.exp(G/RT);K.d=plain(Kd/parse(K.du),4);$('kD').value=K.d}
+  else{Kd=parse(K.d)*parse(K.du);if(!(Kd>0)){$('kErr').textContent='Enter a positive Kd.';return}G=RT*Math.log(Kd);K.g=plain(G/gu,4);$('kG').value=K.g}
+  $('kErr').textContent='';
+  $('kBig').innerHTML=bestC(Kd).replace(/ (\S+)$/,'<span class="u">$1</span>');
+  $('kKv').innerHTML=kv([['ΔG°',`<b>${fmt(G/4.184,4)} kcal/mol</b> = <b>${fmt(G,4)} kJ/mol</b>`],['Association constant K<sub>a</sub>',`${fmt(1/Kd,4)} L/mol (M⁻¹)`],['pK<sub>d</sub>',fmt(-Math.log10(Kd),4)],
+    ['Per 10-fold change in K<sub>d</sub>',`${fmt(RT*Math.LN10/4.184,4)} kcal/mol = ${fmt(RT*Math.LN10,4)} kJ/mol`],['RT at '+fmt(T,5)+' K',`${fmt(RT/4.184,4)} kcal/mol = ${fmt(RT,4)} kJ/mol`]]);
+  const dd=parse(K.dd)*gu;
+  $('kPop').innerHTML=isNaN(dd)?'':kv([['Population ratio A : B',`${fmt(Math.exp(dd/RT),4)} : 1`],['State A',`${fmt(100/(1+Math.exp(-dd/RT)),4)} %`],['State B',`${fmt(100/(1+Math.exp(dd/RT)),4)} %`],['Fold change in K for this ΔΔG',fmt(Math.exp(Math.abs(dd)/RT),4)+'×']]);
+  save();
+}
+const bytes=b=>{const U=['B','KB','MB','GB','TB'];let i=0;while(b>=1024&&i<4){b/=1024;i++}return `${fmt(b,3)} ${U[i]}`};
+function run(init){
+  const R=tl('run');if(init)for(const[k,id]of[['dt','rDt'],['len','rLen'],['out','rOut'],['at','rAt'],['save','rSave'],['perf','rPerf']])$(id).value=R[k];
+  const dt=parse(R.dt),len=parse(R.len),out=parse(R.out),at=parse(R.at),sv=parse(R.save),perf=parse(R.perf);
+  if(![dt,len,out,at,sv,perf].every(x=>x>0)){$('rErr').textContent='Fill every field with a positive number.';$('rBig').innerHTML='—';return}
+  const nsteps=len*1e6/dt,nout=out*1e3/dt,frames=Math.floor(Math.round(nsteps)/Math.round(nout))+1,days=len/perf;
+  const w=[];if(Math.abs(nout-Math.round(nout))>1e-6)w.push(`The save interval is not a whole number of steps (${fmt(nout,5)}); it will be rounded to ${int(nout)}.`);
+  if(dt>4)w.push('Time steps above 4 fs are unstable for all-atom MD.');
+  $('rErr').innerHTML=w.join(' ');
+  const N=Math.round(nsteps),NO=Math.max(1,Math.round(nout)),trr=frames*(sv*12+120);
+  $('rBig').innerHTML=`${int(N)}<span class="u">steps</span>`;
+  const wall=days>=1?`${fmt(days,3)} day${days===1?'':'s'}`:`${fmt(days*24,3)} hours`;
+  $('rKv').innerHTML=kv([['Save every',`${int(NO)} steps`],['Frames written',int(frames)],['Wall-clock time',wall],
+    ['Coordinates, full precision (.trr / .dcd)',bytes(trr)],['Compressed .xtc (approx.)',`${bytes(trr/4)} – ${bytes(trr/3)}`],['Simulated per day',`${fmt(perf,4)} ns = ${fmt(perf*1e6/dt,4)} steps`]]);
+  const ps=plain(dt/1e3,6);
+  $('sG').textContent=`integrator          = md\ndt                  = ${ps}     ; ps (${R.dt} fs)\nnsteps              = ${N}  ; ${R.len} ns\nnstxout-compressed  = ${NO}     ; every ${R.out} ps\nnstenergy           = ${NO}\nnstlog              = ${NO}`;
+  $('sA').textContent=`&cntrl\n  dt = ${ps},          ! ps\n  nstlim = ${N},   ! ${R.len} ns\n  ntwx = ${NO},       ! every ${R.out} ps\n  ntpr = ${NO}, ntwe = ${NO},\n/`;
+  $('sN').textContent=`timestep      ${plain(dt,6)}    ;# fs\nrun           ${N}  ;# ${R.len} ns\ndcdfreq       ${NO}\noutputEnergies ${NO}`;
+  save();
+}
+function bindTool(map,key,fn,drive){for(const[f,id]of map)$(id).addEventListener('input',e=>{const T=tl(key);T[f]=e.target.value;if(drive&&drive[f])T.drive=drive[f];fn()})}
+bindTool(Object.entries(BIDS),'box',box,{conc:'c',cu:'c',n:'n'});
+$('bShape').addEventListener('change',e=>{tl('box').shape=e.target.value;box()});$('bCu').addEventListener('change',e=>{tl('box').cu=e.target.value;box()});
+bindTool([['g','kG'],['d','kD'],['T','kT'],['dd','kDD']],'kd',kd,{g:'g',d:'k'});
+$('kGu').addEventListener('change',e=>{const K=tl('kd');K.gu=e.target.value;kd()});$('kDu').addEventListener('change',e=>{const K=tl('kd');K.du=e.target.value;kd()});
+bindTool([['dt','rDt'],['len','rLen'],['out','rOut'],['at','rAt'],['save','rSave'],['perf','rPerf']],'run',run);
+const TOOLFN={box,kd,run};
+
+function setCat(id){
+  S.cat=id;const c=cat();document.documentElement.style.setProperty('--acc',COL[c.id]);tabs();document.querySelectorAll('.readout .wm').forEach(w=>w.innerHTML=ico(c.id));document.querySelectorAll('.readout .pill').forEach(w=>w.innerHTML=`<span class="ic">${ico(c.id)}</span><span>${c.name.replace('Kd','K<sub>d</sub>')}</span>`);
+  document.querySelectorAll('.tool').forEach(t=>t.hidden=t.id!==c.tool);$('conv').hidden=!!c.tool;
+  if(c.tool)TOOLFN[c.id](true);else{fill();calc()}
+  save();if(location.hash.slice(1)!==id)history.replaceState(null,'','#'+id);
+}
+$('tabrows').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b)setCat(b.dataset.c)});
+$('tabrows').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;const i=CATS.findIndex(c=>c.id===S.cat),n=(i+(e.key==='ArrowRight'?1:-1)+CATS.length)%CATS.length;setCat(CATS[n].id);$('tab-'+CATS[n].id).focus()});
+$('val').addEventListener('input',e=>{st().v=e.target.value;calc()});
+$('from').addEventListener('change',e=>{st().from=e.target.value;calc()});
+$('to').addEventListener('change',e=>{st().to=e.target.value;calc()});
+$('swap').addEventListener('click',()=>{const p=st();[p.from,p.to]=[p.to,p.from];$('from').value=p.from;$('to').value=p.to;calc()});
+$('sig').addEventListener('click',e=>{const b=e.target.closest('[data-s]');if(b){S.sig=+b.dataset.s;calc()}});
+$('temp').addEventListener('input',e=>{const t=parse(e.target.value);if(t>0){S.T=t;calc()}});
+$('presets').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;const[,v,f,t]=cat().presets[+b.dataset.p],p=st();Object.assign(p,{v,from:f,to:t});fill();calc();
+  const big=$('big');big.classList.add('flash');setTimeout(()=>big.classList.remove('flash'),350)});
+async function cp(text,btn){const o=btn.textContent;try{await navigator.clipboard.writeText(text);btn.textContent='Copied'}catch(e){btn.textContent='Copy blocked'}setTimeout(()=>btn.textContent=o,1200)}
+$('copy').addEventListener('click',e=>{if(isFinite(last)){const T=cat().units.find(x=>x.id===st().to);cp(`${plain(last,S.sig)} ${txt(T.sym)}`,e.currentTarget)}});
+$('tbody').addEventListener('click',e=>{
+  const c=cat(),p=st(),b=e.target.closest('[data-cp]');
+  if(b){const v=parse(p.v),F=c.units.find(x=>x.id===p.from),U=c.units.find(x=>x.id===b.dataset.cp);if(isFinite(v))cp(plain(fromSI(U,toSI(F,v)),S.sig),b);return}
+  const r=e.target.closest('tr[data-u]');if(r){p.to=r.dataset.u;$('to').value=p.to;calc()}
+});
+document.querySelectorAll('[data-snip]').forEach(b=>b.addEventListener('click',()=>cp($(b.dataset.snip).textContent,b)));
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==S.cat&&CATS.some(c=>c.id===h))setCat(h)});
+setCat(S.cat);
+}
+</script>
+</body>
+</html>
